@@ -1,0 +1,68 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import SiteHeader from "../../components/SiteHeader.astro";
+import WebglGameFrame from "../../components/WebglGameFrame.astro";
+import { getGame, getGameAssetBase } from "../../data/games";
+
+const game = getGame("signal-garden");
+if (!game) throw new Error("Signal Garden is missing from the catalog");
+
+const assetBase = getGameAssetBase(game);
+const loaderFile = game.release?.loaderFile;
+---
+
+<BaseLayout title={`Play ${game.title}`} description={`Play ${game.title} at Setness Games.`}>
+  <SiteHeader compact />
+  <main class="play-page page-shell">
+    <div class="play-toolbar">
+      <a class="back-link" href="/signal-garden/">
+        ← Game page
+      </a>
+      <span class="play-label">{game.title}</span>
+      {assetBase && loaderFile ? (
+        <button class="text-button" type="button" data-fullscreen>
+          Fullscreen
+        </button>
+      ) : null}
+    </div>
+    {assetBase && loaderFile ? (
+      <WebglGameFrame
+        title={game.title}
+        version={game.release!.version}
+        assetBase={assetBase}
+        loaderFile={loaderFile}
+        dataFile={game.release!.dataFile}
+        frameworkFile={game.release!.frameworkFile}
+        wasmFile={game.release!.wasmFile}
+      />
+    ) : (
+      <section class="not-ready-panel">
+        <p class="eyebrow">Coming soon</p>
+        <h1>The garden is still growing.</h1>
+        <p>There isn’t a playable build here yet. Come back after the next release.</p>
+        <a class="button button-primary" href="/signal-garden/">
+          Return to Signal Garden
+        </a>
+      </section>
+    )}
+  </main>
+</BaseLayout>
+
+<script is:inline>
+  const button = document.querySelector("[data-fullscreen]");
+  const stage = document.querySelector("[data-game-stage]");
+
+  button?.addEventListener("click", async () => {
+    try {
+      if (!document.fullscreenElement) {
+        await stage?.requestFullscreen();
+        button.textContent = "Exit fullscreen";
+      } else {
+        await document.exitFullscreen();
+        button.textContent = "Fullscreen";
+      }
+    } catch {
+      button.textContent = "Fullscreen unavailable";
+    }
+  });
+</script>

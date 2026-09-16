@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">Signal Garden</title>
+  <desc id="desc">A quiet miniature garden with a glowing signal tower.</desc>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#132932" />
+      <stop offset="0.58" stop-color="#426b6e" />
+      <stop offset="1" stop-color="#d3a875" />
+    </linearGradient>
+    <linearGradient id="ground" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#47695d" />
+      <stop offset="1" stop-color="#183d3f" />
+    </linearGradient>
+    <radialGradient id="light" cx="50%" cy="22%" r="30%">
+      <stop offset="0" stop-color="#fff6c9" stop-opacity="0.9" />
+      <stop offset="1" stop-color="#fff6c9" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="760" fill="url(#sky)" />
+  <rect width="1200" height="760" fill="url(#light)" />
+  <path d="M0 492c180-82 326-54 478-8 170 52 306-24 450-30 96-4 183 16 272 62v244H0Z" fill="url(#ground)" />
+  <path d="M0 635c214-92 338-32 525-18 175 13 339-82 675-12v155H0Z" fill="#102f35" opacity="0.82" />
+  <path d="m596 528 17-298h66l17 298Z" fill="#173940" />
+  <path d="m613 230 34-74 34 74Z" fill="#dcae68" />
+  <path d="M625 278h44M623 332h48M620 390h55M617 447h61" stroke="#c6a56e" stroke-width="10" stroke-linecap="round" />
+  <circle cx="647" cy="147" r="24" fill="#f9e8a8" />
+  <circle cx="647" cy="147" r="56" fill="#ffedab" opacity="0.14" />
+  <path d="M240 570c76-93 135-86 203 0M795 573c64-86 122-92 188 0" fill="none" stroke="#88a87e" stroke-width="20" stroke-linecap="round" />
+  <path d="M256 561c-15-61 25-100 58-132M330 553c0-59 36-92 67-113M812 561c-7-66 29-96 64-124M887 560c6-52 45-88 77-104" fill="none" stroke="#b9c87e" stroke-width="12" stroke-linecap="round" />
+  <circle cx="311" cy="427" r="16" fill="#efd58e" />
+  <circle cx="398" cy="436" r="13" fill="#d9e2a1" />
+  <circle cx="875" cy="424" r="15" fill="#efd58e" />
+  <circle cx="958" cy="455" r="11" fill="#d9e2a1" />
+  <path d="M140 666c123-22 202-3 285 28M784 690c104-35 178-37 281-6" fill="none" stroke="#b9a272" stroke-width="7" stroke-linecap="round" opacity="0.66" />
+</svg>

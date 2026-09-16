@@ -1,0 +1,29 @@
+---
+import type { GameEntry } from "../data/games";
+
+interface Props {
+  game: GameEntry;
+}
+
+const { game } = Astro.props;
+const playable = game.status === "playable";
+---
+
+<article class:list={["game-card", { playable }]}>
+  <div class="game-card-art">
+    <img src={game.cardImage} alt="" loading="lazy" />
+    <span class="status-pill">{playable ? "Playable" : "Coming soon"}</span>
+  </div>
+  <div class="game-card-copy">
+    <p class="eyebrow">{game.eyebrow}</p>
+    <h3>{game.title}</h3>
+    <p>{game.description}</p>
+    {playable ? (
+      <a class="text-link" href={game.route}>
+        Open game <span aria-hidden="true">↗</span>
+      </a>
+    ) : (
+      <span class="muted-label">In the garden</span>
+    )}
+  </div>
+</article>

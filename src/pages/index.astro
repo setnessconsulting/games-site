@@ -1,0 +1,90 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import SiteHeader from "../components/SiteHeader.astro";
+import GameCard from "../components/GameCard.astro";
+import { games } from "../data/games";
+---
+
+<BaseLayout
+  title="Small worlds, made with care"
+  description="A growing collection of small games and interactive worlds from Setness Games."
+>
+  <SiteHeader />
+  <main>
+    <section class="hero-section page-shell">
+      <div class="hero-copy">
+        <p class="eyebrow">A personal arcade</p>
+        <h1>
+          Small worlds,
+          <br />
+          <em>made with care.</em>
+        </h1>
+        <p class="hero-description">
+          A quiet collection of games to explore together. Each one is a small experiment in
+          atmosphere, curiosity, and play.
+        </p>
+        <a class="button button-primary" href="#collection">
+          Explore the collection <span aria-hidden="true">↓</span>
+        </a>
+      </div>
+      <div class="hero-visual" aria-hidden="true">
+        <div class="hero-glow"></div>
+        <div class="hero-tower">
+          <div class="tower-light"></div>
+          <div class="tower-cap"></div>
+          <div class="tower-body">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <div class="tower-base"></div>
+        </div>
+        <div class="hero-hill hill-back"></div>
+        <div class="hero-hill hill-front"></div>
+        <span class="hero-spark spark-one"></span>
+        <span class="hero-spark spark-two"></span>
+        <span class="hero-spark spark-three"></span>
+      </div>
+    </section>
+
+    <section class="collection-section page-shell" id="collection">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">The collection</p>
+          <h2>Places worth lingering in.</h2>
+        </div>
+        <p>One site for every little world.</p>
+      </div>
+      <div class="game-grid">
+        {games.map((game) => (
+          <GameCard game={game} />
+        ))}
+      </div>
+    </section>
+
+    <section class="about-section page-shell" id="about">
+      <div class="about-card">
+        <p class="eyebrow">Made for the same screen</p>
+        <h2>Come back when you’re curious.</h2>
+        <p>
+          These games are made to be played at home, side by side, without accounts or clutter. Pick
+          a world, settle in, and see what it has to say.
+        </p>
+      </div>
+      <div class="about-note">
+        <span class="note-mark" aria-hidden="true">
+          ✦
+        </span>
+        <p>
+          New places will arrive slowly.
+          <br />
+          That’s part of the point.
+        </p>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer page-shell">
+    <span>Setness Games</span>
+    <span>Made for curious players</span>
+  </footer>
+</BaseLayout>

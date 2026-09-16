@@ -1,0 +1,54 @@
+---
+import type { GameEntry } from "../data/games";
+import { getGameAssetBase } from "../data/games";
+
+interface Props {
+  game: GameEntry;
+}
+
+const { game } = Astro.props;
+const assetBase = getGameAssetBase(game);
+const playable = game.status === "playable" && Boolean(assetBase);
+---
+
+<section class="launcher-panel" aria-labelledby="launcher-title">
+  <div class="launcher-art">
+    <img src={game.cardImage} alt="" />
+    <span class="signal-orbit orbit-one" aria-hidden="true"></span>
+    <span class="signal-orbit orbit-two" aria-hidden="true"></span>
+  </div>
+  <div class="launcher-copy">
+    <p class="eyebrow">{game.eyebrow}</p>
+    <h1 id="launcher-title">{game.title}</h1>
+    <p class="launcher-description">{game.description}</p>
+    <div class="launcher-actions">
+      {playable ? (
+        <a class="button button-primary" href="/signal-garden/play/">
+          Play Signal Garden <span aria-hidden="true">→</span>
+        </a>
+      ) : (
+        <span class="button button-disabled" aria-disabled="true">
+          The garden is growing
+        </span>
+      )}
+      <a class="button button-quiet" href="/#collection">
+        Back to collection
+      </a>
+    </div>
+    <div class="controls-block">
+      <p class="eyebrow">Controls</p>
+      {game.controls.length > 0 ? (
+        <ul class="control-list">
+          {game.controls.map((control) => (
+            <li>
+              <strong>{control.input}</strong>
+              <span>{control.action}</span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="muted-label">Controls will be shared when the game is ready.</p>
+      )}
+    </div>
+  </div>
+</section>

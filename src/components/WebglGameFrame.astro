@@ -1,0 +1,95 @@
+---
+interface Props {
+  title: string;
+  version: string;
+  assetBase: string;
+  loaderFile: string;
+  dataFile: string;
+  frameworkFile: string;
+  wasmFile: string;
+}
+
+const { title, version, assetBase, loaderFile, dataFile, frameworkFile, wasmFile } = Astro.props;
+---
+
+<div class="game-stage" data-game-stage data-asset-base={assetBase}>
+  <div class="game-stage-loading" data-game-loading>
+    <span class="loading-pulse" aria-hidden="true"></span>
+    <p data-game-progress>Preparing {title}…</p>
+  </div>
+  <div class="game-stage-error" data-game-error hidden>
+    <p class="eyebrow">The signal is quiet</p>
+    <h1>We couldn’t start this game.</h1>
+    <p>
+      Refresh the page and try again. If the problem continues, the latest build may still be
+      arriving.
+    </p>
+    <a class="button button-primary" href={`/signal-garden/`}>
+      Return to game page
+    </a>
+  </div>
+  <div class="game-canvas-wrap" data-game-canvas-wrap hidden>
+    <canvas data-game-canvas aria-label={`${title} game canvas`}></canvas>
+  </div>
+</div>
+
+<script
+  is:inline
+  define:vars={{ assetBase, version, loaderFile, dataFile, frameworkFile, wasmFile }}
+>
+  const stage = document.querySelector("[data-game-stage]");
+  const loading = document.querySelector("[data-game-loading]");
+  const progress = document.querySelector("[data-game-progress]");
+  const error = document.querySelector("[data-game-error]");
+  const canvasWrap = document.querySelector("[data-game-canvas-wrap]");
+  const canvas = document.querySelector("[data-game-canvas]");
+
+  const showError = () => {
+    loading?.setAttribute("hidden", "true");
+    canvasWrap?.setAttribute("hidden", "true");
+    error?.removeAttribute("hidden");
+  };
+
+  const loaderUrl = `${assetBase}/Build/${loaderFile}`;
+
+  if (!loaderUrl || !stage || !loading || !progress || !error || !canvasWrap || !canvas) {
+    showError();
+  } else {
+    const loader = document.createElement("script");
+    loader.src = loaderUrl;
+    loader.async = true;
+    loader.addEventListener("load", async () => {
+      if (typeof window.createUnityInstance !== "function") {
+        showError();
+        return;
+      }
+
+      canvasWrap.removeAttribute("hidden");
+      progress.textContent = "Bringing the garden to life…";
+      try {
+        await window.createUnityInstance(
+          canvas,
+          {
+            dataUrl: `${assetBase}/Build/${dataFile}`,
+            frameworkUrl: `${assetBase}/Build/${frameworkFile}`,
+            codeUrl: `${assetBase}/Build/${wasmFile}`,
+            streamingAssetsUrl: `${assetBase}/StreamingAssets`,
+            companyName: "Setness Consulting",
+            productName: "Signal Garden",
+            productVersion: version,
+            matchWebGLToCanvasSize: true,
+            devicePixelRatio: window.devicePixelRatio
+          },
+          (value) => {
+            progress.textContent = `Loading the garden… ${Math.round(value * 100)}%`;
+          }
+        );
+        loading.setAttribute("hidden", "true");
+      } catch {
+        showError();
+      }
+    });
+    loader.addEventListener("error", showError);
+    document.head.appendChild(loader);
+  }
+</script>

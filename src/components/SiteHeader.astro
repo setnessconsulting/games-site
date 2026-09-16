@@ -1,0 +1,20 @@
+---
+interface Props {
+  compact?: boolean;
+}
+
+const { compact = false } = Astro.props;
+---
+
+<header class:list={["site-header", { compact }]}>
+  <a class="brand" href="/" aria-label="Setness Games home">
+    <span class="brand-mark" aria-hidden="true">
+      <span></span>
+    </span>
+    <span>Setness Games</span>
+  </a>
+  <nav aria-label="Primary navigation">
+    <a href="/#collection">Collection</a>
+    <a href="/#about">About</a>
+  </nav>
+</header>

@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.astro/
+.wrangler/
+coverage/
+
+.env
+.env.*
+!.env.example
+.dev.vars
+
+# Generated Cloudflare and test output
+functions/types.d.ts
+test-results/

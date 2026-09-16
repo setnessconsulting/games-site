@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">A new game is growing</title>
+  <desc id="desc">Abstract shapes hint at another small world to come.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1b2f35" />
+      <stop offset="1" stop-color="#334d4c" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="760" fill="url(#bg)" />
+  <circle cx="210" cy="170" r="120" fill="#dcae68" opacity="0.14" />
+  <circle cx="990" cy="580" r="240" fill="#9cb17e" opacity="0.12" />
+  <path d="M140 592c184-120 334-12 484-76 135-57 244-54 436 50v194H140Z" fill="#173d40" opacity="0.8" />
+  <path d="M372 508 600 268l228 240" fill="none" stroke="#d7bd84" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" opacity="0.7" />
+  <circle cx="600" cy="268" r="25" fill="#f1dfad" opacity="0.9" />
+  <path d="M600 330v188M512 424h176" stroke="#d7bd84" stroke-width="12" stroke-linecap="round" opacity="0.6" />
+</svg>
