@@ -8,7 +8,7 @@ repository.
 Configure:
 
 - Production branch: `main`
-- Build command: `npm ci && npm run build`
+- Build command: `npm run build`
 - Output directory: `dist`
 - Node version: `24` from `.node-version`
 - Custom domain: `games.setnessconsulting.com`
