@@ -28,6 +28,8 @@ describe("game asset contract", () => {
     expect(isApprovedRelease("test-fixture", "0.0.0", false)).toBe(false);
     expect(isApprovedRelease("test-fixture", "0.0.0", true)).toBe(true);
     expect(isApprovedRelease("signal-garden", "0.0.1", true)).toBe(false);
+    expect(isApprovedRelease("bridge-builder", "0.1.0", false)).toBe(false);
+    expect(isApprovedRelease("bridge-builder", "0.1.0", false, "0.1.0")).toBe(true);
   });
 
   it("provides safe content type fallbacks", () => {

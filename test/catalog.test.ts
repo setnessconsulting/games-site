@@ -9,7 +9,22 @@ describe("game catalog", () => {
   });
 
   it("keeps future games non-playable", () => {
-    expect(games.filter((game) => game.status === "coming-soon")).toHaveLength(3);
+    expect(games.filter((game) => game.status === "coming-soon")).toHaveLength(4);
     expect(games.every((game) => game.status === "coming-soon" && !game.release)).toBe(true);
+    expect(games.find((game) => game.slug === "bridge-builder")?.route).toBe("/bridge-builder/");
+  });
+
+  it("accepts the static release shape without making it playable", () => {
+    const candidate = {
+      ...games.find((game) => game.slug === "bridge-builder")!,
+      status: "playable" as const,
+      release: {
+        kind: "static" as const,
+        version: "0.1.0",
+        entryFile: "index.html",
+        manifestFile: "release-manifest.json"
+      }
+    };
+    expect(validateCatalog([candidate])).toEqual([]);
   });
 });

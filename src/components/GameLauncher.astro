@@ -23,12 +23,12 @@ const playable = game.status === "playable" && Boolean(assetBase);
     <p class="launcher-description">{game.description}</p>
     <div class="launcher-actions">
       {playable ? (
-        <a class="button button-primary" href="/signal-garden/play/">
-          Play Signal Garden <span aria-hidden="true">→</span>
+        <a class="button button-primary" href={`${game.route}play/`}>
+          Play {game.title} <span aria-hidden="true">→</span>
         </a>
       ) : (
         <span class="button button-disabled" aria-disabled="true">
-          The garden is growing
+          Qualification in progress
         </span>
       )}
       <a class="button button-quiet" href="/#collection">

@@ -8,7 +8,7 @@ const game = getGame("signal-garden");
 if (!game) throw new Error("Signal Garden is missing from the catalog");
 
 const assetBase = getGameAssetBase(game);
-const loaderFile = game.release?.loaderFile;
+const release = game.release?.kind === "unity" ? game.release : undefined;
 ---
 
 <BaseLayout title={`Play ${game.title}`} description={`Play ${game.title} at Setness Games.`}>
@@ -19,21 +19,21 @@ const loaderFile = game.release?.loaderFile;
         ← Game page
       </a>
       <span class="play-label">{game.title}</span>
-      {assetBase && loaderFile ? (
+      {assetBase && release ? (
         <button class="text-button" type="button" data-fullscreen>
           Fullscreen
         </button>
       ) : null}
     </div>
-    {assetBase && loaderFile ? (
+    {assetBase && release ? (
       <WebglGameFrame
         title={game.title}
-        version={game.release!.version}
+        version={release.version}
         assetBase={assetBase}
-        loaderFile={loaderFile}
-        dataFile={game.release!.dataFile}
-        frameworkFile={game.release!.frameworkFile}
-        wasmFile={game.release!.wasmFile}
+        loaderFile={release.loaderFile}
+        dataFile={release.dataFile}
+        frameworkFile={release.frameworkFile}
+        wasmFile={release.wasmFile}
       />
     ) : (
       <section class="not-ready-panel">

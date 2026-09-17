@@ -8,6 +8,7 @@ import {
 
 interface GameAssetsEnv extends Env {
   GAME_ASSETS_ENABLE_FIXTURE?: string;
+  BRIDGE_BUILDER_PREVIEW_VERSION?: string;
 }
 
 export const onRequest: PagesFunction<GameAssetsEnv> = async (context) => {
@@ -23,7 +24,7 @@ export const onRequest: PagesFunction<GameAssetsEnv> = async (context) => {
   if (!parsed) return new Response(null, { status: 404 });
 
   const allowFixture = context.env.GAME_ASSETS_ENABLE_FIXTURE === "true";
-  if (!isApprovedRelease(parsed.slug, parsed.version, allowFixture)) {
+  if (!isApprovedRelease(parsed.slug, parsed.version, allowFixture, context.env.BRIDGE_BUILDER_PREVIEW_VERSION)) {
     return new Response(null, { status: 404 });
   }
 

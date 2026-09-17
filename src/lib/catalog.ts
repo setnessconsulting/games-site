@@ -1,6 +1,11 @@
 import type { GameEntry } from "../data/games";
 
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const RELEASE_FILE_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._/-]*$/;
+
+function validReleaseFile(value: string): boolean {
+  return RELEASE_FILE_PATTERN.test(value) && !value.split("/").some((part) => part === "..") && !value.startsWith("/");
+}
 
 export function validateCatalog(entries: readonly GameEntry[]): string[] {
   const errors: string[] = [];
@@ -28,6 +33,18 @@ export function validateCatalog(entries: readonly GameEntry[]): string[] {
 
     if (game.status === "playable" && !game.release?.version) {
       errors.push(`${game.slug}: playable games require a release version`);
+    }
+
+    if (game.status === "playable" && game.release) {
+      if (!game.release.kind) errors.push(`${game.slug}: release kind is required`);
+      if (game.release.kind === "static") {
+        if (!validReleaseFile(game.release.entryFile)) {
+          errors.push(`${game.slug}: static release entryFile must be a safe relative path`);
+        }
+        if (!validReleaseFile(game.release.manifestFile)) {
+          errors.push(`${game.slug}: static release manifestFile must be a safe relative path`);
+        }
+      }
     }
 
     if (game.status === "coming-soon" && game.release) {

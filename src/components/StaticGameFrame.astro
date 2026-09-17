@@ -1,0 +1,57 @@
+---
+interface Props {
+  title: string;
+  entryUrl: string;
+  gamePageUrl: string;
+}
+
+const { title, entryUrl, gamePageUrl } = Astro.props;
+---
+
+<div class="static-game-stage" data-static-game-stage>
+  <div class="static-game-loading" data-static-game-loading>
+    <span class="loading-pulse" aria-hidden="true"></span>
+    <p>Loading {title}…</p>
+  </div>
+  <div class="static-game-error" data-static-game-error hidden>
+    <p class="eyebrow">The bridge is unavailable</p>
+    <h1>We couldn’t start this game.</h1>
+    <p>Refresh the page and try again. The release remains versioned and can be rolled back safely.</p>
+    <a class="button button-primary" href={gamePageUrl}>Return to {title}</a>
+  </div>
+  <iframe
+    class="static-game-frame"
+    data-static-game-frame
+    title={`${title} game`}
+    src={entryUrl}
+    loading="eager"
+    allow="fullscreen"
+    allowfullscreen
+    referrerpolicy="same-origin"
+  ></iframe>
+</div>
+
+<script is:inline define:vars={{ title }}>
+  const stage = document.querySelector("[data-static-game-stage]");
+  const loading = stage?.querySelector("[data-static-game-loading]");
+  const error = stage?.querySelector("[data-static-game-error]");
+  const frame = stage?.querySelector("[data-static-game-frame]");
+
+  const showError = () => {
+    loading?.setAttribute("hidden", "true");
+    frame?.setAttribute("hidden", "true");
+    error?.removeAttribute("hidden");
+  };
+
+  if (!stage || !loading || !error || !frame) {
+    showError();
+  } else {
+    frame.addEventListener("load", () => {
+      loading.setAttribute("hidden", "true");
+    });
+    frame.addEventListener("error", showError);
+    window.setTimeout(() => {
+      if (!frame.contentDocument && !frame.hasAttribute("hidden")) showError();
+    }, 12_000);
+  }
+</script>

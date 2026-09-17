@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">Bridge Builder</title>
+  <desc id="desc">A calm geometric bridge over a blue-green valley, with labeled planks ready to be placed.</desc>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#162e43" />
+      <stop offset="0.64" stop-color="#5b91a1" />
+      <stop offset="1" stop-color="#e5bd78" />
+    </linearGradient>
+    <linearGradient id="ground" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2d5f68" />
+      <stop offset="1" stop-color="#153b4b" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="760" fill="url(#sky)" />
+  <circle cx="920" cy="150" r="120" fill="#ffe7a7" opacity=".3" />
+  <path d="M0 510c180-80 312-22 470-52 176-34 298-8 448 26 98 23 180 22 282-17v293H0Z" fill="url(#ground)" />
+  <path d="M0 645c156-59 297-48 440-16 160 36 321-41 458-23 114 16 205 49 302 40v114H0Z" fill="#123542" opacity=".8" />
+  <path d="M146 486h268v164H146Z" fill="#1f4755" />
+  <path d="M786 486h268v164H786Z" fill="#1f4755" />
+  <path d="M156 496h250M796 496h250" stroke="#d6b878" stroke-width="14" stroke-linecap="round" />
+  <path d="M206 483 300 393l94 90M846 483l94-90 94 90" fill="none" stroke="#d6b878" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M414 495h370" stroke="#f6dfad" stroke-width="14" stroke-dasharray="24 18" stroke-linecap="round" opacity=".9" />
+  <rect x="466" y="564" width="92" height="32" rx="8" fill="#4d76d6" transform="rotate(-8 512 580)" />
+  <rect x="590" y="558" width="126" height="32" rx="8" fill="#8f55d8" transform="rotate(7 653 574)" />
+  <circle cx="300" cy="328" r="18" fill="#ffe8ae" />
+  <path d="M300 358v78M274 389h52" stroke="#d6b878" stroke-width="11" stroke-linecap="round" />
+</svg>

@@ -23,6 +23,8 @@ The site is designed to run at the root of `games.setnessconsulting.com`:
 - `/` — arcade collection
 - `/signal-garden/` — Signal Garden launcher
 - `/signal-garden/play/` — game view
+- `/bridge-builder/` — Bridge Builder qualification launcher
+- `/bridge-builder/play/` — approved static-build play view when promoted
 - `/game-assets/...` — approved versioned build assets from R2
 
 ## Repository boundaries
@@ -32,3 +34,8 @@ contract. Individual game repositories own their game source and build pipeline.
 
 See [the architecture](docs/architecture.md), [deployment checklist](docs/deployment.md), and
 [game release contract](docs/game-release-contract.md) before publishing the first playable build.
+
+Bridge Builder is developed and tested in the standalone
+[`game-bridge-builder`](https://github.com/setnessconsulting/game-bridge-builder) repository. Its
+production catalog entry stays `coming-soon` until the hosted qualification and named approval gates
+are complete. LevelBest is a separate post-approval promotion.

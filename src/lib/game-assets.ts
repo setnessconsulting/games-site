@@ -35,8 +35,15 @@ export function parseAssetPath(value: unknown): ParsedAssetPath | undefined {
   return { slug, version, assetPath: assetSegments.join("/") };
 }
 
-export function isApprovedRelease(slug: string, version: string, allowFixture: boolean): boolean {
+export function isApprovedRelease(
+  slug: string,
+  version: string,
+  allowFixture: boolean,
+  previewVersion?: string
+): boolean {
   if (allowFixture && slug === "test-fixture" && version === "0.0.0") return true;
+
+  if (slug === "bridge-builder" && previewVersion && version === previewVersion) return true;
 
   return games.some(
     (game) => game.slug === slug && game.status === "playable" && game.release?.version === version

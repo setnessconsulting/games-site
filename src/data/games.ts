@@ -5,13 +5,31 @@ export interface GameControl {
   action: string;
 }
 
-export interface GameRelease {
+export interface UnityGameRelease {
+  kind: "unity";
   version: string;
   loaderFile: string;
   dataFile: string;
   frameworkFile: string;
   wasmFile: string;
 }
+
+export interface StaticGameRelease {
+  kind: "static";
+  version: string;
+  entryFile: string;
+  manifestFile: string;
+}
+
+export type GameRelease = UnityGameRelease | StaticGameRelease;
+
+// Pages preview builds may set this environment value to exercise a pinned
+// candidate in R2. Production `main` leaves it unset, so Bridge Builder stays
+// coming-soon until the independent approval gate is complete.
+const runtimeProcess = (globalThis as typeof globalThis & {
+  process?: { env?: Record<string, string | undefined> };
+}).process;
+const bridgeBuilderPreviewVersion = runtimeProcess?.env?.BRIDGE_BUILDER_PREVIEW_VERSION;
 
 export interface GameEntry {
   slug: string;
@@ -40,6 +58,31 @@ export const games: readonly GameEntry[] = [
       { input: "WASD", action: "Move" },
       { input: "Esc", action: "Pause or leave" }
     ]
+  },
+  {
+    slug: "bridge-builder",
+    title: "Bridge Builder",
+    status: bridgeBuilderPreviewVersion ? "playable" : "coming-soon",
+    eyebrow: "A thoughtful construction game",
+    description:
+      "Compose labeled planks so a bridge closes exactly. The candidate build is being tested before it joins the playable collection.",
+    cardImage: "/art/bridge-builder-card.svg",
+    route: "/bridge-builder/",
+    controls: [
+      { input: "Pointer or touch", action: "Select and place a plank" },
+      { input: "Keyboard", action: "Move, place, undo, and check" },
+      { input: "Reduce motion", action: "Use the calm presentation mode" }
+    ],
+    ...(bridgeBuilderPreviewVersion
+      ? {
+          release: {
+            kind: "static" as const,
+            version: bridgeBuilderPreviewVersion,
+            entryFile: "index.html",
+            manifestFile: "release-manifest.json"
+          }
+        }
+      : {})
   },
   {
     slug: "new-world-01",

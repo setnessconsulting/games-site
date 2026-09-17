@@ -1,0 +1,55 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import SiteHeader from "../../components/SiteHeader.astro";
+import StaticGameFrame from "../../components/StaticGameFrame.astro";
+import { getGame, getGameAssetBase } from "../../data/games";
+
+const game = getGame("bridge-builder");
+if (!game) throw new Error("Bridge Builder is missing from the catalog");
+
+const assetBase = getGameAssetBase(game);
+const release = game.release?.kind === "static" ? game.release : undefined;
+const entryUrl = assetBase && release ? `${assetBase}/${release.entryFile}` : undefined;
+---
+
+<BaseLayout title={`Play ${game.title}`} description={`Play ${game.title} at Setness Games.`}>
+  <SiteHeader compact />
+  <main class="play-page page-shell">
+    <div class="play-toolbar">
+      <a class="back-link" href="/bridge-builder/">← Game page</a>
+      <span class="play-label">{game.title}</span>
+      {entryUrl ? (
+        <button class="text-button" type="button" data-fullscreen>Fullscreen</button>
+      ) : null}
+    </div>
+    {entryUrl ? (
+      <StaticGameFrame title={game.title} entryUrl={entryUrl} gamePageUrl="/bridge-builder/" />
+    ) : (
+      <section class="not-ready-panel">
+        <p class="eyebrow">Qualification in progress</p>
+        <h1>The bridge is still being tested.</h1>
+        <p>There isn’t an approved hosted build here yet. Promotion stays separate from LevelBest.</p>
+        <a class="button button-primary" href="/bridge-builder/">Return to Bridge Builder</a>
+      </section>
+    )}
+  </main>
+</BaseLayout>
+
+<script is:inline>
+  const button = document.querySelector("[data-fullscreen]");
+  const stage = document.querySelector("[data-static-game-stage]");
+
+  button?.addEventListener("click", async () => {
+    try {
+      if (!document.fullscreenElement) {
+        await stage?.requestFullscreen();
+        button.textContent = "Exit fullscreen";
+      } else {
+        await document.exitFullscreen();
+        button.textContent = "Fullscreen";
+      }
+    } catch {
+      button.textContent = "Fullscreen unavailable";
+    }
+  });
+</script>
