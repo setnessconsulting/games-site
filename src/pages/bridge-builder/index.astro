@@ -11,11 +11,13 @@ if (!game) throw new Error("Bridge Builder is missing from the catalog");
 <BaseLayout title={game.title} description={game.description}>
   <SiteHeader compact />
   <main class="page-shell launcher-page">
-    <a class="back-link" href="/">← Collection</a>
+    <a class="back-link" href="/">
+      ← Collection
+    </a>
     <GameLauncher game={game} />
     <p class="qualification-note">
-      The standalone candidate is built in <code>game-bridge-builder</code> and will only be promoted
-      here after hosted testing and the named approval gates pass.
+      The standalone candidate is built in <code>game-bridge-builder</code> and will only be
+      promoted here after hosted testing and the named approval gates pass.
     </p>
   </main>
 </BaseLayout>

@@ -26,9 +26,11 @@ export type GameRelease = UnityGameRelease | StaticGameRelease;
 // Pages preview builds may set this environment value to exercise a pinned
 // candidate in R2. Production `main` leaves it unset, so Bridge Builder stays
 // coming-soon until the independent approval gate is complete.
-const runtimeProcess = (globalThis as typeof globalThis & {
-  process?: { env?: Record<string, string | undefined> };
-}).process;
+const runtimeProcess = (
+  globalThis as typeof globalThis & {
+    process?: { env?: Record<string, string | undefined> };
+  }
+).process;
 const bridgeBuilderPreviewVersion = runtimeProcess?.env?.BRIDGE_BUILDER_PREVIEW_VERSION;
 
 export interface GameEntry {

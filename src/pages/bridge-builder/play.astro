@@ -16,10 +16,14 @@ const entryUrl = assetBase && release ? `${assetBase}/${release.entryFile}` : un
   <SiteHeader compact />
   <main class="play-page page-shell">
     <div class="play-toolbar">
-      <a class="back-link" href="/bridge-builder/">← Game page</a>
+      <a class="back-link" href="/bridge-builder/">
+        ← Game page
+      </a>
       <span class="play-label">{game.title}</span>
       {entryUrl ? (
-        <button class="text-button" type="button" data-fullscreen>Fullscreen</button>
+        <button class="text-button" type="button" data-fullscreen>
+          Fullscreen
+        </button>
       ) : null}
     </div>
     {entryUrl ? (
@@ -28,8 +32,12 @@ const entryUrl = assetBase && release ? `${assetBase}/${release.entryFile}` : un
       <section class="not-ready-panel">
         <p class="eyebrow">Qualification in progress</p>
         <h1>The bridge is still being tested.</h1>
-        <p>There isn’t an approved hosted build here yet. Promotion stays separate from LevelBest.</p>
-        <a class="button button-primary" href="/bridge-builder/">Return to Bridge Builder</a>
+        <p>
+          There isn’t an approved hosted build here yet. Promotion stays separate from LevelBest.
+        </p>
+        <a class="button button-primary" href="/bridge-builder/">
+          Return to Bridge Builder
+        </a>
       </section>
     )}
   </main>

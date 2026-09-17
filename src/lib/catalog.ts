@@ -4,7 +4,11 @@ const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const RELEASE_FILE_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._/-]*$/;
 
 function validReleaseFile(value: string): boolean {
-  return RELEASE_FILE_PATTERN.test(value) && !value.split("/").some((part) => part === "..") && !value.startsWith("/");
+  return (
+    RELEASE_FILE_PATTERN.test(value) &&
+    !value.split("/").some((part) => part === "..") &&
+    !value.startsWith("/")
+  );
 }
 
 export function validateCatalog(entries: readonly GameEntry[]): string[] {
