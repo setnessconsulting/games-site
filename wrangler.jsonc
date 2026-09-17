@@ -8,5 +8,18 @@
       "binding": "GAME_ASSETS",
       "bucket_name": "setnessconsulting-games"
     }
-  ]
+  ],
+  "env": {
+    "preview": {
+      "r2_buckets": [
+        {
+          "binding": "GAME_ASSETS",
+          "bucket_name": "setnessconsulting-games"
+        }
+      ],
+      "vars": {
+        "BRIDGE_BUILDER_PREVIEW_VERSION": "0.1.0-qualification.1"
+      }
+    }
+  }
 }
