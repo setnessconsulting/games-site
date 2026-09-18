@@ -10,24 +10,11 @@ interface Props {
   returnRoute: string;
 }
 
-const {
-  title,
-  version,
-  assetBase,
-  loaderFile,
-  dataFile,
-  frameworkFile,
-  wasmFile,
-  returnRoute
-} = Astro.props;
+const { title, version, assetBase, loaderFile, dataFile, frameworkFile, wasmFile, returnRoute } =
+  Astro.props;
 ---
 
-<div
-  class="game-stage"
-  data-game-stage
-  data-release-kind="unity-webgl"
-  data-asset-base={assetBase}
->
+<div class="game-stage" data-game-stage data-release-kind="unity-webgl" data-asset-base={assetBase}>
   <div class="game-stage-loading" data-game-loading>
     <span class="loading-pulse" aria-hidden="true"></span>
     <p data-game-progress>Preparing {title}…</p>
