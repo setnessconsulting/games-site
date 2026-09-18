@@ -18,7 +18,7 @@
         }
       ],
       "vars": {
-        "BRIDGE_BUILDER_PREVIEW_VERSION": "0.1.0-qualification.2"
+        "BRIDGE_BUILDER_PREVIEW_VERSION": "0.1.0-qualification.3"
       }
     }
   }
