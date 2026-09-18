@@ -9,10 +9,7 @@ function isSafeRelativeAssetPath(path: string): boolean {
   const segments = path.split("/");
   return segments.every(
     (segment) =>
-      segment.length > 0 &&
-      segment !== "." &&
-      segment !== ".." &&
-      SAFE_ASSET_SEGMENT.test(segment)
+      segment.length > 0 && segment !== "." && segment !== ".." && SAFE_ASSET_SEGMENT.test(segment)
   );
 }
 
@@ -55,9 +52,7 @@ export function validateCatalog(entries: readonly GameEntry[]): string[] {
 
   for (const game of entries) {
     if (!SLUG_PATTERN.test(game.slug)) {
-      errors.push(
-        `${game.slug}: slug must contain lowercase letters, numbers, and hyphens only`
-      );
+      errors.push(`${game.slug}: slug must contain lowercase letters, numbers, and hyphens only`);
     }
 
     if (slugs.has(game.slug)) {
