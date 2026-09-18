@@ -32,6 +32,20 @@ describe("game asset contract", () => {
     expect(isApprovedRelease("bridge-builder", "0.1.0", false, "0.1.0")).toBe(true);
   });
 
+  it("approves only the exact Number Line Jumper preview slug and version", () => {
+    const previewVersion = "pr8-c7428853083f";
+
+    expect(
+      isApprovedRelease("number-line-jumper", previewVersion, false, undefined, previewVersion)
+    ).toBe(true);
+    expect(
+      isApprovedRelease("number-line-jumper", "other-version", false, undefined, previewVersion)
+    ).toBe(false);
+    expect(
+      isApprovedRelease("bridge-builder", previewVersion, false, undefined, previewVersion)
+    ).toBe(false);
+  });
+
   it("provides safe content type fallbacks", () => {
     expect(fallbackContentType("Build/game.wasm")).toBe("application/wasm");
     expect(fallbackContentType("Build/game.loader.js")).toContain("text/javascript");

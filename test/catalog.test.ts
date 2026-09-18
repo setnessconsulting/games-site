@@ -1,9 +1,14 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { GameEntry } from "../src/data/games";
 import { games, getGamePlayRoute } from "../src/data/games";
 import { validateCatalog } from "../src/lib/catalog";
 
 describe("game catalog", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.resetModules();
+  });
+
   it("contains a valid, unique catalog", () => {
     expect(validateCatalog(games)).toEqual([]);
     expect(new Set(games.map((game) => game.slug)).size).toBe(games.length);
@@ -37,6 +42,30 @@ describe("game catalog", () => {
     const game = games.find((entry) => entry.slug === "number-line-jumper");
     expect(game).toBeDefined();
     expect(getGamePlayRoute(game!)).toBe("/number-line-jumper/play/");
+  });
+
+  it("keeps Number Line Jumper coming-soon when its preview pointer is unset", async () => {
+    vi.stubEnv("NUMBER_LINE_JUMPER_PREVIEW_VERSION", "");
+    vi.resetModules();
+    const { games: catalog } = await import("../src/data/games");
+    const game = catalog.find((entry) => entry.slug === "number-line-jumper");
+
+    expect(game?.status).toBe("coming-soon");
+    expect(game?.release).toBeUndefined();
+  });
+
+  it("selects the exact Number Line Jumper version when its preview pointer is set", async () => {
+    vi.stubEnv("NUMBER_LINE_JUMPER_PREVIEW_VERSION", "pr8-c7428853083f");
+    vi.resetModules();
+    const { games: catalog } = await import("../src/data/games");
+    const game = catalog.find((entry) => entry.slug === "number-line-jumper");
+
+    expect(game?.status).toBe("playable");
+    expect(game?.release).toEqual({
+      kind: "static-web",
+      version: "pr8-c7428853083f",
+      entryFile: "index.html"
+    });
   });
 
   it("accepts both release kinds when promoted", () => {

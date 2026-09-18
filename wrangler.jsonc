@@ -18,7 +18,8 @@
         }
       ],
       "vars": {
-        "BRIDGE_BUILDER_PREVIEW_VERSION": "0.1.0-qualification.4"
+        "BRIDGE_BUILDER_PREVIEW_VERSION": "0.1.0-qualification.4",
+        "NUMBER_LINE_JUMPER_PREVIEW_VERSION": "pr8-c7428853083f"
       }
     }
   }

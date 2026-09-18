@@ -28,7 +28,8 @@ export const onRequest: PagesFunction<GameAssetsEnv> = async (context) => {
       parsed.slug,
       parsed.version,
       allowFixture,
-      context.env.BRIDGE_BUILDER_PREVIEW_VERSION
+      context.env.BRIDGE_BUILDER_PREVIEW_VERSION,
+      context.env.NUMBER_LINE_JUMPER_PREVIEW_VERSION
     )
   ) {
     return new Response(null, { status: 404 });

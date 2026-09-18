@@ -33,3 +33,11 @@ Bridge Builder catalog entry stays `coming-soon` during standalone qualification
 may be enabled only on a preview branch. LevelBest remains unchanged until the complete evidence and
 owner-approval gate passes. Later LevelBest integration consumes the exact pinned release artifact
 and does not copy game source.
+
+## Number Line Jumper boundary
+
+`game-number-line-jumper` owns the standalone source, tests, production build, release evidence,
+and immutable `number-line-jumper/<version>/` R2 artifact. The site may expose an exact candidate in
+Pages Preview only when `NUMBER_LINE_JUMPER_PREVIEW_VERSION` is set for both the build and the
+Function. Production leaves that pointer unset, and no LevelBest integration or promotion is part
+of preview qualification.

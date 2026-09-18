@@ -113,5 +113,11 @@ manifest. This repository owns the `number-line-jumper` card, launcher, play rou
 version, promotion, and rollback. The catalog entry intentionally remains `coming-soon` until the
 Number Line Jumper qualification stories produce a validated candidate.
 
+During hosted qualification, `NUMBER_LINE_JUMPER_PREVIEW_VERSION` is a preview-only exact-version
+pointer. When unset, the catalog remains `coming-soon` and the Function denies Number Line Jumper
+asset reads. When set, the catalog selects only that version as `static-web` with `index.html`, and
+the Function allows only the matching `number-line-jumper/<version>/` prefix. Production must leave
+the pointer unset.
+
 LevelBest promotion is a separate, later release action that consumes the exact approved artifact;
 it is not part of games-site qualification.
