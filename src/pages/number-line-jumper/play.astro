@@ -8,9 +8,7 @@ const game = getGame("number-line-jumper");
 if (!game) throw new Error("Number Line Jumper is missing from the catalog");
 
 const release =
-  game.status === "playable" && game.release?.kind === "static-web"
-    ? game.release
-    : undefined;
+  game.status === "playable" && game.release?.kind === "static-web" ? game.release : undefined;
 const assetBase = release ? getGameAssetBase(game) : undefined;
 ---
 
