@@ -1,0 +1,27 @@
+---
+interface Props {
+  title: string;
+  assetBase: string;
+  entryFile: string;
+}
+
+const { title, assetBase, entryFile } = Astro.props;
+const entryUrl = `${assetBase}/${entryFile}`;
+---
+
+<div
+  class="game-stage static-game-stage"
+  data-game-stage
+  data-release-kind="static-web"
+  data-asset-base={assetBase}
+>
+  <iframe
+    class="static-game-frame"
+    src={entryUrl}
+    title={`${title} game`}
+    loading="eager"
+    referrerpolicy="strict-origin-when-cross-origin"
+    allow="autoplay; fullscreen"
+    allowfullscreen
+  ></iframe>
+</div>

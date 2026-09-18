@@ -1,14 +1,14 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import SiteHeader from "../../components/SiteHeader.astro";
-import WebglGameFrame from "../../components/WebglGameFrame.astro";
+import StaticWebGameFrame from "../../components/StaticWebGameFrame.astro";
 import { getGame, getGameAssetBase } from "../../data/games";
 
-const game = getGame("signal-garden");
-if (!game) throw new Error("Signal Garden is missing from the catalog");
+const game = getGame("number-line-jumper");
+if (!game) throw new Error("Number Line Jumper is missing from the catalog");
 
 const release =
-  game.status === "playable" && game.release?.kind === "unity-webgl" ? game.release : undefined;
+  game.status === "playable" && game.release?.kind === "static-web" ? game.release : undefined;
 const assetBase = release ? getGameAssetBase(game) : undefined;
 ---
 
@@ -27,21 +27,16 @@ const assetBase = release ? getGameAssetBase(game) : undefined;
       ) : null}
     </div>
     {assetBase && release ? (
-      <WebglGameFrame
+      <StaticWebGameFrame
         title={game.title}
-        version={release.version}
         assetBase={assetBase}
-        loaderFile={release.loaderFile}
-        dataFile={release.dataFile}
-        frameworkFile={release.frameworkFile}
-        wasmFile={release.wasmFile}
-        returnRoute={game.route}
+        entryFile={release.entryFile}
       />
     ) : (
       <section class="not-ready-panel">
         <p class="eyebrow">Coming soon</p>
-        <h1>The garden is still growing.</h1>
-        <p>There isn’t a playable build here yet. Come back after the next release.</p>
+        <h1>Number Line Jumper is not published yet.</h1>
+        <p>The arcade route is ready, but no validated production release has been promoted.</p>
         <a class="button button-primary" href={game.route}>
           Return to {game.title}
         </a>
