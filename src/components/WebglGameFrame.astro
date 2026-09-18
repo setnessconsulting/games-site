@@ -22,7 +22,12 @@ const {
 } = Astro.props;
 ---
 
-<div class="game-stage" data-game-stage data-release-kind="unity-webgl" data-asset-base={assetBase}>
+<div
+  class="game-stage"
+  data-game-stage
+  data-release-kind="unity-webgl"
+  data-asset-base={assetBase}
+>
   <div class="game-stage-loading" data-game-loading>
     <span class="loading-pulse" aria-hidden="true"></span>
     <p data-game-progress>Preparing {title}…</p>
@@ -30,7 +35,9 @@ const {
   <div class="game-stage-error" data-game-error hidden>
     <p class="eyebrow">Game unavailable</p>
     <h1>We couldn’t start this game.</h1>
-    <p>Refresh the page and try again. If the problem continues, this release may be unavailable.</p>
+    <p>
+      Refresh the page and try again. If the problem continues, this release may be unavailable.
+    </p>
     <a class="button button-primary" href={returnRoute}>
       Return to game page
     </a>
