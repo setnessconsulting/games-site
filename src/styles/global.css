@@ -720,7 +720,7 @@ h2 em {
 .static-game-stage {
   position: relative;
   display: grid;
-  min-height: min(72vh, 780px);
+  min-height: min(78vh, 860px);
   overflow: hidden;
   place-items: center;
   border: 1px solid var(--line);
@@ -746,10 +746,13 @@ h2 em {
 .static-game-frame {
   display: block;
   width: 100%;
-  min-height: min(72vh, 780px);
-  height: min(72vh, 780px);
+  min-height: min(78vh, 860px);
+  height: 100%;
   border: 0;
-  background: #f7f9fc;
+  background: #fff;
+}
+.static-game-stage:fullscreen .static-game-frame {
+  min-height: 100vh;
 }
 .qualification-note {
   max-width: 620px;

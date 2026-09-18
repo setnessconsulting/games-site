@@ -7,15 +7,16 @@ import { getGame, getGameAssetBase } from "../../data/games";
 const game = getGame("signal-garden");
 if (!game) throw new Error("Signal Garden is missing from the catalog");
 
-const assetBase = getGameAssetBase(game);
-const release = game.release?.kind === "unity" ? game.release : undefined;
+const release =
+  game.status === "playable" && game.release?.kind === "unity-webgl" ? game.release : undefined;
+const assetBase = release ? getGameAssetBase(game) : undefined;
 ---
 
 <BaseLayout title={`Play ${game.title}`} description={`Play ${game.title} at Setness Games.`}>
   <SiteHeader compact />
   <main class="play-page page-shell">
     <div class="play-toolbar">
-      <a class="back-link" href="/signal-garden/">
+      <a class="back-link" href={game.route}>
         ← Game page
       </a>
       <span class="play-label">{game.title}</span>
@@ -34,14 +35,15 @@ const release = game.release?.kind === "unity" ? game.release : undefined;
         dataFile={release.dataFile}
         frameworkFile={release.frameworkFile}
         wasmFile={release.wasmFile}
+        returnRoute={game.route}
       />
     ) : (
       <section class="not-ready-panel">
         <p class="eyebrow">Coming soon</p>
         <h1>The garden is still growing.</h1>
         <p>There isn’t a playable build here yet. Come back after the next release.</p>
-        <a class="button button-primary" href="/signal-garden/">
-          Return to Signal Garden
+        <a class="button button-primary" href={game.route}>
+          Return to {game.title}
         </a>
       </section>
     )}

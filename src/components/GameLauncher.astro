@@ -1,6 +1,6 @@
 ---
 import type { GameEntry } from "../data/games";
-import { getGameAssetBase } from "../data/games";
+import { getGameAssetBase, getGamePlayRoute } from "../data/games";
 
 interface Props {
   game: GameEntry;
@@ -23,12 +23,12 @@ const playable = game.status === "playable" && Boolean(assetBase);
     <p class="launcher-description">{game.description}</p>
     <div class="launcher-actions">
       {playable ? (
-        <a class="button button-primary" href={`${game.route}play/`}>
+        <a class="button button-primary" href={getGamePlayRoute(game)}>
           Play {game.title} <span aria-hidden="true">→</span>
         </a>
       ) : (
         <span class="button button-disabled" aria-disabled="true">
-          Qualification in progress
+          Not playable yet
         </span>
       )}
       <a class="button button-quiet" href="/#collection">

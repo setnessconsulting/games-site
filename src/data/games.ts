@@ -5,23 +5,24 @@ export interface GameControl {
   action: string;
 }
 
-export interface UnityGameRelease {
-  kind: "unity";
+interface GameReleaseBase {
   version: string;
+}
+
+export interface UnityWebglRelease extends GameReleaseBase {
+  kind: "unity-webgl";
   loaderFile: string;
   dataFile: string;
   frameworkFile: string;
   wasmFile: string;
 }
 
-export interface StaticGameRelease {
-  kind: "static";
-  version: string;
+export interface StaticWebRelease extends GameReleaseBase {
+  kind: "static-web";
   entryFile: string;
-  manifestFile: string;
 }
 
-export type GameRelease = UnityGameRelease | StaticGameRelease;
+export type GameRelease = UnityWebglRelease | StaticWebRelease;
 
 // Pages preview builds may set this environment value to exercise a pinned
 // candidate in R2. Production `main` leaves it unset, so Bridge Builder stays
@@ -78,13 +79,26 @@ export const games: readonly GameEntry[] = [
     ...(bridgeBuilderPreviewVersion
       ? {
           release: {
-            kind: "static" as const,
+            kind: "static-web" as const,
             version: bridgeBuilderPreviewVersion,
-            entryFile: "index.html",
-            manifestFile: "release-manifest.json"
+            entryFile: "index.html"
           }
         }
       : {})
+  },
+  {
+    slug: "number-line-jumper",
+    title: "Number Line Jumper",
+    status: "coming-soon",
+    eyebrow: "Number sense in motion",
+    description:
+      "Estimate, place, and explore values on a responsive number line across whole numbers, fractions, decimals, and negatives.",
+    cardImage: "/art/coming-soon.svg",
+    route: "/number-line-jumper/",
+    controls: [
+      { input: "Mouse / touch", action: "Place and explore" },
+      { input: "Keyboard", action: "Place, move, and zoom" }
+    ]
   },
   {
     slug: "new-world-01",
@@ -120,4 +134,8 @@ export function getPlayableGame(slug: string): GameEntry | undefined {
 export function getGameAssetBase(game: GameEntry): string | undefined {
   if (game.status !== "playable" || !game.release) return undefined;
   return `/game-assets/${game.slug}/${game.release.version}`;
+}
+
+export function getGamePlayRoute(game: GameEntry): string {
+  return `${game.route}play/`;
 }

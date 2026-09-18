@@ -21,19 +21,24 @@ npm run verify
 The site is designed to run at the root of `games.setnessconsulting.com`:
 
 - `/` — arcade collection
+- `/bridge-builder/` — Bridge Builder qualification launcher
 - `/signal-garden/` — Signal Garden launcher
 - `/signal-garden/play/` — game view
-- `/bridge-builder/` — Bridge Builder qualification launcher
-- `/bridge-builder/play/` — approved static-build play view when promoted
-- `/game-assets/...` — approved versioned build assets from R2
+- `/<slug>/` — game launcher
+- `/<slug>/play/` — game view
+- `/game-assets/<slug>/<version>/...` — selected immutable build assets from R2
+
+The release contract supports both Unity/WebGL builds and static-web/semantic-DOM builds without
+forcing one runtime into the other's manifest shape.
 
 ## Repository boundaries
 
-This repository owns the arcade shell, catalog, launcher, deployment configuration, and release
-contract. Individual game repositories own their game source and build pipeline.
+This repository owns the arcade shell, catalog, launcher, deployment configuration, selected
+production version, promotion, rollback, and release contract. Individual game repositories own
+their source, tests, production build, and immutable release evidence.
 
 See [the architecture](docs/architecture.md), [deployment checklist](docs/deployment.md), and
-[game release contract](docs/game-release-contract.md) before publishing the first playable build.
+[game release contract](docs/game-release-contract.md) before publishing a playable build.
 
 Bridge Builder is developed and tested in the standalone
 [`game-bridge-builder`](https://github.com/setnessconsulting/game-bridge-builder) repository. Its

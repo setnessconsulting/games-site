@@ -1,42 +1,40 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import SiteHeader from "../../components/SiteHeader.astro";
-import StaticGameFrame from "../../components/StaticGameFrame.astro";
+import StaticWebGameFrame from "../../components/StaticWebGameFrame.astro";
 import { getGame, getGameAssetBase } from "../../data/games";
 
-const game = getGame("bridge-builder");
-if (!game) throw new Error("Bridge Builder is missing from the catalog");
+const game = getGame("number-line-jumper");
+if (!game) throw new Error("Number Line Jumper is missing from the catalog");
 
-const assetBase = getGameAssetBase(game);
-const release = game.release?.kind === "static-web" ? game.release : undefined;
-const entryUrl = assetBase && release ? `${assetBase}/${release.entryFile}` : undefined;
+const release =
+  game.status === "playable" && game.release?.kind === "static-web" ? game.release : undefined;
+const assetBase = release ? getGameAssetBase(game) : undefined;
 ---
 
 <BaseLayout title={`Play ${game.title}`} description={`Play ${game.title} at Setness Games.`}>
   <SiteHeader compact />
   <main class="play-page page-shell">
     <div class="play-toolbar">
-      <a class="back-link" href="/bridge-builder/">
+      <a class="back-link" href={game.route}>
         ← Game page
       </a>
       <span class="play-label">{game.title}</span>
-      {entryUrl ? (
+      {assetBase && release ? (
         <button class="text-button" type="button" data-fullscreen>
           Fullscreen
         </button>
       ) : null}
     </div>
-    {entryUrl ? (
-      <StaticGameFrame title={game.title} entryUrl={entryUrl} gamePageUrl="/bridge-builder/" />
+    {assetBase && release ? (
+      <StaticWebGameFrame title={game.title} assetBase={assetBase} entryFile={release.entryFile} />
     ) : (
       <section class="not-ready-panel">
-        <p class="eyebrow">Qualification in progress</p>
-        <h1>The bridge is still being tested.</h1>
-        <p>
-          There isn’t an approved hosted build here yet. Promotion stays separate from LevelBest.
-        </p>
-        <a class="button button-primary" href="/bridge-builder/">
-          Return to Bridge Builder
+        <p class="eyebrow">Coming soon</p>
+        <h1>Number Line Jumper is not published yet.</h1>
+        <p>The arcade route is ready, but no validated production release has been promoted.</p>
+        <a class="button button-primary" href={game.route}>
+          Return to {game.title}
         </a>
       </section>
     )}
@@ -45,7 +43,7 @@ const entryUrl = assetBase && release ? `${assetBase}/${release.entryFile}` : un
 
 <script is:inline>
   const button = document.querySelector("[data-fullscreen]");
-  const stage = document.querySelector("[data-static-game-stage]");
+  const stage = document.querySelector("[data-game-stage]");
 
   button?.addEventListener("click", async () => {
     try {

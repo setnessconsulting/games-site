@@ -7,24 +7,25 @@ interface Props {
   dataFile: string;
   frameworkFile: string;
   wasmFile: string;
+  returnRoute: string;
 }
 
-const { title, version, assetBase, loaderFile, dataFile, frameworkFile, wasmFile } = Astro.props;
+const { title, version, assetBase, loaderFile, dataFile, frameworkFile, wasmFile, returnRoute } =
+  Astro.props;
 ---
 
-<div class="game-stage" data-game-stage data-asset-base={assetBase}>
+<div class="game-stage" data-game-stage data-release-kind="unity-webgl" data-asset-base={assetBase}>
   <div class="game-stage-loading" data-game-loading>
     <span class="loading-pulse" aria-hidden="true"></span>
     <p data-game-progress>Preparing {title}…</p>
   </div>
   <div class="game-stage-error" data-game-error hidden>
-    <p class="eyebrow">The signal is quiet</p>
+    <p class="eyebrow">Game unavailable</p>
     <h1>We couldn’t start this game.</h1>
     <p>
-      Refresh the page and try again. If the problem continues, the latest build may still be
-      arriving.
+      Refresh the page and try again. If the problem continues, this release may be unavailable.
     </p>
-    <a class="button button-primary" href={`/signal-garden/`}>
+    <a class="button button-primary" href={returnRoute}>
       Return to game page
     </a>
   </div>
@@ -35,7 +36,7 @@ const { title, version, assetBase, loaderFile, dataFile, frameworkFile, wasmFile
 
 <script
   is:inline
-  define:vars={{ assetBase, version, loaderFile, dataFile, frameworkFile, wasmFile }}
+  define:vars={{ assetBase, version, loaderFile, dataFile, frameworkFile, wasmFile, title }}
 >
   const stage = document.querySelector("[data-game-stage]");
   const loading = document.querySelector("[data-game-loading]");
@@ -65,7 +66,7 @@ const { title, version, assetBase, loaderFile, dataFile, frameworkFile, wasmFile
       }
 
       canvasWrap.removeAttribute("hidden");
-      progress.textContent = "Bringing the garden to life…";
+      progress.textContent = `Starting ${title}…`;
       try {
         await window.createUnityInstance(
           canvas,
@@ -75,13 +76,13 @@ const { title, version, assetBase, loaderFile, dataFile, frameworkFile, wasmFile
             codeUrl: `${assetBase}/Build/${wasmFile}`,
             streamingAssetsUrl: `${assetBase}/StreamingAssets`,
             companyName: "Setness Consulting",
-            productName: "Signal Garden",
+            productName: title,
             productVersion: version,
             matchWebGLToCanvasSize: true,
             devicePixelRatio: window.devicePixelRatio
           },
           (value) => {
-            progress.textContent = `Loading the garden… ${Math.round(value * 100)}%`;
+            progress.textContent = `Loading ${title}… ${Math.round(value * 100)}%`;
           }
         );
         loading.setAttribute("hidden", "true");
