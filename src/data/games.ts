@@ -5,13 +5,24 @@ export interface GameControl {
   action: string;
 }
 
-export interface GameRelease {
+interface GameReleaseBase {
   version: string;
+}
+
+export interface UnityWebglRelease extends GameReleaseBase {
+  kind: "unity-webgl";
   loaderFile: string;
   dataFile: string;
   frameworkFile: string;
   wasmFile: string;
 }
+
+export interface StaticWebRelease extends GameReleaseBase {
+  kind: "static-web";
+  entryFile: string;
+}
+
+export type GameRelease = UnityWebglRelease | StaticWebRelease;
 
 export interface GameEntry {
   slug: string;
@@ -39,6 +50,20 @@ export const games: readonly GameEntry[] = [
       { input: "Mouse", action: "Look and interact" },
       { input: "WASD", action: "Move" },
       { input: "Esc", action: "Pause or leave" }
+    ]
+  },
+  {
+    slug: "number-line-jumper",
+    title: "Number Line Jumper",
+    status: "coming-soon",
+    eyebrow: "Number sense in motion",
+    description:
+      "Estimate, place, and explore values on a responsive number line across whole numbers, fractions, decimals, and negatives.",
+    cardImage: "/art/coming-soon.svg",
+    route: "/number-line-jumper/",
+    controls: [
+      { input: "Mouse / touch", action: "Place and explore" },
+      { input: "Keyboard", action: "Place, move, and zoom" }
     ]
   },
   {
@@ -75,4 +100,8 @@ export function getPlayableGame(slug: string): GameEntry | undefined {
 export function getGameAssetBase(game: GameEntry): string | undefined {
   if (game.status !== "playable" || !game.release) return undefined;
   return `/game-assets/${game.slug}/${game.release.version}`;
+}
+
+export function getGamePlayRoute(game: GameEntry): string {
+  return `${game.route}play/`;
 }
