@@ -55,7 +55,9 @@ export function validateCatalog(entries: readonly GameEntry[]): string[] {
 
   for (const game of entries) {
     if (!SLUG_PATTERN.test(game.slug)) {
-      errors.push(`${game.slug}: slug must contain lowercase letters, numbers, and hyphens only`);
+      errors.push(
+        `${game.slug}: slug must contain lowercase letters, numbers, and hyphens only`
+      );
     }
 
     if (slugs.has(game.slug)) {
