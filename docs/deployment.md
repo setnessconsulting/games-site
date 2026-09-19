@@ -32,6 +32,20 @@ test-fixture/0.0.0/Build/
 
 Enable `GAME_ASSETS_ENABLE_FIXTURE=true` only in local or staging environments.
 
+For a Bridge Builder hosted qualification preview, publish the immutable static release from the
+standalone game repository under `bridge-builder/<version>/`, then build a non-production Pages
+preview with `BRIDGE_BUILDER_PREVIEW_VERSION=<version>`. This opt-in pointer makes
+`/bridge-builder/play/` load the exact versioned `index.html` through the same-origin R2 function;
+the same variable is supplied to the preview Function so the version is approved for reads. Leave
+it unset on `main` until the named approval gate passes.
+
+For a Number Line Jumper hosted qualification preview, publish the immutable static release from
+`setnessconsulting/game-number-line-jumper` under `number-line-jumper/<version>/`, then build a
+non-production Pages preview with `NUMBER_LINE_JUMPER_PREVIEW_VERSION=<version>`. The same exact
+pointer must be supplied to the preview Function. This makes the catalog card, launcher, play route,
+and same-origin asset route resolve only to that immutable candidate. Leave the variable unset in
+the Production environment; Pages Preview variables apply to all preview deployments while set.
+
 ## Secrets
 
 The game repository's release workflow will need a narrowly scoped Cloudflare credential that can
@@ -45,4 +59,5 @@ After DNS authority moves to Cloudflare, verify:
 
 - `https://games.setnessconsulting.com/`
 - `https://games.setnessconsulting.com/signal-garden/`
+- the preview URL for `/bridge-builder/` and `/bridge-builder/play/` when a candidate branch is enabled
 - `https://games.setnessconsulting.com/game-assets/...`

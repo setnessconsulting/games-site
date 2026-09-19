@@ -23,7 +23,7 @@ The catalog uses a discriminated `release.kind` contract.
 The corresponding R2 object prefix is:
 
 ```text
-<slug>/<version>/Build/
+<slug>/<version>/
 ```
 
 Unity filenames are explicit; none are inferred from the display title.
@@ -41,12 +41,19 @@ Unity filenames are explicit; none are inferred from the display title.
 The corresponding R2 object prefix is:
 
 ```text
-<slug>/<version>/
+<slug>/<version>/index.html
+<slug>/<version>/assets/...
+<slug>/<version>/release-manifest.json
 ```
 
-The entry document and every asset it references must work from the supplied versioned asset base.
-Static-web builds therefore use relative/subpath-safe asset URLs and must not assume domain-root
-hosting.
+For Bridge Builder, the static catalog record uses `kind: "static-web"`, `version`, and `entryFile`.
+The separate release manifest records the source commit, version, entry file, every payload file's
+hash/size/content type, and validation-evidence references. The manifest itself is metadata and is
+not self-hashed.
+
+Every browser build must resolve its referenced files relative to the supplied versioned asset base;
+it must not assume that the game is hosted at the domain root. The release route is same-origin and
+the Pages Function serves the private `GAME_ASSETS` R2 binding with immutable cache headers.
 
 ## Immutable publication
 
@@ -75,7 +82,14 @@ branch preview is the pre-production browser qualification surface. Do not merge
 until the preview resolves the exact immutable artifact and the required direct-navigation, refresh,
 mobile, keyboard, reduced-motion, history/focus, and privacy checks pass.
 
-## Promotion
+## Qualification and promotion
+
+For Bridge Builder, an unapproved candidate is hosted only by a preview/staging branch or local
+fixture. The production catalog remains `coming-soon` while rendering, accessibility, child/device,
+performance, rollback, provenance, comparator, and Q-01–Q-23 evidence are incomplete. Mocks and
+authored-only checks do not count as release evidence. After the named owner approval gate passes, a
+reviewed catalog change may select the exact version and mark it `playable`; the game source remains
+in `game-bridge-builder`.
 
 Promotion is a reviewed catalog change in this repository:
 
@@ -98,3 +112,12 @@ until rollback has been exercised and recorded against the same release candidat
 manifest. This repository owns the `number-line-jumper` card, launcher, play route, selected
 version, promotion, and rollback. The catalog entry intentionally remains `coming-soon` until the
 Number Line Jumper qualification stories produce a validated candidate.
+
+During hosted qualification, `NUMBER_LINE_JUMPER_PREVIEW_VERSION` is a preview-only exact-version
+pointer. When unset, the catalog remains `coming-soon` and the Function denies Number Line Jumper
+asset reads. When set, the catalog selects only that version as `static-web` with `index.html`, and
+the Function allows only the matching `number-line-jumper/<version>/` prefix. Production must leave
+the pointer unset.
+
+LevelBest promotion is a separate, later release action that consumes the exact approved artifact;
+it is not part of games-site qualification.

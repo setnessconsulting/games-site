@@ -1,23 +1,71 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { GameEntry } from "../src/data/games";
 import { games, getGamePlayRoute } from "../src/data/games";
 import { validateCatalog } from "../src/lib/catalog";
 
 describe("game catalog", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.resetModules();
+  });
+
   it("contains a valid, unique catalog", () => {
     expect(validateCatalog(games)).toEqual([]);
     expect(new Set(games.map((game) => game.slug)).size).toBe(games.length);
   });
 
-  it("keeps unpromoted games non-playable", () => {
-    expect(games.every((game) => game.status === "coming-soon" && !game.release)).toBe(true);
+  it("keeps unrelated games unpromoted and retains the Bridge Builder launcher", () => {
+    const bridgeBuilder = games.find((game) => game.slug === "bridge-builder");
+    const unrelatedGames = games.filter((game) => game.slug !== "bridge-builder");
+    expect(unrelatedGames.every((game) => game.status === "coming-soon" && !game.release)).toBe(
+      true
+    );
     expect(games.find((game) => game.slug === "number-line-jumper")?.status).toBe("coming-soon");
+    expect(bridgeBuilder?.route).toBe("/bridge-builder/");
+    expect(getGamePlayRoute(bridgeBuilder!)).toBe("/bridge-builder/play/");
   });
 
-  it("derives a game-specific play route instead of hard-coding a title", () => {
+  it("accepts the static-web release shape for a candidate preview", () => {
+    const candidate = {
+      ...games.find((game) => game.slug === "bridge-builder")!,
+      status: "playable" as const,
+      release: {
+        kind: "static-web" as const,
+        version: "0.1.0",
+        entryFile: "index.html"
+      }
+    };
+    expect(validateCatalog([candidate])).toEqual([]);
+  });
+
+  it("derives game-specific play routes instead of hard-coding a title", () => {
     const game = games.find((entry) => entry.slug === "number-line-jumper");
     expect(game).toBeDefined();
     expect(getGamePlayRoute(game!)).toBe("/number-line-jumper/play/");
+  });
+
+  it("keeps Number Line Jumper coming-soon when its preview pointer is unset", async () => {
+    vi.stubEnv("NUMBER_LINE_JUMPER_PREVIEW_VERSION", "");
+    vi.resetModules();
+    const { games: catalog } = await import("../src/data/games");
+    const game = catalog.find((entry) => entry.slug === "number-line-jumper");
+
+    expect(game?.status).toBe("coming-soon");
+    expect(game?.release).toBeUndefined();
+  });
+
+  it("selects the exact Number Line Jumper version when its preview pointer is set", async () => {
+    vi.stubEnv("NUMBER_LINE_JUMPER_PREVIEW_VERSION", "pr8-c7428853083f");
+    vi.resetModules();
+    const { games: catalog } = await import("../src/data/games");
+    const game = catalog.find((entry) => entry.slug === "number-line-jumper");
+
+    expect(game?.status).toBe("playable");
+    expect(game?.release).toEqual({
+      kind: "static-web",
+      version: "pr8-c7428853083f",
+      entryFile: "index.html"
+    });
   });
 
   it("accepts both release kinds when promoted", () => {

@@ -35,8 +35,30 @@ export function parseAssetPath(value: unknown): ParsedAssetPath | undefined {
   return { slug, version, assetPath: assetSegments.join("/") };
 }
 
-export function isApprovedRelease(slug: string, version: string, allowFixture: boolean): boolean {
+export function isApprovedRelease(
+  slug: string,
+  version: string,
+  allowFixture: boolean,
+  bridgeBuilderPreviewVersion?: string,
+  numberLineJumperPreviewVersion?: string
+): boolean {
   if (allowFixture && slug === "test-fixture" && version === "0.0.0") return true;
+
+  if (
+    slug === "bridge-builder" &&
+    bridgeBuilderPreviewVersion &&
+    version === bridgeBuilderPreviewVersion
+  ) {
+    return true;
+  }
+
+  if (
+    slug === "number-line-jumper" &&
+    numberLineJumperPreviewVersion &&
+    version === numberLineJumperPreviewVersion
+  ) {
+    return true;
+  }
 
   return games.some(
     (game) => game.slug === slug && game.status === "playable" && game.release?.version === version

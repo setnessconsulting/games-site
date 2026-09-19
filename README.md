@@ -21,6 +21,9 @@ npm run verify
 The site is designed to run at the root of `games.setnessconsulting.com`:
 
 - `/` — arcade collection
+- `/bridge-builder/` — Bridge Builder qualification launcher
+- `/signal-garden/` — Signal Garden launcher
+- `/signal-garden/play/` — game view
 - `/<slug>/` — game launcher
 - `/<slug>/play/` — game view
 - `/game-assets/<slug>/<version>/...` — selected immutable build assets from R2
@@ -36,3 +39,8 @@ their source, tests, production build, and immutable release evidence.
 
 See [the architecture](docs/architecture.md), [deployment checklist](docs/deployment.md), and
 [game release contract](docs/game-release-contract.md) before publishing a playable build.
+
+Bridge Builder is developed and tested in the standalone
+[`game-bridge-builder`](https://github.com/setnessconsulting/game-bridge-builder) repository. Its
+production catalog entry stays `coming-soon` until the hosted qualification and named approval gates
+are complete. LevelBest is a separate post-approval promotion.

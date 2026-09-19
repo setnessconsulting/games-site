@@ -24,3 +24,20 @@ artifacts so the site is not constrained by Pages' per-file asset limit.
 Game repositories own source, tests, builds, and release evidence. `games-site` never rebuilds a
 game or derives mathematical/game state. It owns only arcade presentation, selected production
 versions, same-origin artifact delivery, promotion, and rollback.
+
+## Bridge Builder boundary
+
+`game-bridge-builder` owns Bridge Builder source, tests, builds, and release manifest. `games-site`
+owns its catalog entry, launcher, same-origin play route, and selected release pointer. The production
+Bridge Builder catalog entry stays `coming-soon` during standalone qualification; a candidate pointer
+may be enabled only on a preview branch. LevelBest remains unchanged until the complete evidence and
+owner-approval gate passes. Later LevelBest integration consumes the exact pinned release artifact
+and does not copy game source.
+
+## Number Line Jumper boundary
+
+`game-number-line-jumper` owns the standalone source, tests, production build, release evidence,
+and immutable `number-line-jumper/<version>/` R2 artifact. The site may expose an exact candidate in
+Pages Preview only when `NUMBER_LINE_JUMPER_PREVIEW_VERSION` is set for both the build and the
+Function. Production leaves that pointer unset, and no LevelBest integration or promotion is part
+of preview qualification.

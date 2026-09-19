@@ -718,8 +718,30 @@ h2 em {
   height: 100%;
 }
 .static-game-stage {
-  display: block;
+  position: relative;
+  display: grid;
   min-height: min(78vh, 860px);
+  overflow: hidden;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: #08171c;
+  box-shadow: var(--shadow);
+}
+.static-game-stage:fullscreen {
+  border: 0;
+  border-radius: 0;
+}
+.static-game-loading,
+.static-game-error {
+  max-width: 430px;
+  padding: 34px;
+  text-align: center;
+}
+.static-game-loading p,
+.static-game-error > p:not(.eyebrow) {
+  color: var(--muted);
+  line-height: 1.65;
 }
 .static-game-frame {
   display: block;
@@ -731,6 +753,12 @@ h2 em {
 }
 .static-game-stage:fullscreen .static-game-frame {
   min-height: 100vh;
+}
+.qualification-note {
+  max-width: 620px;
+  margin: 30px 0 0;
+  color: var(--muted);
+  font-size: 0.82rem;
 }
 .not-ready-panel {
   min-height: 540px;

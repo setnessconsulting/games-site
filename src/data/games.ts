@@ -24,6 +24,17 @@ export interface StaticWebRelease extends GameReleaseBase {
 
 export type GameRelease = UnityWebglRelease | StaticWebRelease;
 
+// Pages preview builds may set these environment values to exercise pinned
+// candidates in R2. Production `main` leaves them unset, so neither candidate
+// is promoted until its independent approval gate is complete.
+const runtimeProcess = (
+  globalThis as typeof globalThis & {
+    process?: { env?: Record<string, string | undefined> };
+  }
+).process;
+const bridgeBuilderPreviewVersion = runtimeProcess?.env?.BRIDGE_BUILDER_PREVIEW_VERSION;
+const numberLineJumperPreviewVersion = runtimeProcess?.env?.NUMBER_LINE_JUMPER_PREVIEW_VERSION;
+
 export interface GameEntry {
   slug: string;
   title: string;
@@ -53,18 +64,52 @@ export const games: readonly GameEntry[] = [
     ]
   },
   {
+    slug: "bridge-builder",
+    title: "Bridge Builder",
+    status: bridgeBuilderPreviewVersion ? "playable" : "coming-soon",
+    eyebrow: "A thoughtful construction game",
+    description:
+      "Compose labeled planks so a bridge closes exactly. The candidate build is being tested before it joins the playable collection.",
+    cardImage: "/art/bridge-builder-card.svg",
+    route: "/bridge-builder/",
+    controls: [
+      { input: "Pointer or touch", action: "Select and place a plank" },
+      { input: "Keyboard", action: "Move, place, undo, and check" },
+      { input: "Reduce motion", action: "Use the calm presentation mode" }
+    ],
+    ...(bridgeBuilderPreviewVersion
+      ? {
+          release: {
+            kind: "static-web" as const,
+            version: bridgeBuilderPreviewVersion,
+            entryFile: "index.html"
+          }
+        }
+      : {})
+  },
+  {
     slug: "number-line-jumper",
     title: "Number Line Jumper",
-    status: "coming-soon",
+    status: numberLineJumperPreviewVersion ? "playable" : "coming-soon",
     eyebrow: "Number sense in motion",
-    description:
-      "Estimate, place, and explore values on a responsive number line across whole numbers, fractions, decimals, and negatives.",
+    description: numberLineJumperPreviewVersion
+      ? "Estimate, place, and explore values on a responsive number line across whole numbers, fractions, decimals, and negatives. This candidate build is being tested before it joins the playable collection."
+      : "Estimate, place, and explore values on a responsive number line across whole numbers, fractions, decimals, and negatives.",
     cardImage: "/art/coming-soon.svg",
     route: "/number-line-jumper/",
     controls: [
       { input: "Mouse / touch", action: "Place and explore" },
       { input: "Keyboard", action: "Place, move, and zoom" }
-    ]
+    ],
+    ...(numberLineJumperPreviewVersion
+      ? {
+          release: {
+            kind: "static-web" as const,
+            version: numberLineJumperPreviewVersion,
+            entryFile: "index.html"
+          }
+        }
+      : {})
   },
   {
     slug: "new-world-01",
