@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { GameEntry } from "../src/data/games";
 import {
   BRIDGE_BUILDER_PRODUCTION_VERSION,
+  MATH_DETECTIVE_PRODUCTION_VERSION,
   NUMBER_LINE_JUMPER_PRODUCTION_VERSION,
   games,
   getGamePlayRoute
@@ -48,7 +49,7 @@ describe("game catalog", () => {
     expect(mathDetective?.status).toBe("playable");
     expect(mathDetective?.release).toEqual({
       kind: "static-web",
-      version: "2026.09.20-visual-pass.1",
+      version: MATH_DETECTIVE_PRODUCTION_VERSION,
       entryFile: "index.html"
     });
     expect(bridgeBuilder?.status).toBe("playable");
@@ -104,6 +105,34 @@ describe("game catalog", () => {
     expect(game?.release).toEqual({
       kind: "static-web",
       version: "main-12641c0-preview",
+      entryFile: "index.html"
+    });
+  });
+
+  it("selects the Math Detective production release when its preview pointer is unset", async () => {
+    vi.stubEnv("MATH_DETECTIVE_PREVIEW_VERSION", "");
+    vi.resetModules();
+    const { games: catalog } = await import("../src/data/games");
+    const game = catalog.find((entry) => entry.slug === "math-detective");
+
+    expect(game?.status).toBe("playable");
+    expect(game?.release).toEqual({
+      kind: "static-web",
+      version: MATH_DETECTIVE_PRODUCTION_VERSION,
+      entryFile: "index.html"
+    });
+  });
+
+  it("overrides the Math Detective production release with the exact preview version", async () => {
+    vi.stubEnv("MATH_DETECTIVE_PREVIEW_VERSION", "2026.09.20-visual-pass.1-preview");
+    vi.resetModules();
+    const { games: catalog } = await import("../src/data/games");
+    const game = catalog.find((entry) => entry.slug === "math-detective");
+
+    expect(game?.status).toBe("playable");
+    expect(game?.release).toEqual({
+      kind: "static-web",
+      version: "2026.09.20-visual-pass.1-preview",
       entryFile: "index.html"
     });
   });
