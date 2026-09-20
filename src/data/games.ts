@@ -35,6 +35,7 @@ const runtimeProcess = (
 ).process;
 const bridgeBuilderPreviewVersion = runtimeProcess?.env?.BRIDGE_BUILDER_PREVIEW_VERSION;
 const numberLineJumperPreviewVersion = runtimeProcess?.env?.NUMBER_LINE_JUMPER_PREVIEW_VERSION;
+const mathDetectivePreviewVersion = runtimeProcess?.env?.MATH_DETECTIVE_PREVIEW_VERSION;
 const bridgeBuilderProductionRelease: StaticWebRelease = {
   kind: "static-web",
   version: BRIDGE_BUILDER_PRODUCTION_VERSION,
@@ -106,6 +107,31 @@ export const games: readonly GameEntry[] = [
           release: {
             kind: "static-web" as const,
             version: numberLineJumperPreviewVersion,
+            entryFile: "index.html"
+          }
+        }
+      : {})
+  },
+  {
+    slug: "math-detective",
+    title: "Math Detective",
+    status: mathDetectivePreviewVersion ? "playable" : "coming-soon",
+    eyebrow: "A case file for curious minds",
+    description: mathDetectivePreviewVersion
+      ? "Follow the clues, solve the math, and crack the case. This candidate build is being tested before it joins the playable collection."
+      : "Follow the clues, solve the math, and crack the case.",
+    cardImage: "/art/coming-soon.svg",
+    route: "/math-detective/",
+    controls: [
+      { input: "Mouse / touch", action: "Inspect evidence and choose" },
+      { input: "Keyboard", action: "Move through the case file" },
+      { input: "Read aloud", action: "Hear goals and hints when available" }
+    ],
+    ...(mathDetectivePreviewVersion
+      ? {
+          release: {
+            kind: "static-web" as const,
+            version: mathDetectivePreviewVersion,
             entryFile: "index.html"
           }
         }
