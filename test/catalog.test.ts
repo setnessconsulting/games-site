@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { GameEntry } from "../src/data/games";
-import { games, getGamePlayRoute } from "../src/data/games";
+import { BRIDGE_BUILDER_PRODUCTION_VERSION, games, getGamePlayRoute } from "../src/data/games";
 import { validateCatalog } from "../src/lib/catalog";
 
 describe("game catalog", () => {
@@ -14,13 +14,19 @@ describe("game catalog", () => {
     expect(new Set(games.map((game) => game.slug)).size).toBe(games.length);
   });
 
-  it("keeps unrelated games unpromoted and retains the Bridge Builder launcher", () => {
+  it("promotes Bridge Builder while keeping unrelated games unpromoted", () => {
     const bridgeBuilder = games.find((game) => game.slug === "bridge-builder");
     const unrelatedGames = games.filter((game) => game.slug !== "bridge-builder");
     expect(unrelatedGames.every((game) => game.status === "coming-soon" && !game.release)).toBe(
       true
     );
     expect(games.find((game) => game.slug === "number-line-jumper")?.status).toBe("coming-soon");
+    expect(bridgeBuilder?.status).toBe("playable");
+    expect(bridgeBuilder?.release).toEqual({
+      kind: "static-web",
+      version: BRIDGE_BUILDER_PRODUCTION_VERSION,
+      entryFile: "index.html"
+    });
     expect(bridgeBuilder?.route).toBe("/bridge-builder/");
     expect(getGamePlayRoute(bridgeBuilder!)).toBe("/bridge-builder/play/");
   });

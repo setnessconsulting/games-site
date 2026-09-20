@@ -21,7 +21,7 @@ npm run verify
 The site is designed to run at the root of `games.setnessconsulting.com`:
 
 - `/` — arcade collection
-- `/bridge-builder/` — Bridge Builder qualification launcher
+- `/bridge-builder/` — Bridge Builder launcher
 - `/signal-garden/` — Signal Garden launcher
 - `/signal-garden/play/` — game view
 - `/<slug>/` — game launcher
@@ -42,5 +42,5 @@ See [the architecture](docs/architecture.md), [deployment checklist](docs/deploy
 
 Bridge Builder is developed and tested in the standalone
 [`game-bridge-builder`](https://github.com/setnessconsulting/game-bridge-builder) repository. Its
-production catalog entry stays `coming-soon` until the hosted qualification and named approval gates
-are complete. LevelBest is a separate post-approval promotion.
+production catalog selects the approved immutable release after hosted qualification and named
+approval gates. LevelBest is a separate post-approval promotion.

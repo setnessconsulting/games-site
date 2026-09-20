@@ -24,9 +24,10 @@ export interface StaticWebRelease extends GameReleaseBase {
 
 export type GameRelease = UnityWebglRelease | StaticWebRelease;
 
-// Pages preview builds may set these environment values to exercise pinned
-// candidates in R2. Production `main` leaves them unset, so neither candidate
-// is promoted until its independent approval gate is complete.
+export const BRIDGE_BUILDER_PRODUCTION_VERSION = "0.1.0-qualification.9";
+
+// Production selects the approved immutable release directly. Pages preview
+// builds may override the version to exercise a different pinned candidate.
 const runtimeProcess = (
   globalThis as typeof globalThis & {
     process?: { env?: Record<string, string | undefined> };
@@ -34,6 +35,14 @@ const runtimeProcess = (
 ).process;
 const bridgeBuilderPreviewVersion = runtimeProcess?.env?.BRIDGE_BUILDER_PREVIEW_VERSION;
 const numberLineJumperPreviewVersion = runtimeProcess?.env?.NUMBER_LINE_JUMPER_PREVIEW_VERSION;
+const bridgeBuilderProductionRelease: StaticWebRelease = {
+  kind: "static-web",
+  version: BRIDGE_BUILDER_PRODUCTION_VERSION,
+  entryFile: "index.html"
+};
+const bridgeBuilderRelease: StaticWebRelease = bridgeBuilderPreviewVersion
+  ? { ...bridgeBuilderProductionRelease, version: bridgeBuilderPreviewVersion }
+  : bridgeBuilderProductionRelease;
 
 export interface GameEntry {
   slug: string;
@@ -66,10 +75,9 @@ export const games: readonly GameEntry[] = [
   {
     slug: "bridge-builder",
     title: "Bridge Builder",
-    status: bridgeBuilderPreviewVersion ? "playable" : "coming-soon",
+    status: "playable",
     eyebrow: "A thoughtful construction game",
-    description:
-      "Compose labeled planks so a bridge closes exactly. The candidate build is being tested before it joins the playable collection.",
+    description: "Choose planks, close each gap exactly, and send the car safely across.",
     cardImage: "/art/bridge-builder-card.svg",
     route: "/bridge-builder/",
     controls: [
@@ -77,15 +85,7 @@ export const games: readonly GameEntry[] = [
       { input: "Keyboard", action: "Move, place, undo, and check" },
       { input: "Reduce motion", action: "Use the calm presentation mode" }
     ],
-    ...(bridgeBuilderPreviewVersion
-      ? {
-          release: {
-            kind: "static-web" as const,
-            version: bridgeBuilderPreviewVersion,
-            entryFile: "index.html"
-          }
-        }
-      : {})
+    release: bridgeBuilderRelease
   },
   {
     slug: "number-line-jumper",

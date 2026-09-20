@@ -29,10 +29,9 @@ versions, same-origin artifact delivery, promotion, and rollback.
 
 `game-bridge-builder` owns Bridge Builder source, tests, builds, and release manifest. `games-site`
 owns its catalog entry, launcher, same-origin play route, and selected release pointer. The production
-Bridge Builder catalog entry stays `coming-soon` during standalone qualification; a candidate pointer
-may be enabled only on a preview branch. LevelBest remains unchanged until the complete evidence and
-owner-approval gate passes. Later LevelBest integration consumes the exact pinned release artifact
-and does not copy game source.
+Bridge Builder catalog entry now selects the approved immutable `0.1.0-qualification.9` release;
+preview branches may override that pointer for candidate validation. LevelBest remains unchanged.
+Later LevelBest integration consumes the exact pinned release artifact and does not copy game source.
 
 ## Number Line Jumper boundary
 
