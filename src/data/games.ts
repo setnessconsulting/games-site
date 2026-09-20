@@ -70,7 +70,7 @@ export const games: readonly GameEntry[] = [
   {
     slug: "signal-garden",
     title: "Signal Garden",
-    status: "coming-soon",
+    status: "playable",
     eyebrow: "A quiet world in progress",
     description:
       "Tend a tiny landscape, follow its gentle signals, and discover what changes when you pay attention.",
@@ -80,7 +80,15 @@ export const games: readonly GameEntry[] = [
       { input: "Mouse", action: "Look and interact" },
       { input: "WASD", action: "Move" },
       { input: "Esc", action: "Pause or leave" }
-    ]
+    ],
+    release: {
+      kind: "unity-webgl",
+      version: "2026-09-20-1b3586f",
+      loaderFile: "WebGL.loader.js",
+      dataFile: "WebGL.data.br",
+      frameworkFile: "WebGL.framework.js.br",
+      wasmFile: "WebGL.wasm.br"
+    }
   },
   {
     slug: "bridge-builder",
