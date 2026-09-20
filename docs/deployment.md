@@ -46,12 +46,13 @@ preview with `MATH_DETECTIVE_PREVIEW_VERSION=<version>`. The production catalog 
 `coming-soon` until the live-child, device, performance, authored-presentation, rollback, and
 named approval gates are complete.
 
-For a Number Line Jumper hosted qualification preview, publish the immutable static release from
-`setnessconsulting/game-number-line-jumper` under `number-line-jumper/<version>/`, then build a
-non-production Pages preview with `NUMBER_LINE_JUMPER_PREVIEW_VERSION=<version>`. The same exact
-pointer must be supplied to the preview Function. This makes the catalog card, launcher, play route,
-and same-origin asset route resolve only to that immutable candidate. Leave the variable unset in
-the Production environment; Pages Preview variables apply to all preview deployments while set.
+For a Number Line Jumper release, publish the immutable static build from
+`setnessconsulting/game-number-line-jumper` under `number-line-jumper/<version>/`, then update the
+checked-in production pointer in `src/data/games.ts` and deploy `main`. The current production
+version is `main-12641c0`. A non-production Pages preview may override it with
+`NUMBER_LINE_JUMPER_PREVIEW_VERSION=<version>`; the same exact pointer must be supplied to the
+preview Function. Rollback changes only the checked-in production pointer to a previously published
+immutable version. Do not overwrite or delete published prefixes.
 
 ## Secrets
 

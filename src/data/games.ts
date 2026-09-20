@@ -25,6 +25,7 @@ export interface StaticWebRelease extends GameReleaseBase {
 export type GameRelease = UnityWebglRelease | StaticWebRelease;
 
 export const BRIDGE_BUILDER_PRODUCTION_VERSION = "0.1.0-qualification.10";
+export const NUMBER_LINE_JUMPER_PRODUCTION_VERSION = "main-12641c0";
 export const MATH_DETECTIVE_PRODUCTION_VERSION = "2026.09.20-visual-pass.1";
 
 // Production selects the approved immutable release directly. Pages preview
@@ -45,6 +46,14 @@ const bridgeBuilderProductionRelease: StaticWebRelease = {
 const bridgeBuilderRelease: StaticWebRelease = bridgeBuilderPreviewVersion
   ? { ...bridgeBuilderProductionRelease, version: bridgeBuilderPreviewVersion }
   : bridgeBuilderProductionRelease;
+const numberLineJumperProductionRelease: StaticWebRelease = {
+  kind: "static-web",
+  version: NUMBER_LINE_JUMPER_PRODUCTION_VERSION,
+  entryFile: "index.html"
+};
+const numberLineJumperRelease: StaticWebRelease = numberLineJumperPreviewVersion
+  ? { ...numberLineJumperProductionRelease, version: numberLineJumperPreviewVersion }
+  : numberLineJumperProductionRelease;
 const mathDetectiveProductionRelease: StaticWebRelease = {
   kind: "static-web",
   version: MATH_DETECTIVE_PRODUCTION_VERSION,
@@ -108,7 +117,7 @@ export const games: readonly GameEntry[] = [
   {
     slug: "number-line-jumper",
     title: "Number Line Jumper",
-    status: numberLineJumperPreviewVersion ? "playable" : "coming-soon",
+    status: "playable",
     eyebrow: "Number sense in motion",
     description: numberLineJumperPreviewVersion
       ? "Estimate, place, and explore values on a responsive number line across whole numbers, fractions, decimals, and negatives. This candidate build is being tested before it joins the playable collection."
@@ -119,15 +128,7 @@ export const games: readonly GameEntry[] = [
       { input: "Mouse / touch", action: "Place and explore" },
       { input: "Keyboard", action: "Place, move, and zoom" }
     ],
-    ...(numberLineJumperPreviewVersion
-      ? {
-          release: {
-            kind: "static-web" as const,
-            version: numberLineJumperPreviewVersion,
-            entryFile: "index.html"
-          }
-        }
-      : {})
+    release: numberLineJumperRelease
   },
   {
     slug: "math-detective",
