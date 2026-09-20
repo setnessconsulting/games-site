@@ -1,0 +1,23 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import SiteHeader from "../../components/SiteHeader.astro";
+import GameLauncher from "../../components/GameLauncher.astro";
+import { getGame } from "../../data/games";
+
+const game = getGame("math-detective");
+if (!game) throw new Error("Math Detective is missing from the catalog");
+---
+
+<BaseLayout title={game.title} description={game.description}>
+  <SiteHeader compact />
+  <main class="page-shell launcher-page">
+    <a class="back-link" href="/">
+      ← Collection
+    </a>
+    <GameLauncher game={game} />
+    <p class="game-note">
+      Follow each clue, solve the evidence station, and connect what you learn before naming the
+      suspect.
+    </p>
+  </main>
+</BaseLayout>

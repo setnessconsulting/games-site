@@ -40,7 +40,8 @@ export function isApprovedRelease(
   version: string,
   allowFixture: boolean,
   bridgeBuilderPreviewVersion?: string,
-  numberLineJumperPreviewVersion?: string
+  numberLineJumperPreviewVersion?: string,
+  mathDetectivePreviewVersion?: string
 ): boolean {
   if (allowFixture && slug === "test-fixture" && version === "0.0.0") return true;
 
@@ -56,6 +57,14 @@ export function isApprovedRelease(
     slug === "number-line-jumper" &&
     numberLineJumperPreviewVersion &&
     version === numberLineJumperPreviewVersion
+  ) {
+    return true;
+  }
+
+  if (
+    slug === "math-detective" &&
+    mathDetectivePreviewVersion &&
+    version === mathDetectivePreviewVersion
   ) {
     return true;
   }

@@ -22,6 +22,7 @@ The site is designed to run at the root of `games.setnessconsulting.com`:
 
 - `/` — arcade collection
 - `/bridge-builder/` — Bridge Builder launcher
+- `/math-detective/` — Math Detective launcher
 - `/signal-garden/` — Signal Garden launcher
 - `/signal-garden/play/` — game view
 - `/<slug>/` — game launcher
