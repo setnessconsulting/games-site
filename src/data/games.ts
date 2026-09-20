@@ -24,7 +24,7 @@ export interface StaticWebRelease extends GameReleaseBase {
 
 export type GameRelease = UnityWebglRelease | StaticWebRelease;
 
-export const BRIDGE_BUILDER_PRODUCTION_VERSION = "0.1.0-qualification.9";
+export const BRIDGE_BUILDER_PRODUCTION_VERSION = "0.1.0-qualification.10";
 
 // Production selects the approved immutable release directly. Pages preview
 // builds may override the version to exercise a different pinned candidate.

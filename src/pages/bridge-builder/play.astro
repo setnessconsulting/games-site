@@ -44,20 +44,20 @@ const entryUrl = assetBase && release ? `${assetBase}/${release.entryFile}` : un
 </BaseLayout>
 
 <script is:inline>
-  const button = document.querySelector("[data-fullscreen]");
-  const stage = document.querySelector("[data-static-game-stage]");
+  const fullscreenButton = document.querySelector("[data-fullscreen]");
+  const fullscreenStage = document.querySelector("[data-static-game-stage]");
 
-  button?.addEventListener("click", async () => {
+  fullscreenButton?.addEventListener("click", async () => {
     try {
       if (!document.fullscreenElement) {
-        await stage?.requestFullscreen();
-        button.textContent = "Exit fullscreen";
+        await fullscreenStage?.requestFullscreen();
+        fullscreenButton.textContent = "Exit fullscreen";
       } else {
         await document.exitFullscreen();
-        button.textContent = "Fullscreen";
+        fullscreenButton.textContent = "Fullscreen";
       }
     } catch {
-      button.textContent = "Fullscreen unavailable";
+      fullscreenButton.textContent = "Fullscreen unavailable";
     }
   });
 </script>
