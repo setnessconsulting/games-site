@@ -48,6 +48,12 @@ rollback, and named approval gates are complete. The live-child gate is the owne
 protocol in the standalone repository's `PLAYTEST_PROTOCOL.md`; it intentionally requires one
 tester and does not claim statistically representative usability.
 
+The current candidate completed the promotion path on 2026-09-20. The active production catalog
+selects `math-detective/2026.09.20-visual-pass.1/`; the previous known-good Pages deployment
+`50118dc5.games-site-7pn.pages.dev` remains available as the rollback target and was verified to
+serve the prior `coming-soon` state. This read-only target verification does not claim that a live
+production rollback drill has been exercised.
+
 For a Number Line Jumper release, publish the immutable static build from
 `setnessconsulting/game-number-line-jumper` under `number-line-jumper/<version>/`, then update the
 checked-in production pointer in `src/data/games.ts` and deploy `main`. The current production

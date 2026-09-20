@@ -124,6 +124,19 @@ For the candidate promoted by PR #10:
 The exact pointer remains reviewable in `src/data/games.ts`, and the hosted preview must resolve
 the exact immutable artifact before this promotion is merged.
 
+### Operational closeout
+
+The active production deployment for the promotion is Cloudflare Pages deployment
+`f84e9c97-92dc-4a1a-a861-fcf2dddc5066` from games-site commit
+`d596206ff8999f3575f92e950399864fe7e7efd5`. The prior known-good deployment is
+`50118dc5.games-site-7pn.pages.dev` from the pre-promotion catalog revision; a direct read-only
+check confirmed that it serves the previous Math Detective `coming-soon` state. This establishes
+the reversible target without mutating the immutable R2 prefix.
+
+The release record intentionally does not claim that production was switched to the rollback
+target and switched back. Performing that live drill remains an owner-controlled operational
+decision because it would temporarily remove the playable game from the public catalog.
+
 ## Rollback
 
 Rollback restores the previous known-good catalog release pointer and deploys that games-site
