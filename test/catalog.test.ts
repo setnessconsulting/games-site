@@ -14,11 +14,15 @@ describe("game catalog", () => {
     expect(new Set(games.map((game) => game.slug)).size).toBe(games.length);
   });
 
-  it("promotes Bridge Builder while keeping unrelated games unpromoted", () => {
+  it("keeps unpublished games unpromoted while published games select exact releases", () => {
     const bridgeBuilder = games.find((game) => game.slug === "bridge-builder");
     const signalGarden = games.find((game) => game.slug === "signal-garden");
+    const mathDetective = games.find((game) => game.slug === "math-detective");
     const unrelatedGames = games.filter(
-      (game) => game.slug !== "bridge-builder" && game.slug !== "signal-garden"
+      (game) =>
+        game.slug !== "bridge-builder" &&
+        game.slug !== "signal-garden" &&
+        game.slug !== "math-detective"
     );
     expect(unrelatedGames.every((game) => game.status === "coming-soon" && !game.release)).toBe(
       true
@@ -32,6 +36,12 @@ describe("game catalog", () => {
       dataFile: "WebGL.data.br",
       frameworkFile: "WebGL.framework.js.br",
       wasmFile: "WebGL.wasm.br"
+    });
+    expect(mathDetective?.status).toBe("playable");
+    expect(mathDetective?.release).toEqual({
+      kind: "static-web",
+      version: "2026.09.20-visual-pass.1",
+      entryFile: "index.html"
     });
     expect(bridgeBuilder?.status).toBe("playable");
     expect(bridgeBuilder?.release).toEqual({

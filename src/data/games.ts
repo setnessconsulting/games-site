@@ -25,6 +25,7 @@ export interface StaticWebRelease extends GameReleaseBase {
 export type GameRelease = UnityWebglRelease | StaticWebRelease;
 
 export const BRIDGE_BUILDER_PRODUCTION_VERSION = "0.1.0-qualification.10";
+export const MATH_DETECTIVE_PRODUCTION_VERSION = "2026.09.20-visual-pass.1";
 
 // Production selects the approved immutable release directly. Pages preview
 // builds may override the version to exercise a different pinned candidate.
@@ -44,6 +45,14 @@ const bridgeBuilderProductionRelease: StaticWebRelease = {
 const bridgeBuilderRelease: StaticWebRelease = bridgeBuilderPreviewVersion
   ? { ...bridgeBuilderProductionRelease, version: bridgeBuilderPreviewVersion }
   : bridgeBuilderProductionRelease;
+const mathDetectiveProductionRelease: StaticWebRelease = {
+  kind: "static-web",
+  version: MATH_DETECTIVE_PRODUCTION_VERSION,
+  entryFile: "index.html"
+};
+const mathDetectiveRelease: StaticWebRelease = mathDetectivePreviewVersion
+  ? { ...mathDetectiveProductionRelease, version: mathDetectivePreviewVersion }
+  : mathDetectiveProductionRelease;
 
 export interface GameEntry {
   slug: string;
@@ -123,27 +132,17 @@ export const games: readonly GameEntry[] = [
   {
     slug: "math-detective",
     title: "Math Detective",
-    status: mathDetectivePreviewVersion ? "playable" : "coming-soon",
+    status: "playable",
     eyebrow: "A case file for curious minds",
-    description: mathDetectivePreviewVersion
-      ? "Follow the clues, solve the math, and crack the case. This candidate build is being tested before it joins the playable collection."
-      : "Follow the clues, solve the math, and crack the case.",
-    cardImage: "/art/coming-soon.svg",
+    description: "Follow the clues, solve the math, and crack the case.",
+    cardImage: "/art/math-detective-card.svg",
     route: "/math-detective/",
     controls: [
       { input: "Mouse / touch", action: "Inspect evidence and choose" },
       { input: "Keyboard", action: "Move through the case file" },
       { input: "Read aloud", action: "Hear goals and hints when available" }
     ],
-    ...(mathDetectivePreviewVersion
-      ? {
-          release: {
-            kind: "static-web" as const,
-            version: mathDetectivePreviewVersion,
-            entryFile: "index.html"
-          }
-        }
-      : {})
+    release: mathDetectiveRelease
   },
   {
     slug: "new-world-01",
