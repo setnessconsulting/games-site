@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { BRIDGE_BUILDER_PRODUCTION_VERSION } from "../src/data/games";
+import {
+  BRIDGE_BUILDER_PRODUCTION_VERSION,
+  NUMBER_LINE_JUMPER_PRODUCTION_VERSION
+} from "../src/data/games";
 import {
   buildAssetKey,
   fallbackContentType,
@@ -36,9 +39,12 @@ describe("game asset contract", () => {
     expect(isApprovedRelease("bridge-builder", "0.1.0", false, "0.1.0")).toBe(true);
   });
 
-  it("approves only the exact Number Line Jumper preview slug and version", () => {
-    const previewVersion = "pr8-c7428853083f";
+  it("approves the production Number Line Jumper release and exact preview override", () => {
+    const previewVersion = "main-12641c0-preview";
 
+    expect(
+      isApprovedRelease("number-line-jumper", NUMBER_LINE_JUMPER_PRODUCTION_VERSION, false)
+    ).toBe(true);
     expect(
       isApprovedRelease("number-line-jumper", previewVersion, false, undefined, previewVersion)
     ).toBe(true);

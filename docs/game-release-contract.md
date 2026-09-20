@@ -110,14 +110,14 @@ until rollback has been exercised and recorded against the same release candidat
 
 `setnessconsulting/game-number-line-jumper` produces the static-web artifact and its release
 manifest. This repository owns the `number-line-jumper` card, launcher, play route, selected
-version, promotion, and rollback. The catalog entry intentionally remains `coming-soon` until the
-Number Line Jumper qualification stories produce a validated candidate.
+version, promotion, and rollback. The current production catalog selects the validated
+`main-12641c0` release.
 
 During hosted qualification, `NUMBER_LINE_JUMPER_PREVIEW_VERSION` is a preview-only exact-version
-pointer. When unset, the catalog remains `coming-soon` and the Function denies Number Line Jumper
-asset reads. When set, the catalog selects only that version as `static-web` with `index.html`, and
-the Function allows only the matching `number-line-jumper/<version>/` prefix. Production must leave
-the pointer unset.
+override. When unset, the catalog selects the checked-in production version. When set, the preview
+catalog selects only that version as `static-web` with `index.html`, and the Function allows only
+the matching `number-line-jumper/<version>/` prefix. Production leaves the preview override unset
+and uses the checked-in production pointer.
 
-LevelBest promotion is a separate, later release action that consumes the exact approved artifact;
-it is not part of games-site qualification.
+LevelBest is a separate host product; this promotion publishes the game on games-site and does not
+copy the game runtime into LevelBest.
