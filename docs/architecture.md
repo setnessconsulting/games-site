@@ -36,7 +36,7 @@ Later LevelBest integration consumes the exact pinned release artifact and does 
 ## Number Line Jumper boundary
 
 `game-number-line-jumper` owns the standalone source, tests, production build, release evidence,
-and immutable `number-line-jumper/<version>/` R2 artifact. The site may expose an exact candidate in
-Pages Preview only when `NUMBER_LINE_JUMPER_PREVIEW_VERSION` is set for both the build and the
-Function. Production leaves that pointer unset, and no LevelBest integration or promotion is part
-of preview qualification.
+and immutable `number-line-jumper/<version>/` R2 artifact. The games-site production catalog now
+selects the exact `main-12641c0` artifact. Pages Preview may override that checked-in pointer with
+`NUMBER_LINE_JUMPER_PREVIEW_VERSION` for candidate validation. LevelBest is a separate host product;
+the games-site deployment does not copy the game runtime there.

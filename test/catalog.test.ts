@@ -1,6 +1,11 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { GameEntry } from "../src/data/games";
-import { BRIDGE_BUILDER_PRODUCTION_VERSION, games, getGamePlayRoute } from "../src/data/games";
+import {
+  BRIDGE_BUILDER_PRODUCTION_VERSION,
+  NUMBER_LINE_JUMPER_PRODUCTION_VERSION,
+  games,
+  getGamePlayRoute
+} from "../src/data/games";
 import { validateCatalog } from "../src/lib/catalog";
 
 describe("game catalog", () => {
@@ -20,10 +25,13 @@ describe("game catalog", () => {
     const unrelatedGames = games.filter(
       (game) => game.slug !== "bridge-builder" && game.slug !== "signal-garden"
     );
-    expect(unrelatedGames.every((game) => game.status === "coming-soon" && !game.release)).toBe(
-      true
-    );
-    expect(games.find((game) => game.slug === "number-line-jumper")?.status).toBe("coming-soon");
+    expect(
+      unrelatedGames.every(
+        (game) =>
+          game.slug === "number-line-jumper" || (game.status === "coming-soon" && !game.release)
+      )
+    ).toBe(true);
+    expect(games.find((game) => game.slug === "number-line-jumper")?.status).toBe("playable");
     expect(signalGarden?.status).toBe("playable");
     expect(signalGarden?.release).toEqual({
       kind: "unity-webgl",
@@ -62,18 +70,8 @@ describe("game catalog", () => {
     expect(getGamePlayRoute(game!)).toBe("/number-line-jumper/play/");
   });
 
-  it("keeps Number Line Jumper coming-soon when its preview pointer is unset", async () => {
+  it("selects the production release when its preview pointer is unset", async () => {
     vi.stubEnv("NUMBER_LINE_JUMPER_PREVIEW_VERSION", "");
-    vi.resetModules();
-    const { games: catalog } = await import("../src/data/games");
-    const game = catalog.find((entry) => entry.slug === "number-line-jumper");
-
-    expect(game?.status).toBe("coming-soon");
-    expect(game?.release).toBeUndefined();
-  });
-
-  it("selects the exact Number Line Jumper version when its preview pointer is set", async () => {
-    vi.stubEnv("NUMBER_LINE_JUMPER_PREVIEW_VERSION", "pr8-c7428853083f");
     vi.resetModules();
     const { games: catalog } = await import("../src/data/games");
     const game = catalog.find((entry) => entry.slug === "number-line-jumper");
@@ -81,7 +79,21 @@ describe("game catalog", () => {
     expect(game?.status).toBe("playable");
     expect(game?.release).toEqual({
       kind: "static-web",
-      version: "pr8-c7428853083f",
+      version: NUMBER_LINE_JUMPER_PRODUCTION_VERSION,
+      entryFile: "index.html"
+    });
+  });
+
+  it("overrides the production release with the exact Number Line Jumper preview version", async () => {
+    vi.stubEnv("NUMBER_LINE_JUMPER_PREVIEW_VERSION", "main-12641c0-preview");
+    vi.resetModules();
+    const { games: catalog } = await import("../src/data/games");
+    const game = catalog.find((entry) => entry.slug === "number-line-jumper");
+
+    expect(game?.status).toBe("playable");
+    expect(game?.release).toEqual({
+      kind: "static-web",
+      version: "main-12641c0-preview",
       entryFile: "index.html"
     });
   });
