@@ -16,11 +16,23 @@ describe("game catalog", () => {
 
   it("promotes Bridge Builder while keeping unrelated games unpromoted", () => {
     const bridgeBuilder = games.find((game) => game.slug === "bridge-builder");
-    const unrelatedGames = games.filter((game) => game.slug !== "bridge-builder");
+    const signalGarden = games.find((game) => game.slug === "signal-garden");
+    const unrelatedGames = games.filter(
+      (game) => game.slug !== "bridge-builder" && game.slug !== "signal-garden"
+    );
     expect(unrelatedGames.every((game) => game.status === "coming-soon" && !game.release)).toBe(
       true
     );
     expect(games.find((game) => game.slug === "number-line-jumper")?.status).toBe("coming-soon");
+    expect(signalGarden?.status).toBe("playable");
+    expect(signalGarden?.release).toEqual({
+      kind: "unity-webgl",
+      version: "2026-09-20-1b3586f",
+      loaderFile: "WebGL.loader.js",
+      dataFile: "WebGL.data.br",
+      frameworkFile: "WebGL.framework.js.br",
+      wasmFile: "WebGL.wasm.br"
+    });
     expect(bridgeBuilder?.status).toBe("playable");
     expect(bridgeBuilder?.release).toEqual({
       kind: "static-web",
