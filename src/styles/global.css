@@ -754,7 +754,7 @@ h2 em {
 .static-game-stage:fullscreen .static-game-frame {
   min-height: 100vh;
 }
-.qualification-note {
+.game-note {
   max-width: 620px;
   margin: 30px 0 0;
   color: var(--muted);
