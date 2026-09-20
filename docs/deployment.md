@@ -40,6 +40,12 @@ the same variable is supplied to the preview Function so the version is approved
 approved production version is pinned directly in `src/data/games.ts`; do not use the preview
 variable as the production release pointer.
 
+For a Math Detective hosted qualification preview, publish the immutable static release from the
+standalone game repository under `math-detective/<version>/`, then build a non-production Pages
+preview with `MATH_DETECTIVE_PREVIEW_VERSION=<version>`. The production catalog remains
+`coming-soon` until the live-child, device, performance, authored-presentation, rollback, and
+named approval gates are complete.
+
 For a Number Line Jumper hosted qualification preview, publish the immutable static release from
 `setnessconsulting/game-number-line-jumper` under `number-line-jumper/<version>/`, then build a
 non-production Pages preview with `NUMBER_LINE_JUMPER_PREVIEW_VERSION=<version>`. The same exact

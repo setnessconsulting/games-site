@@ -14,7 +14,7 @@ const { title, entryUrl, gamePageUrl } = Astro.props;
     <p>Loading {title}…</p>
   </div>
   <div class="static-game-error" data-static-game-error hidden>
-    <p class="eyebrow">The bridge is unavailable</p>
+    <p class="eyebrow">{title} is unavailable</p>
     <h1>We couldn’t start this game.</h1>
     <p>
       Refresh the page and try again. The release remains versioned and can be rolled back safely.

@@ -1,0 +1,61 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import SiteHeader from "../../components/SiteHeader.astro";
+import StaticGameFrame from "../../components/StaticGameFrame.astro";
+import { getGame, getGameAssetBase } from "../../data/games";
+
+const game = getGame("math-detective");
+if (!game) throw new Error("Math Detective is missing from the catalog");
+
+const assetBase = getGameAssetBase(game);
+const release = game.release?.kind === "static-web" ? game.release : undefined;
+const entryUrl = assetBase && release ? `${assetBase}/${release.entryFile}` : undefined;
+---
+
+<BaseLayout title={`Play ${game.title}`} description={`Play ${game.title} at Setness Games.`}>
+  <SiteHeader compact />
+  <main class="play-page page-shell">
+    <div class="play-toolbar">
+      <a class="back-link" href={game.route}>
+        ← Game page
+      </a>
+      <span class="play-label">{game.title}</span>
+      {entryUrl ? (
+        <button class="text-button" type="button" data-fullscreen>
+          Fullscreen
+        </button>
+      ) : null}
+    </div>
+    {entryUrl ? (
+      <StaticGameFrame title={game.title} entryUrl={entryUrl} gamePageUrl={game.route} />
+    ) : (
+      <section class="not-ready-panel">
+        <p class="eyebrow">Coming soon</p>
+        <h1>The case file is still being prepared.</h1>
+        <p>There isn’t a playable build here yet. Return to the game page and try again later.</p>
+        <a class="button button-primary" href={game.route}>
+          Return to {game.title}
+        </a>
+      </section>
+    )}
+  </main>
+</BaseLayout>
+
+<script is:inline>
+  const button = document.querySelector("[data-fullscreen]");
+  const stage = document.querySelector("[data-static-game-stage]");
+
+  button?.addEventListener("click", async () => {
+    try {
+      if (!document.fullscreenElement) {
+        await stage?.requestFullscreen();
+        button.textContent = "Exit fullscreen";
+      } else {
+        await document.exitFullscreen();
+        button.textContent = "Fullscreen";
+      }
+    } catch {
+      button.textContent = "Fullscreen unavailable";
+    }
+  });
+</script>
