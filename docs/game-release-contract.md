@@ -100,6 +100,30 @@ Promotion is a reviewed catalog change in this repository:
 
 The merge commit/SHA is the games-site production promotion identity.
 
+## Math Detective
+
+Math Detective uses the single-tester release policy defined in
+`game-math-detective/docs/migration/levelbest/math-detective/PLAYTEST_PROTOCOL.md` and merged in
+that repository's PR #8. The policy change replaces the former multi-child study requirement
+with one owner-selected child tester as a qualitative release gate; it does not remove the
+device, performance, authored-presentation, accessibility, rollback, provenance, or approval
+requirements.
+
+For the candidate promoted by PR #10:
+
+- version: `2026.09.20-visual-pass.1`;
+- source SHA: `6b23e239b48871c0f4a2bf29343d9aebd0ccf9f5`;
+- immutable R2 prefix: `math-detective/2026.09.20-visual-pass.1/`;
+- entry file: `index.html`;
+- owner evidence: on 2026-09-20, the owner reported that one child tester played the hosted
+  candidate and judged it good enough for production. No child name or other PII is recorded;
+  device, input, timing, and structured session fields were not captured, so this is a
+  qualitative acceptance signal rather than a population-level usability claim;
+- copy approval: the project owner approved the final production copy for this candidate.
+
+The exact pointer remains reviewable in `src/data/games.ts`, and the hosted preview must resolve
+the exact immutable artifact before this promotion is merged.
+
 ## Rollback
 
 Rollback restores the previous known-good catalog release pointer and deploys that games-site

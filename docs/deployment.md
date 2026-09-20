@@ -43,8 +43,10 @@ variable as the production release pointer.
 For a Math Detective hosted qualification preview, publish the immutable static release from the
 standalone game repository under `math-detective/<version>/`, then build a non-production Pages
 preview with `MATH_DETECTIVE_PREVIEW_VERSION=<version>`. The production catalog remains
-`coming-soon` until the live-child, device, performance, authored-presentation, rollback, and
-named approval gates are complete.
+`coming-soon` until the single-tester live-child, device, performance, authored-presentation,
+rollback, and named approval gates are complete. The live-child gate is the owner-run qualitative
+protocol in the standalone repository's `PLAYTEST_PROTOCOL.md`; it intentionally requires one
+tester and does not claim statistically representative usability.
 
 For a Number Line Jumper release, publish the immutable static build from
 `setnessconsulting/game-number-line-jumper` under `number-line-jumper/<version>/`, then update the
