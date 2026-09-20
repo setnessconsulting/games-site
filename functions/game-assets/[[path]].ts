@@ -57,6 +57,9 @@ export const onRequest: PagesFunction<GameAssetsEnv> = async (context) => {
       "content-type",
       headers.get("content-type") ?? fallbackContentType(parsed.assetPath)
     );
+    if (parsed.assetPath.toLowerCase().endsWith(".br")) {
+      headers.set("content-encoding", "br");
+    }
 
     const byteRange = parseByteRange(requestRange, object.size);
     if (requestRange && !byteRange) {
