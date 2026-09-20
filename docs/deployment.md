@@ -60,7 +60,8 @@ checked-in production pointer in `src/data/games.ts` and deploy `main`. The curr
 version is `main-12641c0`. A non-production Pages preview may override it with
 `NUMBER_LINE_JUMPER_PREVIEW_VERSION=<version>`; the same exact pointer must be supplied to the
 preview Function. Rollback changes only the checked-in production pointer to a previously published
-immutable version. Do not overwrite or delete published prefixes.
+immutable version. Do not overwrite or delete published prefixes. The 2026-09-20 rehearsal is
+recorded in [`number-line-jumper-rollback.md`](number-line-jumper-rollback.md).
 
 ## Secrets
 
