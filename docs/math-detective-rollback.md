@@ -26,6 +26,11 @@ Recorded 2026-09-20 for the Math Detective production release.
    - `/math-detective/play/` returned `200` and loaded the exact immutable entry;
    - `index.html`, the JavaScript bundle, the CSS bundle, and the Phaser module returned `200`;
    - the case desk rendered with “The Case of the Mixed-Up Medals.”
+5. The documentation merge produced Pages deployment `2fad9797-7651-4055-aa6a-d13f384c5d38`
+   from games-site commit `89767dc3393799ed8133e03124691e912ca09a79`. At
+   `2026-09-21T00:07:47Z`, Playwright rechecked that deployment and the custom domain; the
+   collection remained `PLAYABLE`, the exact immutable entry remained loaded, and its assets
+   still returned `200`.
 
 ## Boundary
 
