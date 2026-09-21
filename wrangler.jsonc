@@ -20,8 +20,7 @@
       "vars": {
         "BRIDGE_BUILDER_PREVIEW_VERSION": "0.1.0-qualification.10",
         "NUMBER_LINE_JUMPER_PREVIEW_VERSION": "main-12641c0",
-        "MATH_DETECTIVE_PREVIEW_VERSION": "2026.09.21-playtest-enhancements.1",
-        "WEATHER_COMMAND_PREVIEW_VERSION": ""
+        "MATH_DETECTIVE_PREVIEW_VERSION": "2026.09.21-playtest-enhancements.1"
       }
     }
   }
