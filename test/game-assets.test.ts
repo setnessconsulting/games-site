@@ -56,7 +56,6 @@ describe("game asset contract", () => {
     ).toBe(false);
   });
 
-
   it("allows only the exact Weather Command preview version before production promotion", () => {
     const previewVersion = "main-foundation-preview";
 
