@@ -40,11 +40,11 @@ describe("game catalog", () => {
     expect(signalGarden?.status).toBe("playable");
     expect(signalGarden?.release).toEqual({
       kind: "unity-webgl",
-      version: "2026-09-20-1b3586f",
+      version: "2026-09-20-1b3586f-uncompressed",
       loaderFile: "WebGL.loader.js",
-      dataFile: "WebGL.data.br",
-      frameworkFile: "WebGL.framework.js.br",
-      wasmFile: "WebGL.wasm.br"
+      dataFile: "WebGL.data",
+      frameworkFile: "WebGL.framework.js",
+      wasmFile: "WebGL.wasm"
     });
     expect(mathDetective?.status).toBe("playable");
     expect(mathDetective?.release).toEqual({

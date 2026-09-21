@@ -25,12 +25,18 @@ const { title, version, assetBase, loaderFile, dataFile, frameworkFile, wasmFile
     <p>
       Refresh the page and try again. If the problem continues, this release may be unavailable.
     </p>
+    <p class="game-diagnostics" data-game-diagnostics hidden></p>
     <a class="button button-primary" href={returnRoute}>
       Return to game page
     </a>
   </div>
   <div class="game-canvas-wrap" data-game-canvas-wrap hidden>
-    <canvas data-game-canvas aria-label={`${title} game canvas`}></canvas>
+    <canvas
+      id="unity-canvas"
+      data-game-canvas
+      tabindex="-1"
+      aria-label={`${title} game canvas`}
+    ></canvas>
   </div>
 </div>
 
@@ -42,26 +48,37 @@ const { title, version, assetBase, loaderFile, dataFile, frameworkFile, wasmFile
   const loading = document.querySelector("[data-game-loading]");
   const progress = document.querySelector("[data-game-progress]");
   const error = document.querySelector("[data-game-error]");
+  const diagnostics = document.querySelector("[data-game-diagnostics]");
   const canvasWrap = document.querySelector("[data-game-canvas-wrap]");
   const canvas = document.querySelector("[data-game-canvas]");
 
-  const showError = () => {
+  const showError = (reason) => {
     loading?.setAttribute("hidden", "true");
     canvasWrap?.setAttribute("hidden", "true");
+    if (diagnostics) {
+      const detail =
+        reason instanceof Error
+          ? reason.message
+          : typeof reason === "string"
+            ? reason
+            : "Unity failed to initialize.";
+      diagnostics.textContent = `Release ${version}: ${detail}`;
+      diagnostics.removeAttribute("hidden");
+    }
     error?.removeAttribute("hidden");
   };
 
   const loaderUrl = `${assetBase}/Build/${loaderFile}`;
 
   if (!loaderUrl || !stage || !loading || !progress || !error || !canvasWrap || !canvas) {
-    showError();
+    showError("The game loader is not configured.");
   } else {
     const loader = document.createElement("script");
     loader.src = loaderUrl;
     loader.async = true;
     loader.addEventListener("load", async () => {
       if (typeof window.createUnityInstance !== "function") {
-        showError();
+        showError("The Unity loader did not initialize.");
         return;
       }
 
@@ -85,12 +102,13 @@ const { title, version, assetBase, loaderFile, dataFile, frameworkFile, wasmFile
             progress.textContent = `Loading ${title}… ${Math.round(value * 100)}%`;
           }
         );
+        canvas.focus?.({ preventScroll: true });
         loading.setAttribute("hidden", "true");
-      } catch {
-        showError();
+      } catch (reason) {
+        showError(reason);
       }
     });
-    loader.addEventListener("error", showError);
+    loader.addEventListener("error", () => showError("The Unity loader could not be downloaded."));
     document.head.appendChild(loader);
   }
 </script>
