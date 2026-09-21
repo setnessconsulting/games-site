@@ -92,11 +92,11 @@ export const games: readonly GameEntry[] = [
     ],
     release: {
       kind: "unity-webgl",
-      version: "2026-09-20-1b3586f-uncompressed",
+      version: "2026-09-21-58f2c29",
       loaderFile: "WebGL.loader.js",
-      dataFile: "WebGL.data",
-      frameworkFile: "WebGL.framework.js",
-      wasmFile: "WebGL.wasm"
+      dataFile: "WebGL.data.br",
+      frameworkFile: "WebGL.framework.js.br",
+      wasmFile: "WebGL.wasm.br"
     }
   },
   {
