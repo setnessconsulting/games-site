@@ -126,11 +126,11 @@ the exact immutable artifact before this promotion is merged.
 
 ### Operational closeout
 
-The current production deployment is Cloudflare Pages deployment
+The live rehearsal used Cloudflare Pages deployment
 `3691f315-8a13-40e4-8984-e13aedbecf60` from games-site commit
-`a2527d822d351ff175824021e26258b19c9da59b`, which preserves the Math Detective pointer while
-including the later Number Line Jumper restoration. The prior known-good deployment is
-`50118dc5.games-site-7pn.pages.dev` from the pre-promotion catalog revision.
+`a2527d822d351ff175824021e26258b19c9da59b` as the restore target; it preserved the Math Detective
+pointer while including the later Number Line Jumper restoration. The prior known-good deployment
+is `50118dc5.games-site-7pn.pages.dev` from the pre-promotion catalog revision.
 
 The live rollback rehearsal switched the production alias to `50118dc5`, verified the collection
 and direct play route as `coming-soon` with Playwright on both the Pages hostname and the custom
@@ -139,6 +139,10 @@ domain, then restored `3691f315`. The restored custom-domain route again loaded 
 200 responses. The full evidence record is in
 [`math-detective-rollback.md`](math-detective-rollback.md); no immutable R2 object was deleted or
 overwritten.
+
+The documentation merge then produced Pages deployment `2fad9797-7651-4055-aa6a-d13f384c5d38`
+from games-site commit `89767dc3393799ed8133e03124691e912ca09a79`; a post-merge Playwright
+readback confirmed that the Math Detective pointer and public play route remained unchanged.
 
 ## Rollback
 
