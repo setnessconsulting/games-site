@@ -41,7 +41,8 @@ export function isApprovedRelease(
   allowFixture: boolean,
   bridgeBuilderPreviewVersion?: string,
   numberLineJumperPreviewVersion?: string,
-  mathDetectivePreviewVersion?: string
+  mathDetectivePreviewVersion?: string,
+  weatherCommandPreviewVersion?: string
 ): boolean {
   if (allowFixture && slug === "test-fixture" && version === "0.0.0") return true;
 
@@ -65,6 +66,14 @@ export function isApprovedRelease(
     slug === "math-detective" &&
     mathDetectivePreviewVersion &&
     version === mathDetectivePreviewVersion
+  ) {
+    return true;
+  }
+
+  if (
+    slug === "weather-command" &&
+    weatherCommandPreviewVersion &&
+    version === weatherCommandPreviewVersion
   ) {
     return true;
   }
