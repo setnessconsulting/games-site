@@ -126,22 +126,25 @@ the exact immutable artifact before this promotion is merged.
 
 ### Operational closeout
 
-The active production deployment for the promotion is Cloudflare Pages deployment
-`f84e9c97-92dc-4a1a-a861-fcf2dddc5066` from games-site commit
-`d596206ff8999f3575f92e950399864fe7e7efd5`. The prior known-good deployment is
-`50118dc5.games-site-7pn.pages.dev` from the pre-promotion catalog revision; a direct read-only
-check confirmed that it serves the previous Math Detective `coming-soon` state. This establishes
-the reversible target without mutating the immutable R2 prefix.
+The current production deployment is Cloudflare Pages deployment
+`3691f315-8a13-40e4-8984-e13aedbecf60` from games-site commit
+`a2527d822d351ff175824021e26258b19c9da59b`, which preserves the Math Detective pointer while
+including the later Number Line Jumper restoration. The prior known-good deployment is
+`50118dc5.games-site-7pn.pages.dev` from the pre-promotion catalog revision.
 
-The release record intentionally does not claim that production was switched to the rollback
-target and switched back. Performing that live drill remains an owner-controlled operational
-decision because it would temporarily remove the playable game from the public catalog.
+The live rollback rehearsal switched the production alias to `50118dc5`, verified the collection
+and direct play route as `coming-soon` with Playwright on both the Pages hostname and the custom
+domain, then restored `3691f315`. The restored custom-domain route again loaded the exact
+`math-detective/2026.09.20-visual-pass.1/index.html` entry and its JavaScript/CSS assets with HTTP
+200 responses. The full evidence record is in
+[`math-detective-rollback.md`](math-detective-rollback.md); no immutable R2 object was deleted or
+overwritten.
 
 ## Rollback
 
 Rollback restores the previous known-good catalog release pointer and deploys that games-site
-revision. It never deletes or mutates immutable R2 artifacts. A release is not finally accepted
-until rollback has been exercised and recorded against the same release candidate.
+revision. It never deletes or mutates immutable R2 artifacts. The Math Detective candidate's
+rollback has been exercised and recorded against the same release candidate.
 
 ## Number Line Jumper
 
