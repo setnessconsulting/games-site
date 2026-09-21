@@ -57,7 +57,8 @@ export const onRequest: PagesFunction<GameAssetsEnv> = async (context) => {
       "content-type",
       headers.get("content-type") ?? fallbackContentType(parsed.assetPath)
     );
-    if (parsed.assetPath.toLowerCase().endsWith(".br")) {
+    const isBrotliAsset = parsed.assetPath.toLowerCase().endsWith(".br");
+    if (isBrotliAsset) {
       headers.set("content-encoding", "br");
     }
 
@@ -78,7 +79,8 @@ export const onRequest: PagesFunction<GameAssetsEnv> = async (context) => {
 
     return new Response(method === "HEAD" ? null : object.body, {
       status: byteRange ? 206 : 200,
-      headers
+      headers,
+      encodeBody: isBrotliAsset ? "manual" : "automatic"
     });
   } catch (error) {
     console.error(
