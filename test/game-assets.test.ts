@@ -56,6 +56,44 @@ describe("game asset contract", () => {
     ).toBe(false);
   });
 
+  it("allows only the exact Weather Command preview version before production promotion", () => {
+    const previewVersion = "main-foundation-preview";
+
+    expect(
+      isApprovedRelease(
+        "weather-command",
+        previewVersion,
+        false,
+        undefined,
+        undefined,
+        undefined,
+        previewVersion
+      )
+    ).toBe(true);
+    expect(
+      isApprovedRelease(
+        "weather-command",
+        "other-version",
+        false,
+        undefined,
+        undefined,
+        undefined,
+        previewVersion
+      )
+    ).toBe(false);
+    expect(
+      isApprovedRelease(
+        "other-game",
+        previewVersion,
+        false,
+        undefined,
+        undefined,
+        undefined,
+        previewVersion
+      )
+    ).toBe(false);
+  });
+
   it("provides safe content type fallbacks", () => {
     expect(fallbackContentType("Build/game.wasm")).toBe("application/wasm");
     expect(fallbackContentType("Build/game.loader.js")).toContain("text/javascript");
