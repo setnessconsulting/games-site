@@ -137,6 +137,31 @@ describe("game catalog", () => {
     });
   });
 
+
+  it("keeps Weather Command coming-soon unless an exact preview is selected", async () => {
+    vi.stubEnv("WEATHER_COMMAND_PREVIEW_VERSION", "");
+    vi.resetModules();
+    let module = await import("../src/data/games");
+    let game = module.games.find((entry) => entry.slug === "weather-command");
+
+    expect(game?.status).toBe("coming-soon");
+    expect(game?.release).toBeUndefined();
+    expect(game?.route).toBe("/weather-command/");
+    expect(module.getGamePlayRoute(game!)).toBe("/weather-command/play/");
+
+    vi.stubEnv("WEATHER_COMMAND_PREVIEW_VERSION", "main-foundation-preview");
+    vi.resetModules();
+    module = await import("../src/data/games");
+    game = module.games.find((entry) => entry.slug === "weather-command");
+
+    expect(game?.status).toBe("playable");
+    expect(game?.release).toEqual({
+      kind: "static-web",
+      version: "main-foundation-preview",
+      entryFile: "index.html"
+    });
+  });
+
   it("accepts both release kinds when promoted", () => {
     const webGame: GameEntry = {
       ...games[0],
