@@ -64,7 +64,6 @@ preview Function. Rollback changes only the checked-in production pointer to a p
 immutable version. Do not overwrite or delete published prefixes. The 2026-09-20 rehearsal is
 recorded in [`number-line-jumper-rollback.md`](number-line-jumper-rollback.md).
 
-
 For a Weather Command qualification preview, publish the immutable static-web artifact from
 `setnessconsulting/game-weather-command` under `weather-command/<version>/`, then create a
 non-production Pages preview with `WEATHER_COMMAND_PREVIEW_VERSION=<version>`. The preview
