@@ -38,6 +38,7 @@ const runtimeProcess = (
 const bridgeBuilderPreviewVersion = runtimeProcess?.env?.BRIDGE_BUILDER_PREVIEW_VERSION;
 const numberLineJumperPreviewVersion = runtimeProcess?.env?.NUMBER_LINE_JUMPER_PREVIEW_VERSION;
 const mathDetectivePreviewVersion = runtimeProcess?.env?.MATH_DETECTIVE_PREVIEW_VERSION;
+const weatherCommandPreviewVersion = runtimeProcess?.env?.WEATHER_COMMAND_PREVIEW_VERSION;
 const bridgeBuilderProductionRelease: StaticWebRelease = {
   kind: "static-web",
   version: BRIDGE_BUILDER_PRODUCTION_VERSION,
@@ -62,6 +63,9 @@ const mathDetectiveProductionRelease: StaticWebRelease = {
 const mathDetectiveRelease: StaticWebRelease = mathDetectivePreviewVersion
   ? { ...mathDetectiveProductionRelease, version: mathDetectivePreviewVersion }
   : mathDetectiveProductionRelease;
+const weatherCommandPreviewRelease: StaticWebRelease | undefined = weatherCommandPreviewVersion
+  ? { kind: "static-web", version: weatherCommandPreviewVersion, entryFile: "index.html" }
+  : undefined;
 
 export interface GameEntry {
   slug: string;
@@ -144,6 +148,22 @@ export const games: readonly GameEntry[] = [
       { input: "Read aloud", action: "Hear goals and hints when available" }
     ],
     release: mathDetectiveRelease
+  },
+  {
+    slug: "weather-command",
+    title: "Weather Command",
+    status: weatherCommandPreviewRelease ? "playable" : "coming-soon",
+    eyebrow: "Read the atmosphere",
+    description: weatherCommandPreviewRelease
+      ? "Inspect atmospheric evidence, make a forecast, and compare your prediction with a simulated weather system in this qualification preview."
+      : "A forecast desk is taking shape. Soon you’ll read atmospheric evidence, make a prediction, and see how the simulated weather responds.",
+    cardImage: "/art/coming-soon.svg",
+    route: "/weather-command/",
+    controls: [
+      { input: "Mouse / touch", action: "Inspect evidence and build a forecast" },
+      { input: "Keyboard", action: "Navigate evidence and forecast controls" }
+    ],
+    ...(weatherCommandPreviewRelease ? { release: weatherCommandPreviewRelease } : {})
   },
   {
     slug: "new-world-01",
