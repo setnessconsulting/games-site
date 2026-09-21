@@ -137,7 +137,6 @@ describe("game catalog", () => {
     });
   });
 
-
   it("keeps Weather Command coming-soon unless an exact preview is selected", async () => {
     vi.stubEnv("WEATHER_COMMAND_PREVIEW_VERSION", "");
     vi.resetModules();
