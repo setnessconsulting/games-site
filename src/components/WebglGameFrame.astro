@@ -31,7 +31,12 @@ const { title, version, assetBase, loaderFile, dataFile, frameworkFile, wasmFile
     </a>
   </div>
   <div class="game-canvas-wrap" data-game-canvas-wrap hidden>
-    <canvas data-game-canvas aria-label={`${title} game canvas`}></canvas>
+    <canvas
+      id="unity-canvas"
+      data-game-canvas
+      tabindex="-1"
+      aria-label={`${title} game canvas`}
+    ></canvas>
   </div>
 </div>
 
@@ -97,6 +102,7 @@ const { title, version, assetBase, loaderFile, dataFile, frameworkFile, wasmFile
             progress.textContent = `Loading ${title}… ${Math.round(value * 100)}%`;
           }
         );
+        canvas.focus?.({ preventScroll: true });
         loading.setAttribute("hidden", "true");
       } catch (reason) {
         showError(reason);
