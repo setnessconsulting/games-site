@@ -32,7 +32,8 @@ export const onRequest: PagesFunction<GameAssetsEnv> = async (context) => {
       context.env.BRIDGE_BUILDER_PREVIEW_VERSION,
       context.env.NUMBER_LINE_JUMPER_PREVIEW_VERSION,
       context.env.MATH_DETECTIVE_PREVIEW_VERSION,
-      context.env.WEATHER_COMMAND_PREVIEW_VERSION
+      context.env.WEATHER_COMMAND_PREVIEW_VERSION,
+      context.env.ECOSYSTEM_RESCUE_PREVIEW_VERSION
     )
   ) {
     return new Response(null, { status: 404 });

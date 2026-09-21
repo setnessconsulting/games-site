@@ -42,7 +42,8 @@ export function isApprovedRelease(
   bridgeBuilderPreviewVersion?: string,
   numberLineJumperPreviewVersion?: string,
   mathDetectivePreviewVersion?: string,
-  weatherCommandPreviewVersion?: string
+  weatherCommandPreviewVersion?: string,
+  ecosystemRescuePreviewVersion?: string
 ): boolean {
   if (allowFixture && slug === "test-fixture" && version === "0.0.0") return true;
 
@@ -74,6 +75,14 @@ export function isApprovedRelease(
     slug === "weather-command" &&
     weatherCommandPreviewVersion &&
     version === weatherCommandPreviewVersion
+  ) {
+    return true;
+  }
+
+  if (
+    slug === "ecosystem-rescue" &&
+    ecosystemRescuePreviewVersion &&
+    version === ecosystemRescuePreviewVersion
   ) {
     return true;
   }

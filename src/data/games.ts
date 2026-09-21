@@ -39,6 +39,7 @@ const bridgeBuilderPreviewVersion = runtimeProcess?.env?.BRIDGE_BUILDER_PREVIEW_
 const numberLineJumperPreviewVersion = runtimeProcess?.env?.NUMBER_LINE_JUMPER_PREVIEW_VERSION;
 const mathDetectivePreviewVersion = runtimeProcess?.env?.MATH_DETECTIVE_PREVIEW_VERSION;
 const weatherCommandPreviewVersion = runtimeProcess?.env?.WEATHER_COMMAND_PREVIEW_VERSION;
+const ecosystemRescuePreviewVersion = runtimeProcess?.env?.ECOSYSTEM_RESCUE_PREVIEW_VERSION;
 const bridgeBuilderProductionRelease: StaticWebRelease = {
   kind: "static-web",
   version: BRIDGE_BUILDER_PRODUCTION_VERSION,
@@ -65,6 +66,12 @@ const mathDetectiveRelease: StaticWebRelease = mathDetectivePreviewVersion
   : mathDetectiveProductionRelease;
 const weatherCommandPreviewRelease: StaticWebRelease | undefined = weatherCommandPreviewVersion
   ? { kind: "static-web", version: weatherCommandPreviewVersion, entryFile: "index.html" }
+  : undefined;
+// Ecosystem Rescue is a qualification candidate: production keeps it coming-soon, and a preview
+// build with the exact version pinned serves that immutable artifact. Merging this change does not
+// publish the game; the preview environment is what renders it.
+const ecosystemRescuePreviewRelease: StaticWebRelease | undefined = ecosystemRescuePreviewVersion
+  ? { kind: "static-web", version: ecosystemRescuePreviewVersion, entryFile: "index.html" }
   : undefined;
 
 export interface GameEntry {
@@ -164,6 +171,22 @@ export const games: readonly GameEntry[] = [
       { input: "Keyboard", action: "Navigate evidence and forecast controls" }
     ],
     ...(weatherCommandPreviewRelease ? { release: weatherCommandPreviewRelease } : {})
+  },
+  {
+    slug: "ecosystem-rescue",
+    title: "Ecosystem Rescue",
+    status: ecosystemRescuePreviewRelease ? "playable" : "coming-soon",
+    eyebrow: "Read the whole pond",
+    description: ecosystemRescuePreviewRelease
+      ? "Follow fertiliser from the fields into a pond: watch the algae bloom, the water cloud over, and the oxygen fall, then decide what to do about it. This candidate build is being tested before it joins the playable collection, and it says on screen which parts of the model it does not yet run."
+      : "A pond is taking shape. Soon you’ll trace nutrients through a whole ecosystem, read the evidence, and decide what a struggling pond needs.",
+    cardImage: "/art/coming-soon.svg",
+    route: "/ecosystem-rescue/",
+    controls: [
+      { input: "Mouse / touch", action: "Advance days and take an intervention" },
+      { input: "Keyboard", action: "Advance, intervene, and read the evidence table" }
+    ],
+    ...(ecosystemRescuePreviewRelease ? { release: ecosystemRescuePreviewRelease } : {})
   },
   {
     slug: "new-world-01",
