@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   BRIDGE_BUILDER_PRODUCTION_VERSION,
-  NUMBER_LINE_JUMPER_PRODUCTION_VERSION
+  NUMBER_LINE_JUMPER_PRODUCTION_VERSION,
+  WEATHER_COMMAND_PRODUCTION_VERSION
 } from "../src/data/games";
 import {
   buildAssetKey,
@@ -56,9 +57,12 @@ describe("game asset contract", () => {
     ).toBe(false);
   });
 
-  it("allows only the exact Weather Command preview version before production promotion", () => {
+  it("approves the production Weather Command release and exact preview override", () => {
     const previewVersion = "main-foundation-preview";
 
+    expect(isApprovedRelease("weather-command", WEATHER_COMMAND_PRODUCTION_VERSION, false)).toBe(
+      true
+    );
     expect(
       isApprovedRelease(
         "weather-command",

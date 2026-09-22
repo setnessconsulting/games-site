@@ -5,6 +5,7 @@ import {
   ECOSYSTEM_RESCUE_PRODUCTION_VERSION,
   MATH_DETECTIVE_PRODUCTION_VERSION,
   NUMBER_LINE_JUMPER_PRODUCTION_VERSION,
+  WEATHER_COMMAND_PRODUCTION_VERSION,
   games,
   getGamePlayRoute
 } from "../src/data/games";
@@ -42,7 +43,7 @@ describe("game catalog", () => {
     expect(games.find((game) => game.slug === "weather-command")?.status).toBe("playable");
     expect(games.find((game) => game.slug === "weather-command")?.release).toEqual({
       kind: "static-web",
-      version: "0.1.0-qualification.1",
+      version: WEATHER_COMMAND_PRODUCTION_VERSION,
       entryFile: "index.html"
     });
     expect(games.find((game) => game.slug === "number-line-jumper")?.status).toBe("playable");
@@ -146,7 +147,7 @@ describe("game catalog", () => {
     });
   });
 
-  it("pins Weather Command to the qualification candidate, overridable by preview env", async () => {
+  it("keeps Weather Command on its promoted production release unless a preview is pinned", async () => {
     vi.stubEnv("WEATHER_COMMAND_PREVIEW_VERSION", "");
     vi.resetModules();
     let module = await import("../src/data/games");
@@ -155,7 +156,7 @@ describe("game catalog", () => {
     expect(game?.status).toBe("playable");
     expect(game?.release).toEqual({
       kind: "static-web",
-      version: "0.1.0-qualification.1",
+      version: WEATHER_COMMAND_PRODUCTION_VERSION,
       entryFile: "index.html"
     });
     expect(game?.route).toBe("/weather-command/");
