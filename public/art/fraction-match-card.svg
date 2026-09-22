@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">Fraction Match</title>
+  <desc id="desc">Two night-table cards that show the same amount in different pictures: a halved bar and a circle split into four, with two quarters filled.</desc>
+  <defs>
+    <linearGradient id="night" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#182d3b" />
+      <stop offset="1" stop-color="#0b1f2a" />
+    </linearGradient>
+    <linearGradient id="table" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2a4a52" />
+      <stop offset="1" stop-color="#16333b" />
+    </linearGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f4e4c1" />
+      <stop offset="1" stop-color="#e2c48a" />
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="760" fill="url(#night)" />
+  <circle cx="980" cy="118" r="92" fill="#f5d893" opacity=".22" />
+  <circle cx="980" cy="118" r="46" fill="#f5d893" opacity=".42" />
+  <circle cx="160" cy="96" r="5" fill="#f5d893" opacity=".7" />
+  <circle cx="248" cy="168" r="4" fill="#f5d893" opacity=".55" />
+  <circle cx="1088" cy="248" r="4" fill="#f5d893" opacity=".6" />
+  <circle cx="70" cy="240" r="3" fill="#f5d893" opacity=".45" />
+
+  <path d="M0 470c168-48 338-42 508-10 172 32 318-18 474-8 118 8 154 36 218 18v290H0Z" fill="#123746" />
+  <path d="M0 560c186-36 352-22 520 6 170 28 324-24 470-12 108 9 146 28 210 10v196H0Z" fill="url(#table)" />
+  <path d="M0 704c196-18 360-10 528 8 170 18 318 8 452-10 78-10 148-12 220-4v62H0Z" fill="#0a2934" />
+
+  <g transform="translate(214 214) rotate(-8 186 228)">
+    <rect width="372" height="456" rx="28" fill="url(#card)" />
+    <rect x="28" y="28" width="316" height="400" rx="18" fill="#f8eeda" />
+    <rect x="64" y="118" width="244" height="116" rx="12" fill="#f3dfb1" stroke="#8b5d50" stroke-width="8" />
+    <rect x="64" y="118" width="122" height="116" rx="12" fill="#2f6a72" />
+    <path d="M186 118v116" stroke="#8b5d50" stroke-width="8" />
+    <rect x="118" y="292" width="136" height="18" rx="9" fill="#c98f5a" opacity=".55" />
+  </g>
+
+  <g transform="translate(614 248) rotate(7 186 228)">
+    <rect width="372" height="456" rx="28" fill="url(#card)" />
+    <rect x="28" y="28" width="316" height="400" rx="18" fill="#f8eeda" />
+    <circle cx="186" cy="176" r="88" fill="#f3dfb1" stroke="#8b5d50" stroke-width="8" />
+    <path d="M186 88 A88 88 0 0 1 274 176 L186 176 Z" fill="#2f6a72" />
+    <path d="M186 176 A88 88 0 0 1 186 264 L186 176 Z" fill="#2f6a72" />
+    <path d="M186 88v176M98 176h176" stroke="#8b5d50" stroke-width="6" />
+    <rect x="118" y="308" width="136" height="18" rx="9" fill="#c98f5a" opacity=".55" />
+  </g>
+</svg>
