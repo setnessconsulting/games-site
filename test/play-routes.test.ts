@@ -21,29 +21,38 @@ const staticWebPages = [
   {
     slug: "bridge-builder",
     version: BRIDGE_BUILDER_PRODUCTION_VERSION,
+    stage: "[data-static-game-stage]",
     Page: BridgeBuilderPlay
   },
   {
     slug: "ecosystem-rescue",
     version: ECOSYSTEM_RESCUE_PRODUCTION_VERSION,
+    stage: "[data-static-game-stage]",
     Page: EcosystemRescuePlay
   },
-  { slug: "math-detective", version: MATH_DETECTIVE_PRODUCTION_VERSION, Page: MathDetectivePlay },
+  {
+    slug: "math-detective",
+    version: MATH_DETECTIVE_PRODUCTION_VERSION,
+    stage: "[data-static-game-stage]",
+    Page: MathDetectivePlay
+  },
   {
     slug: "weather-command",
     version: WEATHER_COMMAND_PRODUCTION_VERSION,
+    stage: "[data-static-game-stage]",
     Page: WeatherCommandPlay
   },
   {
     slug: "number-line-jumper",
     version: NUMBER_LINE_JUMPER_PRODUCTION_VERSION,
+    stage: "[data-game-stage]",
     Page: NumberLineJumperPlay
   }
 ] as const;
 
 const allPlayPages = [
   ...staticWebPages,
-  { slug: "signal-garden", Page: SignalGardenPlay }
+  { slug: "signal-garden", stage: "[data-game-stage]", Page: SignalGardenPlay }
 ] as const;
 
 async function renderPlayPage(page: (typeof allPlayPages)[number]["Page"]) {
@@ -72,15 +81,25 @@ describe("play routes for promoted games", () => {
     expect(html).not.toContain("Coming soon");
   });
 
-  it("keeps the play toolbar and back link pointed at each game page", async () => {
+  it("renders the shared toolbar with the game page back link", async () => {
     for (const { slug, Page } of allPlayPages) {
       const game = getGame(slug)!;
       const html = await renderPlayPage(Page);
 
       expect(html, slug).toContain(`<title>Play ${game.title} · Setness Games</title>`);
-      expect(html, slug).toContain(`<span class="play-label">${game.title}</span>`);
       expect(html, slug).toContain(`<a class="back-link" href="${game.route}">`);
+      expect(html, slug).toContain(`<span class="play-label">${game.title}</span>`);
+    }
+  });
+
+  it("renders one fullscreen control wired to each page's stage", async () => {
+    for (const { slug, stage, Page } of allPlayPages) {
+      const html = await renderPlayPage(Page);
+
       expect(html, slug).toContain("Fullscreen");
+      expect(html, slug).toContain("data-play-fullscreen");
+      expect(html, slug).toContain(`data-fullscreen-stage="${stage}"`);
+      expect(html, slug).toContain('document.querySelector("[data-play-fullscreen]")');
     }
   });
 });

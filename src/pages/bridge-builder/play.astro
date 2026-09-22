@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import GameUnavailable from "../../components/GameUnavailable.astro";
+import PlayToolbar from "../../components/PlayToolbar.astro";
 import SiteHeader from "../../components/SiteHeader.astro";
 import StaticGameFrame from "../../components/StaticGameFrame.astro";
 import { getGame, getStaticWebPlaySource } from "../../data/games";
@@ -15,17 +16,11 @@ const entryUrl = playSource ? `${playSource.assetBase}/${playSource.release.entr
 <BaseLayout title={`Play ${game.title}`} description={`Play ${game.title} at Setness Games.`}>
   <SiteHeader compact />
   <main class="play-page page-shell">
-    <div class="play-toolbar">
-      <a class="back-link" href="/bridge-builder/">
-        ← Game page
-      </a>
-      <span class="play-label">{game.title}</span>
-      {entryUrl ? (
-        <button class="text-button" type="button" data-fullscreen>
-          Fullscreen
-        </button>
-      ) : null}
-    </div>
+    <PlayToolbar
+      game={game}
+      canFullscreen={Boolean(entryUrl)}
+      fullscreenStage="[data-static-game-stage]"
+    />
     {entryUrl ? (
       <StaticGameFrame title={game.title} entryUrl={entryUrl} gamePageUrl={game.route} />
     ) : (
@@ -37,22 +32,3 @@ const entryUrl = playSource ? `${playSource.assetBase}/${playSource.release.entr
     )}
   </main>
 </BaseLayout>
-
-<script is:inline>
-  const fullscreenButton = document.querySelector("[data-fullscreen]");
-  const fullscreenStage = document.querySelector("[data-static-game-stage]");
-
-  fullscreenButton?.addEventListener("click", async () => {
-    try {
-      if (!document.fullscreenElement) {
-        await fullscreenStage?.requestFullscreen();
-        fullscreenButton.textContent = "Exit fullscreen";
-      } else {
-        await document.exitFullscreen();
-        fullscreenButton.textContent = "Fullscreen";
-      }
-    } catch {
-      fullscreenButton.textContent = "Fullscreen unavailable";
-    }
-  });
-</script>

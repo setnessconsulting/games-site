@@ -92,6 +92,17 @@ describe("play routes for unavailable games", () => {
     }
   });
 
+  it("does not render the fullscreen control for unavailable games", async () => {
+    for (const { slug, Page } of unavailablePages) {
+      const container = await AstroContainer.create();
+      const html = await container.renderToString(Page, { partial: false });
+
+      expect(html, slug).not.toContain("data-play-fullscreen");
+      expect(html, slug).not.toContain("data-fullscreen-stage");
+      expect(html, slug).not.toContain("requestFullscreen");
+    }
+  });
+
   it("keeps the page shell, toolbar, and game title intact", async () => {
     for (const { slug, Page } of unavailablePages) {
       const game = getGame(slug)!;
