@@ -15,6 +15,7 @@ vi.mock("../src/data/games", async (importOriginal) => {
 
 import BridgeBuilderPlay from "../src/pages/bridge-builder/play.astro";
 import EcosystemRescuePlay from "../src/pages/ecosystem-rescue/play.astro";
+import FractionMatchPlay from "../src/pages/fraction-match/play.astro";
 import MathDetectivePlay from "../src/pages/math-detective/play.astro";
 import NumberLineJumperPlay from "../src/pages/number-line-jumper/play.astro";
 import SignalGardenPlay from "../src/pages/signal-garden/play.astro";
@@ -62,6 +63,13 @@ const unavailablePages = [
     description:
       "There isn’t a qualified Ecosystem Rescue build here yet. Production stays intentionally unavailable until the candidate passes its science, accessibility, comparator, device, and playtest gates.",
     Page: EcosystemRescuePlay
+  },
+  {
+    slug: "fraction-match",
+    heading: "The cards are still being dealt.",
+    description:
+      "There isn’t a qualified Fraction Match build here yet. Production stays intentionally unavailable until the candidate passes its accessibility, comparator, device, and playtest gates.",
+    Page: FractionMatchPlay
   }
 ] as const;
 

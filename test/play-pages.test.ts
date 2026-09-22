@@ -1,16 +1,17 @@
 // Structural guard: the "Coming soon" fallback and the play toolbar are shared components.
 // A play page that hand-rolls either one should fail this test instead of drifting silently.
-import { readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
-const PLAY_PAGE_SLUGS = [
-  "signal-garden",
-  "bridge-builder",
-  "number-line-jumper",
-  "math-detective",
-  "weather-command",
-  "ecosystem-rescue"
-] as const;
+const pagesDir = fileURLToPath(new URL("../src/pages", import.meta.url));
+
+const PLAY_PAGE_SLUGS = readdirSync(pagesDir, { withFileTypes: true })
+  .filter((entry) => entry.isDirectory())
+  .map((entry) => entry.name)
+  .filter((slug) => existsSync(join(pagesDir, slug, "play.astro")))
+  .sort();
 
 /** The stage element each frame component renders for the fullscreen control. */
 const FRAME_STAGE_SELECTORS = {
@@ -20,10 +21,15 @@ const FRAME_STAGE_SELECTORS = {
 } as const;
 
 function readPlayPage(slug: string): string {
-  return readFileSync(new URL(`../src/pages/${slug}/play.astro`, import.meta.url), "utf8");
+  return readFileSync(join(pagesDir, slug, "play.astro"), "utf8");
 }
 
 describe("play page structure", () => {
+  it("discovers every play.astro route from the filesystem", () => {
+    expect(PLAY_PAGE_SLUGS.length).toBeGreaterThan(0);
+    expect(PLAY_PAGE_SLUGS).toContain("fraction-match");
+  });
+
   it("renders the unavailable state through the shared GameUnavailable component", () => {
     for (const slug of PLAY_PAGE_SLUGS) {
       const source = readPlayPage(slug);
