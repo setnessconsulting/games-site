@@ -27,6 +27,7 @@ export type GameRelease = UnityWebglRelease | StaticWebRelease;
 export const BRIDGE_BUILDER_PRODUCTION_VERSION = "0.1.0-qualification.12";
 export const NUMBER_LINE_JUMPER_PRODUCTION_VERSION = "main-12641c0";
 export const MATH_DETECTIVE_PRODUCTION_VERSION = "2026.09.21-playtest-enhancements.1";
+export const ECOSYSTEM_RESCUE_PRODUCTION_VERSION = "0.1.0-qualification.4";
 
 // Production selects the approved immutable release directly. Pages preview
 // builds may override the version to exercise a different pinned candidate.
@@ -39,6 +40,7 @@ const bridgeBuilderPreviewVersion = runtimeProcess?.env?.BRIDGE_BUILDER_PREVIEW_
 const numberLineJumperPreviewVersion = runtimeProcess?.env?.NUMBER_LINE_JUMPER_PREVIEW_VERSION;
 const mathDetectivePreviewVersion = runtimeProcess?.env?.MATH_DETECTIVE_PREVIEW_VERSION;
 const weatherCommandPreviewVersion = runtimeProcess?.env?.WEATHER_COMMAND_PREVIEW_VERSION;
+const ecosystemRescuePreviewVersion = runtimeProcess?.env?.ECOSYSTEM_RESCUE_PREVIEW_VERSION;
 const bridgeBuilderProductionRelease: StaticWebRelease = {
   kind: "static-web",
   version: BRIDGE_BUILDER_PRODUCTION_VERSION,
@@ -66,6 +68,17 @@ const mathDetectiveRelease: StaticWebRelease = mathDetectivePreviewVersion
 const weatherCommandPreviewRelease: StaticWebRelease | undefined = weatherCommandPreviewVersion
   ? { kind: "static-web", version: weatherCommandPreviewVersion, entryFile: "index.html" }
   : undefined;
+// Ecosystem Rescue's release: production selects the promoted immutable version, and a preview
+// build can pin a different candidate for qualification. The catalog entry is playable either way,
+// which is what makes the promoted version reachable at /ecosystem-rescue/play/ in production.
+const ecosystemRescueProductionRelease: StaticWebRelease = {
+  kind: "static-web",
+  version: ECOSYSTEM_RESCUE_PRODUCTION_VERSION,
+  entryFile: "index.html"
+};
+const ecosystemRescueRelease: StaticWebRelease = ecosystemRescuePreviewVersion
+  ? { ...ecosystemRescueProductionRelease, version: ecosystemRescuePreviewVersion }
+  : ecosystemRescueProductionRelease;
 
 export interface GameEntry {
   slug: string;
@@ -164,6 +177,22 @@ export const games: readonly GameEntry[] = [
       { input: "Keyboard", action: "Navigate evidence and forecast controls" }
     ],
     ...(weatherCommandPreviewRelease ? { release: weatherCommandPreviewRelease } : {})
+  },
+  {
+    slug: "ecosystem-rescue",
+    title: "Ecosystem Rescue",
+    status: "playable",
+    eyebrow: "Read the whole pond",
+    description: ecosystemRescuePreviewVersion
+      ? "Follow fertiliser from the fields into a pond: watch the algae bloom, the water cloud over, and the animals that need the most oxygen feel it first, then decide what to do about it. This candidate build is being tested before it joins the collection."
+      : "Follow fertiliser from the fields into a pond: watch the algae bloom, the water cloud over, and the animals that need the most oxygen feel it first, then decide what to do about it.",
+    cardImage: "/art/coming-soon.svg",
+    route: "/ecosystem-rescue/",
+    controls: [
+      { input: "Mouse / touch", action: "Advance days and take an intervention" },
+      { input: "Keyboard", action: "Advance, intervene, and read the evidence table" }
+    ],
+    release: ecosystemRescueRelease
   },
   {
     slug: "new-world-01",
