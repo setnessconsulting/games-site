@@ -1,15 +1,15 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import GameUnavailable from "../../components/GameUnavailable.astro";
 import SiteHeader from "../../components/SiteHeader.astro";
 import StaticGameFrame from "../../components/StaticGameFrame.astro";
-import { getGame, getGameAssetBase } from "../../data/games";
+import { getGame, getStaticWebPlaySource } from "../../data/games";
 
 const game = getGame("bridge-builder");
 if (!game) throw new Error("Bridge Builder is missing from the catalog");
 
-const assetBase = getGameAssetBase(game);
-const release = game.release?.kind === "static-web" ? game.release : undefined;
-const entryUrl = assetBase && release ? `${assetBase}/${release.entryFile}` : undefined;
+const playSource = getStaticWebPlaySource(game);
+const entryUrl = playSource ? `${playSource.assetBase}/${playSource.release.entryFile}` : undefined;
 ---
 
 <BaseLayout title={`Play ${game.title}`} description={`Play ${game.title} at Setness Games.`}>
@@ -27,18 +27,13 @@ const entryUrl = assetBase && release ? `${assetBase}/${release.entryFile}` : un
       ) : null}
     </div>
     {entryUrl ? (
-      <StaticGameFrame title={game.title} entryUrl={entryUrl} gamePageUrl="/bridge-builder/" />
+      <StaticGameFrame title={game.title} entryUrl={entryUrl} gamePageUrl={game.route} />
     ) : (
-      <section class="not-ready-panel">
-        <p class="eyebrow">Coming soon</p>
-        <h1>The bridge is unavailable right now.</h1>
-        <p>
-          There isn’t a playable build here right now. Return to the game page and try again later.
-        </p>
-        <a class="button button-primary" href="/bridge-builder/">
-          Return to Bridge Builder
-        </a>
-      </section>
+      <GameUnavailable
+        game={game}
+        heading="The bridge is unavailable right now."
+        description="There isn’t a playable build here right now. Return to the game page and try again later."
+      />
     )}
   </main>
 </BaseLayout>

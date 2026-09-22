@@ -236,6 +236,31 @@ export function getGameAssetBase(game: GameEntry): string | undefined {
   return `/game-assets/${game.slug}/${game.release.version}`;
 }
 
+export interface GamePlaySource<TRelease extends GameRelease = GameRelease> {
+  assetBase: string;
+  release: TRelease;
+}
+
+// Play routes must not launch a build the catalog has not promoted, so the
+// readiness check lives here instead of being repeated in every play page.
+export function getStaticWebPlaySource(
+  game: GameEntry
+): GamePlaySource<StaticWebRelease> | undefined {
+  const assetBase = getGameAssetBase(game);
+  const release = game.release;
+  if (!assetBase || release?.kind !== "static-web") return undefined;
+  return { assetBase, release };
+}
+
+export function getUnityWebglPlaySource(
+  game: GameEntry
+): GamePlaySource<UnityWebglRelease> | undefined {
+  const assetBase = getGameAssetBase(game);
+  const release = game.release;
+  if (!assetBase || release?.kind !== "unity-webgl") return undefined;
+  return { assetBase, release };
+}
+
 export function getGamePlayRoute(game: GameEntry): string {
   return `${game.route}play/`;
 }
