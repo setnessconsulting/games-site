@@ -165,3 +165,23 @@ and uses the checked-in production pointer.
 
 LevelBest is a separate host product; this promotion publishes the game on games-site and does not
 copy the game runtime into LevelBest.
+
+## Fraction Match
+
+`setnessconsulting/game-fraction-match` produces the static-web artifact and its release manifest.
+This repository owns the `fraction-match` card, launcher, play route, selected version, promotion,
+and rollback. The current production catalog selects `0.1.0-qualification.1`, published at
+`fraction-match/0.1.0-qualification.1/` from source SHA `3652699870699e9d92a78fb3eb781b3ec3ccde3a`.
+
+During hosted qualification, `FRACTION_MATCH_PREVIEW_VERSION` is a preview-only exact-version
+override. When unset, the catalog selects the checked-in production version. When set, the preview
+catalog selects only that version as `static-web` with `index.html`, and the Function allows the
+matching `fraction-match/<version>/` prefix. Production leaves the preview override unset and uses
+the checked-in production pointer.
+
+This promotion is a candidate-quality release: GAME-193 still records screen-reader parity as
+Below pending NVDA and VoiceOver runs. The owner asked for the game on the public collection; those
+remaining gates stay recorded rather than claimed as complete. Rollback restores the previous
+games-site catalog revision and never deletes or overwrites the immutable R2 prefix.
+
+LevelBest is a separate host product; this promotion does not copy the game runtime there.
