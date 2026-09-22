@@ -60,7 +60,7 @@ export function validateCatalog(entries: readonly GameEntry[]): string[] {
     }
     slugs.add(game.slug);
 
-    if (!game.route.startsWith("/") || !game.route.endsWith("/")) {
+    if (!game.route.startsWith('/') || !game.route.endsWith('/')) {
       errors.push(`${game.slug}: route must start and end with /`);
     }
 
@@ -68,6 +68,25 @@ export function validateCatalog(entries: readonly GameEntry[]): string[] {
       errors.push(`${game.slug}: duplicate route ${game.route}`);
     }
     routes.add(game.route);
+
+    // Required fields validation
+    if (!game.title || game.title.trim().length === 0) {
+      errors.push(`${game.slug}: missing or empty title`);
+    }
+    if (!game.description || game.description.trim().length === 0) {
+      errors.push(`${game.slug}: missing or empty description`);
+    }
+    if (!game.cardImage || game.cardImage.trim().length === 0) {
+      errors.push(`${game.slug}: missing or empty cardImage`);
+    } else {
+      // Verify local asset exists for cardImage (paths start with '/')
+      const assetPath = game.cardImage.startsWith('/') ? game.cardImage.slice(1) : game.cardImage;
+      const fullPath = require('path').join(process.cwd(), 'public', assetPath);
+      const fs = require('fs');
+      if (!fs.existsSync(fullPath)) {
+        errors.push(`${game.slug}: cardImage asset not found at ${game.cardImage}`);
+      }
+    }
 
     if (game.status === "playable" && !game.release) {
       errors.push(`${game.slug}: playable games require a release`);
