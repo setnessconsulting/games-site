@@ -102,4 +102,15 @@ describe("play routes for promoted games", () => {
       expect(html, slug).toContain('document.querySelector("[data-play-fullscreen]")');
     }
   });
+
+  it("targets a stage element that exists in the same rendered page", async () => {
+    for (const { slug, stage, Page } of allPlayPages) {
+      const html = await renderPlayPage(Page);
+      const stageAttribute = stage.slice(1, -1);
+      // Count only element attributes, not the selector string inside the toolbar button.
+      const rendered = html.match(new RegExp(`${stageAttribute}(?=[\\s>])`, "g")) ?? [];
+
+      expect(rendered, `${slug} should render exactly one ${stageAttribute}`).toHaveLength(1);
+    }
+  });
 });

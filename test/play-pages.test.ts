@@ -12,6 +12,13 @@ const PLAY_PAGE_SLUGS = [
   "ecosystem-rescue"
 ] as const;
 
+/** The stage element each frame component renders for the fullscreen control. */
+const FRAME_STAGE_SELECTORS = {
+  StaticGameFrame: "[data-static-game-stage]",
+  StaticWebGameFrame: "[data-game-stage]",
+  WebglGameFrame: "[data-game-stage]"
+} as const;
+
 function readPlayPage(slug: string): string {
   return readFileSync(new URL(`../src/pages/${slug}/play.astro`, import.meta.url), "utf8");
 }
@@ -34,6 +41,22 @@ describe("play page structure", () => {
       expect(source, slug).toContain("<PlayToolbar");
       expect(source, slug).not.toContain('class="play-toolbar"');
       expect(source, slug).not.toContain("data-fullscreen");
+    }
+  });
+
+  it("points fullscreen at the stage element its own frame component renders", () => {
+    for (const slug of PLAY_PAGE_SLUGS) {
+      const source = readPlayPage(slug);
+      const frames = Object.keys(FRAME_STAGE_SELECTORS).filter((frame) =>
+        source.includes(`<${frame}`)
+      );
+      const stageProps = source.match(/fullscreenStage="[^"]+"/g) ?? [];
+
+      expect(frames, `${slug} should render exactly one game frame`).toHaveLength(1);
+      expect(stageProps, `${slug} should pass one fullscreenStage`).toHaveLength(1);
+      expect(stageProps[0], slug).toBe(
+        `fullscreenStage="${FRAME_STAGE_SELECTORS[frames[0] as keyof typeof FRAME_STAGE_SELECTORS]}"`
+      );
     }
   });
 });
