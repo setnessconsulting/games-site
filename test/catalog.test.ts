@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { GameEntry } from "../src/data/games";
 import {
   BRIDGE_BUILDER_PRODUCTION_VERSION,
+  ECOSYSTEM_RESCUE_PRODUCTION_VERSION,
   MATH_DETECTIVE_PRODUCTION_VERSION,
   NUMBER_LINE_JUMPER_PRODUCTION_VERSION,
   games,
@@ -28,7 +29,8 @@ describe("game catalog", () => {
       (game) =>
         game.slug !== "bridge-builder" &&
         game.slug !== "signal-garden" &&
-        game.slug !== "math-detective"
+        game.slug !== "math-detective" &&
+        game.slug !== "ecosystem-rescue"
     );
     expect(
       unrelatedGames.every(
@@ -157,6 +159,33 @@ describe("game catalog", () => {
     expect(game?.release).toEqual({
       kind: "static-web",
       version: "main-foundation-preview",
+      entryFile: "index.html"
+    });
+  });
+
+  it("keeps Ecosystem Rescue on its promoted production release unless a preview is pinned", async () => {
+    vi.stubEnv("ECOSYSTEM_RESCUE_PREVIEW_VERSION", "");
+    vi.resetModules();
+    let module = await import("../src/data/games");
+    let game = module.games.find((entry) => entry.slug === "ecosystem-rescue");
+
+    expect(game?.status).toBe("playable");
+    expect(game?.release).toEqual({
+      kind: "static-web",
+      version: ECOSYSTEM_RESCUE_PRODUCTION_VERSION,
+      entryFile: "index.html"
+    });
+    expect(game?.route).toBe("/ecosystem-rescue/");
+    expect(module.getGamePlayRoute(game!)).toBe("/ecosystem-rescue/play/");
+
+    vi.stubEnv("ECOSYSTEM_RESCUE_PREVIEW_VERSION", "0.1.0-qualification.9");
+    vi.resetModules();
+    module = await import("../src/data/games");
+    game = module.games.find((entry) => entry.slug === "ecosystem-rescue");
+
+    expect(game?.release).toEqual({
+      kind: "static-web",
+      version: "0.1.0-qualification.9",
       entryFile: "index.html"
     });
   });
