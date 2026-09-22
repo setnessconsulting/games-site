@@ -60,9 +60,9 @@ describe("game asset contract", () => {
   it("approves the production Weather Command release and exact preview override", () => {
     const previewVersion = "main-foundation-preview";
 
-    expect(
-      isApprovedRelease("weather-command", WEATHER_COMMAND_PRODUCTION_VERSION, false)
-    ).toBe(true);
+    expect(isApprovedRelease("weather-command", WEATHER_COMMAND_PRODUCTION_VERSION, false)).toBe(
+      true
+    );
     expect(
       isApprovedRelease(
         "weather-command",
