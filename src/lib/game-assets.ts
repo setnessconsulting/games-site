@@ -43,7 +43,8 @@ export function isApprovedRelease(
   numberLineJumperPreviewVersion?: string,
   mathDetectivePreviewVersion?: string,
   weatherCommandPreviewVersion?: string,
-  ecosystemRescuePreviewVersion?: string
+  ecosystemRescuePreviewVersion?: string,
+  fractionMatchPreviewVersion?: string
 ): boolean {
   if (allowFixture && slug === "test-fixture" && version === "0.0.0") return true;
 
@@ -83,6 +84,14 @@ export function isApprovedRelease(
     slug === "ecosystem-rescue" &&
     ecosystemRescuePreviewVersion &&
     version === ecosystemRescuePreviewVersion
+  ) {
+    return true;
+  }
+
+  if (
+    slug === "fraction-match" &&
+    fractionMatchPreviewVersion &&
+    version === fractionMatchPreviewVersion
   ) {
     return true;
   }

@@ -1,0 +1,23 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import SiteHeader from "../../components/SiteHeader.astro";
+import GameLauncher from "../../components/GameLauncher.astro";
+import { getGame } from "../../data/games";
+
+const game = getGame("fraction-match");
+if (!game) throw new Error("Fraction Match is missing from the catalog");
+---
+
+<BaseLayout title={game.title} description={game.description}>
+  <SiteHeader compact />
+  <main class="page-shell launcher-page">
+    <a class="back-link" href="/">
+      ← Collection
+    </a>
+    <GameLauncher game={game} />
+    <p class="game-note">
+      Match two cards that represent the same amount, even when the pictures look different. Play
+      stays on this device; the game does not keep a record of a session.
+    </p>
+  </main>
+</BaseLayout>

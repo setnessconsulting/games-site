@@ -74,6 +74,14 @@ preview Function. Rollback changes only the checked-in production pointer (or re
 games-site deployment). Do not overwrite or delete published prefixes. See
 [`weather-command-rollback.md`](weather-command-rollback.md).
 
+For a Fraction Match release, publish the immutable static-web artifact from
+`setnessconsulting/game-fraction-match` under `fraction-match/<version>/`, then update the
+checked-in production pointer in `src/data/games.ts` and deploy `main`. The current production
+version is `0.1.0-qualification.1` (source SHA `3652699870699e9d92a78fb3eb781b3ec3ccde3a`). A
+non-production Pages preview may override it with `FRACTION_MATCH_PREVIEW_VERSION=<version>`;
+the same exact pointer must be supplied to the preview Function. Rollback changes only the
+checked-in production pointer. Do not overwrite or delete published prefixes.
+
 ## Secrets
 
 The game repository's release workflow will need a narrowly scoped Cloudflare credential that can

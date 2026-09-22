@@ -29,6 +29,7 @@ export const NUMBER_LINE_JUMPER_PRODUCTION_VERSION = "main-12641c0";
 export const MATH_DETECTIVE_PRODUCTION_VERSION = "2026.09.21-playtest-enhancements.1";
 export const ECOSYSTEM_RESCUE_PRODUCTION_VERSION = "0.1.0-qualification.6";
 export const WEATHER_COMMAND_PRODUCTION_VERSION = "0.1.0-qualification.2";
+export const FRACTION_MATCH_PRODUCTION_VERSION = "0.1.0-qualification.1";
 
 // Production selects the approved immutable release directly. Pages preview
 // builds may override the version to exercise a different pinned candidate.
@@ -42,6 +43,7 @@ const numberLineJumperPreviewVersion = runtimeProcess?.env?.NUMBER_LINE_JUMPER_P
 const mathDetectivePreviewVersion = runtimeProcess?.env?.MATH_DETECTIVE_PREVIEW_VERSION;
 const weatherCommandPreviewVersion = runtimeProcess?.env?.WEATHER_COMMAND_PREVIEW_VERSION;
 const ecosystemRescuePreviewVersion = runtimeProcess?.env?.ECOSYSTEM_RESCUE_PREVIEW_VERSION;
+const fractionMatchPreviewVersion = runtimeProcess?.env?.FRACTION_MATCH_PREVIEW_VERSION;
 const bridgeBuilderProductionRelease: StaticWebRelease = {
   kind: "static-web",
   version: BRIDGE_BUILDER_PRODUCTION_VERSION,
@@ -85,6 +87,14 @@ const ecosystemRescueProductionRelease: StaticWebRelease = {
 const ecosystemRescueRelease: StaticWebRelease = ecosystemRescuePreviewVersion
   ? { ...ecosystemRescueProductionRelease, version: ecosystemRescuePreviewVersion }
   : ecosystemRescueProductionRelease;
+const fractionMatchProductionRelease: StaticWebRelease = {
+  kind: "static-web",
+  version: FRACTION_MATCH_PRODUCTION_VERSION,
+  entryFile: "index.html"
+};
+const fractionMatchRelease: StaticWebRelease = fractionMatchPreviewVersion
+  ? { ...fractionMatchProductionRelease, version: fractionMatchPreviewVersion }
+  : fractionMatchProductionRelease;
 
 export interface GameEntry {
   slug: string;
@@ -167,6 +177,23 @@ export const games: readonly GameEntry[] = [
       { input: "Read aloud", action: "Hear goals and hints when available" }
     ],
     release: mathDetectiveRelease
+  },
+  {
+    slug: "fraction-match",
+    title: "Fraction Match",
+    status: "playable",
+    eyebrow: "Same amount, different faces",
+    description: fractionMatchPreviewVersion
+      ? "Turn two cards that show the same amount, even when the pictures look different. This candidate build is being tested before it joins the collection."
+      : "Turn two cards that show the same amount, even when the pictures look different.",
+    cardImage: "/art/fraction-match-card.svg",
+    route: "/fraction-match/",
+    controls: [
+      { input: "Mouse / touch", action: "Turn a card and look for its match" },
+      { input: "Keyboard", action: "Move between cards and select" },
+      { input: "Reduce motion", action: "Keep the inspection window, skip the decoration" }
+    ],
+    release: fractionMatchRelease
   },
   {
     slug: "weather-command",
