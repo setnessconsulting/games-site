@@ -18,6 +18,24 @@ Run the full local verification suite with:
 npm run verify
 ```
 
+### Route integrity
+
+Internal routes and links are validated statically (no browser or dev server) before code reaches
+CI:
+
+```bash
+npm run validate:routes
+```
+
+The check derives the site's routes from `src/pages` and `public/_routes.json`, then verifies every
+registry route, play route, unavailable-game target, and known static link (header, launcher,
+back links) resolves. It also fails on duplicate or conflicting catalog routes. Broken routes are
+reported with their source, for example:
+
+```
+weather-comand: configured route "/weather-comand/" has no matching site route
+```
+
 The site is designed to run at the root of `games.setnessconsulting.com`:
 
 - `/` — arcade collection

@@ -17,9 +17,9 @@ function baseEntry(overrides: Partial<GameEntry> = {}): GameEntry {
     release: {
       kind: "static-web",
       version: "1.0.0",
-      entryFile: "index.html",
+      entryFile: "index.html"
     },
-    ...overrides,
+    ...overrides
   } as GameEntry;
 }
 

@@ -1,4 +1,11 @@
+import { existsSync } from "node:fs";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import type { GameEntry, GameRelease } from "../data/games";
+
+// Resolve public/ relative to this module so validation works regardless of the
+// caller's working directory (scripts, vitest, and editor tooling).
+const PUBLIC_DIR = fileURLToPath(new URL("../../public", import.meta.url));
 
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const VERSION_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
@@ -60,7 +67,7 @@ export function validateCatalog(entries: readonly GameEntry[]): string[] {
     }
     slugs.add(game.slug);
 
-    if (!game.route.startsWith('/') || !game.route.endsWith('/')) {
+    if (!game.route.startsWith("/") || !game.route.endsWith("/")) {
       errors.push(`${game.slug}: route must start and end with /`);
     }
 
@@ -80,10 +87,9 @@ export function validateCatalog(entries: readonly GameEntry[]): string[] {
       errors.push(`${game.slug}: missing or empty cardImage`);
     } else {
       // Verify local asset exists for cardImage (paths start with '/')
-      const assetPath = game.cardImage.startsWith('/') ? game.cardImage.slice(1) : game.cardImage;
-      const fullPath = require('path').join(process.cwd(), 'public', assetPath);
-      const fs = require('fs');
-      if (!fs.existsSync(fullPath)) {
+      const assetPath = game.cardImage.startsWith("/") ? game.cardImage.slice(1) : game.cardImage;
+      const fullPath = join(PUBLIC_DIR, assetPath);
+      if (!existsSync(fullPath)) {
         errors.push(`${game.slug}: cardImage asset not found at ${game.cardImage}`);
       }
     }
