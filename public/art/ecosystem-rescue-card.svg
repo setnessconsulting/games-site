@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">Ecosystem Rescue</title>
+  <desc id="desc">A night pond seen side-on: a fish beneath the surface with a green algae bloom spreading through the water, a bed of waterweeds on the left bank, and reeds with seed heads on the right.</desc>
+  <defs>
+    <linearGradient id="night" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#182d3b" />
+      <stop offset="1" stop-color="#0b1f2a" />
+    </linearGradient>
+    <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2f7079" />
+      <stop offset="1" stop-color="#10333f" />
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#f5d893" stop-opacity=".3" />
+      <stop offset="1" stop-color="#f5d893" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <rect width="1200" height="760" fill="url(#night)" />
+  <circle cx="300" cy="176" r="210" fill="url(#glow)" />
+  <circle cx="300" cy="176" r="66" fill="#f5d893" opacity=".46" />
+  <circle cx="170" cy="86" r="5" fill="#f5d893" opacity=".6" />
+  <circle cx="462" cy="96" r="4" fill="#f5d893" opacity=".5" />
+  <circle cx="590" cy="212" r="3" fill="#f5d893" opacity=".4" />
+  <circle cx="120" cy="300" r="4" fill="#f5d893" opacity=".42" />
+  <circle cx="718" cy="132" r="4" fill="#f5d893" opacity=".38" />
+
+  <path d="M0 246c164-34 336-38 512-14 176 25 322 6 470-24 76-16 146-22 218-20v248H0Z" fill="#123746" />
+  <path d="M0 300c186-30 358-30 528-8 168 22 316 14 462-16 74-15 142-22 210-20v98c-72-2-140 5-214 20-146 30-294 38-462 16-170-22-342-22-524 8Z" fill="#0f3040" opacity=".7" />
+
+  <path d="M0 420c186-30 358-30 528-8 168 22 316 14 462-16 74-15 142-22 210-20v384H0Z" fill="url(#water)" />
+  <path d="M0 402c186-30 358-30 528-8 168 22 316 14 462-16 74-15 142-22 210-20" stroke="#4f9aa2" stroke-width="8" fill="none" opacity=".45" />
+  <path d="M0 640c176-26 348-24 520-2 176 22 322 18 456-4 76-13 148-16 224-10v136H0Z" fill="#0c2b36" opacity=".8" />
+
+  <g fill="#6d9f57">
+    <circle cx="512" cy="556" r="104" opacity=".24" />
+    <circle cx="300" cy="630" r="78" opacity=".22" />
+    <circle cx="690" cy="620" r="72" opacity=".2" />
+    <circle cx="596" cy="690" r="56" opacity=".2" />
+    <circle cx="430" cy="520" r="44" opacity=".18" />
+  </g>
+  <g fill="#86b06a">
+    <circle cx="566" cy="588" r="36" opacity=".28" />
+    <circle cx="466" cy="662" r="28" opacity=".26" />
+    <circle cx="700" cy="548" r="24" opacity=".22" />
+    <circle cx="360" cy="586" r="22" opacity=".24" />
+    <circle cx="640" cy="676" r="30" opacity=".22" />
+  </g>
+
+  <g fill="#356f61">
+    <path d="M104 712c-6-62-2-124 10-186 4-22 12-22 14 0 8 62 8 124 2 186Z" />
+    <path d="M166 716c-10-74-8-142 6-206 4-20 13-20 16 0 10 64 10 132 2 206Z" opacity=".92" />
+    <path d="M232 710c-4-56 0-112 14-168 4-18 12-18 15 0 10 56 8 112 0 168Z" opacity=".85" />
+  </g>
+  <g fill="#3f7f6e">
+    <path d="M292 712c-8-66-4-126 10-184 3-16 11-16 13 0 8 58 8 118 2 184Z" opacity=".9" />
+    <path d="M136 714c-4-44 0-86 10-126 3-14 10-14 12 0 8 40 8 82 2 126Z" opacity=".75" />
+    <path d="M202 714c-6-50-2-96 8-140 3-14 10-14 12 0 8 44 8 90 2 140Z" opacity=".7" />
+    <path d="M262 712c-2-40 2-78 12-114 3-12 9-12 11 0 7 36 7 74 1 114Z" opacity=".65" />
+  </g>
+
+  <g>
+    <ellipse cx="590" cy="560" rx="82" ry="31" fill="#204b56" />
+    <path d="M516 560 450 528l15 32-15 32Z" fill="#204b56" />
+    <circle cx="650" cy="552" r="6" fill="#f5d893" opacity=".8" />
+    <path d="M534 576c28 11 62 11 92-2" stroke="#16414b" stroke-width="5" fill="none" opacity=".4" stroke-linecap="round" />
+  </g>
+
+  <g>
+    <path d="M978 706c-14-72-6-132 20-182" stroke="#3f7f6e" stroke-width="22" fill="none" stroke-linecap="round" />
+    <path d="M1046 710c-6-78 8-140 34-190" stroke="#3f7f6e" stroke-width="20" fill="none" stroke-linecap="round" />
+    <path d="M1112 706c2-66 16-120 40-166" stroke="#356f61" stroke-width="18" fill="none" stroke-linecap="round" />
+    <ellipse cx="1000" cy="516" rx="14" ry="40" fill="#c98f5a" opacity=".58" />
+    <ellipse cx="1084" cy="508" rx="13" ry="37" fill="#c98f5a" opacity=".46" />
+  </g>
+
+  <g fill="#cfe0d8" opacity=".24">
+    <circle cx="790" cy="672" r="11" />
+    <circle cx="832" cy="624" r="8" />
+    <circle cx="876" cy="676" r="6" />
+  </g>
+
+  <path d="M0 704c196-24 360-20 528 2 174 22 318 18 452-6 78-14 148-18 220-12v72H0Z" fill="#0a2934" />
+</svg>
