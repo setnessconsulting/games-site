@@ -1,11 +1,14 @@
 ---
+import GameFrameOverlays from "./GameFrameOverlays.astro";
+
 interface Props {
   title: string;
   assetBase: string;
   entryFile: string;
+  gamePageUrl: string;
 }
 
-const { title, assetBase, entryFile } = Astro.props;
+const { title, assetBase, entryFile, gamePageUrl } = Astro.props;
 const entryUrl = `${assetBase}/${entryFile}`;
 ---
 
@@ -15,8 +18,10 @@ const entryUrl = `${assetBase}/${entryFile}`;
   data-release-kind="static-web"
   data-asset-base={assetBase}
 >
+  <GameFrameOverlays kind="static" title={title} returnHref={gamePageUrl} />
   <iframe
     class="static-game-frame"
+    data-static-game-frame
     src={entryUrl}
     title={`${title} game`}
     loading="eager"
@@ -25,3 +30,30 @@ const entryUrl = `${assetBase}/${entryFile}`;
     allowfullscreen
   ></iframe>
 </div>
+
+<script is:inline>
+  (() => {
+    const stage = document.querySelector('[data-game-stage][data-release-kind="static-web"]');
+    const loading = stage?.querySelector("[data-static-game-loading]");
+    const error = stage?.querySelector("[data-static-game-error]");
+    const frame = stage?.querySelector("[data-static-game-frame]");
+
+    const showError = () => {
+      loading?.setAttribute("hidden", "true");
+      frame?.setAttribute("hidden", "true");
+      error?.removeAttribute("hidden");
+    };
+
+    if (!stage || !loading || !error || !frame) {
+      showError();
+    } else {
+      frame.addEventListener("load", () => {
+        loading.setAttribute("hidden", "true");
+      });
+      frame.addEventListener("error", showError);
+      window.setTimeout(() => {
+        if (!frame.contentDocument && !frame.hasAttribute("hidden")) showError();
+      }, 12_000);
+    }
+  })();
+</script>

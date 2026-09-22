@@ -1,0 +1,47 @@
+---
+interface Props {
+  kind: "static" | "unity";
+  title: string;
+  returnHref: string;
+}
+
+const { kind, title, returnHref } = Astro.props;
+const isStatic = kind === "static";
+---
+
+{isStatic ? (
+  <>
+    <div class="static-game-loading" data-static-game-loading>
+      <span class="loading-pulse" aria-hidden="true"></span>
+      <p>Loading {title}…</p>
+    </div>
+    <div class="static-game-error" data-static-game-error hidden>
+      <p class="eyebrow">{title} is unavailable</p>
+      <h1>We couldn’t start this game.</h1>
+      <p>
+        Refresh the page and try again. The release remains versioned and can be rolled back safely.
+      </p>
+      <a class="button button-primary" href={returnHref}>
+        Return to {title}
+      </a>
+    </div>
+  </>
+) : (
+  <>
+    <div class="game-stage-loading" data-game-loading>
+      <span class="loading-pulse" aria-hidden="true"></span>
+      <p data-game-progress>Preparing {title}…</p>
+    </div>
+    <div class="game-stage-error" data-game-error hidden>
+      <p class="eyebrow">Game unavailable</p>
+      <h1>We couldn’t start this game.</h1>
+      <p>
+        Refresh the page and try again. If the problem continues, this release may be unavailable.
+      </p>
+      <p class="game-diagnostics" data-game-diagnostics hidden></p>
+      <a class="button button-primary" href={returnHref}>
+        Return to game page
+      </a>
+    </div>
+  </>
+)}

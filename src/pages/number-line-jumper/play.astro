@@ -25,6 +25,7 @@ const playSource = getStaticWebPlaySource(game);
         title={game.title}
         assetBase={playSource.assetBase}
         entryFile={playSource.release.entryFile}
+        gamePageUrl={game.route}
       />
     ) : (
       <GameUnavailable

@@ -1,4 +1,6 @@
 ---
+import GameFrameOverlays from "./GameFrameOverlays.astro";
+
 interface Props {
   title: string;
   version: string;
@@ -15,21 +17,7 @@ const { title, version, assetBase, loaderFile, dataFile, frameworkFile, wasmFile
 ---
 
 <div class="game-stage" data-game-stage data-release-kind="unity-webgl" data-asset-base={assetBase}>
-  <div class="game-stage-loading" data-game-loading>
-    <span class="loading-pulse" aria-hidden="true"></span>
-    <p data-game-progress>Preparing {title}…</p>
-  </div>
-  <div class="game-stage-error" data-game-error hidden>
-    <p class="eyebrow">Game unavailable</p>
-    <h1>We couldn’t start this game.</h1>
-    <p>
-      Refresh the page and try again. If the problem continues, this release may be unavailable.
-    </p>
-    <p class="game-diagnostics" data-game-diagnostics hidden></p>
-    <a class="button button-primary" href={returnRoute}>
-      Return to game page
-    </a>
-  </div>
+  <GameFrameOverlays kind="unity" title={title} returnHref={returnRoute} />
   <div class="game-canvas-wrap" data-game-canvas-wrap hidden>
     <canvas
       id="unity-canvas"
@@ -44,71 +32,75 @@ const { title, version, assetBase, loaderFile, dataFile, frameworkFile, wasmFile
   is:inline
   define:vars={{ assetBase, version, loaderFile, dataFile, frameworkFile, wasmFile, title }}
 >
-  const stage = document.querySelector("[data-game-stage]");
-  const loading = document.querySelector("[data-game-loading]");
-  const progress = document.querySelector("[data-game-progress]");
-  const error = document.querySelector("[data-game-error]");
-  const diagnostics = document.querySelector("[data-game-diagnostics]");
-  const canvasWrap = document.querySelector("[data-game-canvas-wrap]");
-  const canvas = document.querySelector("[data-game-canvas]");
+  (() => {
+    const stage = document.querySelector('[data-game-stage][data-release-kind="unity-webgl"]');
+    const loading = stage?.querySelector("[data-game-loading]");
+    const progress = stage?.querySelector("[data-game-progress]");
+    const error = stage?.querySelector("[data-game-error]");
+    const diagnostics = stage?.querySelector("[data-game-diagnostics]");
+    const canvasWrap = stage?.querySelector("[data-game-canvas-wrap]");
+    const canvas = stage?.querySelector("[data-game-canvas]");
 
-  const showError = (reason) => {
-    loading?.setAttribute("hidden", "true");
-    canvasWrap?.setAttribute("hidden", "true");
-    if (diagnostics) {
-      const detail =
-        reason instanceof Error
-          ? reason.message
-          : typeof reason === "string"
-            ? reason
-            : "Unity failed to initialize.";
-      diagnostics.textContent = `Release ${version}: ${detail}`;
-      diagnostics.removeAttribute("hidden");
+    const showError = (reason) => {
+      loading?.setAttribute("hidden", "true");
+      canvasWrap?.setAttribute("hidden", "true");
+      if (diagnostics) {
+        const detail =
+          reason instanceof Error
+            ? reason.message
+            : typeof reason === "string"
+              ? reason
+              : "Unity failed to initialize.";
+        diagnostics.textContent = `Release ${version}: ${detail}`;
+        diagnostics.removeAttribute("hidden");
+      }
+      error?.removeAttribute("hidden");
+    };
+
+    const loaderUrl = `${assetBase}/Build/${loaderFile}`;
+
+    if (!loaderUrl || !stage || !loading || !progress || !error || !canvasWrap || !canvas) {
+      showError("The game loader is not configured.");
+    } else {
+      const loader = document.createElement("script");
+      loader.src = loaderUrl;
+      loader.async = true;
+      loader.addEventListener("load", async () => {
+        if (typeof window.createUnityInstance !== "function") {
+          showError("The Unity loader did not initialize.");
+          return;
+        }
+
+        canvasWrap.removeAttribute("hidden");
+        progress.textContent = `Starting ${title}…`;
+        try {
+          await window.createUnityInstance(
+            canvas,
+            {
+              dataUrl: `${assetBase}/Build/${dataFile}`,
+              frameworkUrl: `${assetBase}/Build/${frameworkFile}`,
+              codeUrl: `${assetBase}/Build/${wasmFile}`,
+              streamingAssetsUrl: `${assetBase}/StreamingAssets`,
+              companyName: "Setness Consulting",
+              productName: title,
+              productVersion: version,
+              matchWebGLToCanvasSize: true,
+              devicePixelRatio: window.devicePixelRatio
+            },
+            (value) => {
+              progress.textContent = `Loading ${title}… ${Math.round(value * 100)}%`;
+            }
+          );
+          canvas.focus?.({ preventScroll: true });
+          loading.setAttribute("hidden", "true");
+        } catch (reason) {
+          showError(reason);
+        }
+      });
+      loader.addEventListener("error", () =>
+        showError("The Unity loader could not be downloaded.")
+      );
+      document.head.appendChild(loader);
     }
-    error?.removeAttribute("hidden");
-  };
-
-  const loaderUrl = `${assetBase}/Build/${loaderFile}`;
-
-  if (!loaderUrl || !stage || !loading || !progress || !error || !canvasWrap || !canvas) {
-    showError("The game loader is not configured.");
-  } else {
-    const loader = document.createElement("script");
-    loader.src = loaderUrl;
-    loader.async = true;
-    loader.addEventListener("load", async () => {
-      if (typeof window.createUnityInstance !== "function") {
-        showError("The Unity loader did not initialize.");
-        return;
-      }
-
-      canvasWrap.removeAttribute("hidden");
-      progress.textContent = `Starting ${title}…`;
-      try {
-        await window.createUnityInstance(
-          canvas,
-          {
-            dataUrl: `${assetBase}/Build/${dataFile}`,
-            frameworkUrl: `${assetBase}/Build/${frameworkFile}`,
-            codeUrl: `${assetBase}/Build/${wasmFile}`,
-            streamingAssetsUrl: `${assetBase}/StreamingAssets`,
-            companyName: "Setness Consulting",
-            productName: title,
-            productVersion: version,
-            matchWebGLToCanvasSize: true,
-            devicePixelRatio: window.devicePixelRatio
-          },
-          (value) => {
-            progress.textContent = `Loading ${title}… ${Math.round(value * 100)}%`;
-          }
-        );
-        canvas.focus?.({ preventScroll: true });
-        loading.setAttribute("hidden", "true");
-      } catch (reason) {
-        showError(reason);
-      }
-    });
-    loader.addEventListener("error", () => showError("The Unity loader could not be downloaded."));
-    document.head.appendChild(loader);
-  }
+  })();
 </script>
