@@ -19,6 +19,10 @@ publishes an immutable versioned browser build to the shared private R2 bucket.
 Pages hosts the small HTML, CSS, JavaScript, artwork shell, and launch routes. R2 holds game release
 artifacts so the site is not constrained by Pages' per-file asset limit.
 
+Local `astro preview` does not run Pages Functions, so `/game-assets/...` is unavailable there.
+Use `npm run preview:pages` (`wrangler pages dev dist`) when you need the Function + R2 path for
+play-route smoke tests.
+
 ## Authority boundary
 
 Game repositories own source, tests, builds, and release evidence. `games-site` never rebuilds a

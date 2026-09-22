@@ -32,6 +32,10 @@ test-fixture/0.0.0/Build/
 
 Enable `GAME_ASSETS_ENABLE_FIXTURE=true` only in local or staging environments.
 
+Plain `astro preview` does not execute Pages Functions, so `/game-assets/...` will 404 there
+(including Signal Garden’s Unity loader). After `npm run build`, use `npm run preview:pages` to
+run `wrangler pages dev dist` with the `GAME_ASSETS` binding from this file’s `wrangler.jsonc`.
+
 For a Bridge Builder hosted qualification preview, publish the immutable static release from the
 standalone game repository under `bridge-builder/<version>/`, then build a non-production Pages
 preview with `BRIDGE_BUILDER_PREVIEW_VERSION=<version>`. This opt-in pointer makes

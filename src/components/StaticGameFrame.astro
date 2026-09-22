@@ -24,29 +24,8 @@ const { title, entryUrl, gamePageUrl } = Astro.props;
   ></iframe>
 </div>
 
-<script is:inline>
-  (() => {
-    const stage = document.querySelector("[data-static-game-stage]");
-    const loading = stage?.querySelector("[data-static-game-loading]");
-    const error = stage?.querySelector("[data-static-game-error]");
-    const frame = stage?.querySelector("[data-static-game-frame]");
+<script>
+  import { wireStaticGameIframe } from "../lib/static-game-iframe";
 
-    const showError = () => {
-      loading?.setAttribute("hidden", "true");
-      frame?.setAttribute("hidden", "true");
-      error?.removeAttribute("hidden");
-    };
-
-    if (!stage || !loading || !error || !frame) {
-      showError();
-    } else {
-      frame.addEventListener("load", () => {
-        loading.setAttribute("hidden", "true");
-      });
-      frame.addEventListener("error", showError);
-      window.setTimeout(() => {
-        if (!frame.contentDocument && !frame.hasAttribute("hidden")) showError();
-      }, 12_000);
-    }
-  })();
+  wireStaticGameIframe(document.querySelector("[data-static-game-stage]"));
 </script>
