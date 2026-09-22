@@ -27,7 +27,7 @@ export type GameRelease = UnityWebglRelease | StaticWebRelease;
 export const BRIDGE_BUILDER_PRODUCTION_VERSION = "0.1.0-qualification.12";
 export const NUMBER_LINE_JUMPER_PRODUCTION_VERSION = "main-12641c0";
 export const MATH_DETECTIVE_PRODUCTION_VERSION = "2026.09.21-playtest-enhancements.1";
-export const ECOSYSTEM_RESCUE_PRODUCTION_VERSION = "0.1.0-qualification.4";
+export const ECOSYSTEM_RESCUE_PRODUCTION_VERSION = "0.1.0-qualification.5";
 
 // Production selects the approved immutable release directly. Pages preview
 // builds may override the version to exercise a different pinned candidate.
