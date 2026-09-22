@@ -189,7 +189,7 @@ export const games: readonly GameEntry[] = [
     description: ecosystemRescuePreviewVersion
       ? "Follow fertiliser from the fields into a pond: watch the algae bloom, the water cloud over, and the animals that need the most oxygen feel it first, then decide what to do about it. This candidate build is being tested before it joins the collection."
       : "Follow fertiliser from the fields into a pond: watch the algae bloom, the water cloud over, and the animals that need the most oxygen feel it first, then decide what to do about it.",
-    cardImage: "/art/coming-soon.svg",
+    cardImage: "/art/ecosystem-rescue-card.svg",
     route: "/ecosystem-rescue/",
     controls: [
       { input: "Mouse / touch", action: "Advance days and take an intervention" },
