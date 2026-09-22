@@ -41,6 +41,13 @@ const numberLineJumperPreviewVersion = runtimeProcess?.env?.NUMBER_LINE_JUMPER_P
 const mathDetectivePreviewVersion = runtimeProcess?.env?.MATH_DETECTIVE_PREVIEW_VERSION;
 const weatherCommandPreviewVersion = runtimeProcess?.env?.WEATHER_COMMAND_PREVIEW_VERSION;
 const ecosystemRescuePreviewVersion = runtimeProcess?.env?.ECOSYSTEM_RESCUE_PREVIEW_VERSION;
+// Qualification preview branch only: pin the exact immutable candidate so Pages Git previews
+// load it without a dashboard env var. Do not merge this pin to main (WC-PROMOTE).
+const weatherCommandRelease: StaticWebRelease = {
+  kind: "static-web",
+  version: weatherCommandPreviewVersion || "0.1.0-qualification.1",
+  entryFile: "index.html"
+};
 const bridgeBuilderProductionRelease: StaticWebRelease = {
   kind: "static-web",
   version: BRIDGE_BUILDER_PRODUCTION_VERSION,
@@ -65,9 +72,6 @@ const mathDetectiveProductionRelease: StaticWebRelease = {
 const mathDetectiveRelease: StaticWebRelease = mathDetectivePreviewVersion
   ? { ...mathDetectiveProductionRelease, version: mathDetectivePreviewVersion }
   : mathDetectiveProductionRelease;
-const weatherCommandPreviewRelease: StaticWebRelease | undefined = weatherCommandPreviewVersion
-  ? { kind: "static-web", version: weatherCommandPreviewVersion, entryFile: "index.html" }
-  : undefined;
 // Ecosystem Rescue's release: production selects the promoted immutable version, and a preview
 // build can pin a different candidate for qualification. The catalog entry is playable either way,
 // which is what makes the promoted version reachable at /ecosystem-rescue/play/ in production.
@@ -165,18 +169,17 @@ export const games: readonly GameEntry[] = [
   {
     slug: "weather-command",
     title: "Weather Command",
-    status: weatherCommandPreviewRelease ? "playable" : "coming-soon",
+    status: "playable",
     eyebrow: "Read the atmosphere",
-    description: weatherCommandPreviewRelease
-      ? "Inspect atmospheric evidence, make a forecast, and compare your prediction with a simulated weather system in this qualification preview."
-      : "A forecast desk is taking shape. Soon you’ll read atmospheric evidence, make a prediction, and see how the simulated weather responds.",
+    description:
+      "Inspect atmospheric evidence, make a forecast, and compare your prediction with a simulated weather system in this qualification preview.",
     cardImage: "/art/coming-soon.svg",
     route: "/weather-command/",
     controls: [
       { input: "Mouse / touch", action: "Inspect evidence and build a forecast" },
       { input: "Keyboard", action: "Navigate evidence and forecast controls" }
     ],
-    ...(weatherCommandPreviewRelease ? { release: weatherCommandPreviewRelease } : {})
+    release: weatherCommandRelease
   },
   {
     slug: "ecosystem-rescue",

@@ -30,7 +30,8 @@ describe("game catalog", () => {
         game.slug !== "bridge-builder" &&
         game.slug !== "signal-garden" &&
         game.slug !== "math-detective" &&
-        game.slug !== "ecosystem-rescue"
+        game.slug !== "ecosystem-rescue" &&
+        game.slug !== "weather-command"
     );
     expect(
       unrelatedGames.every(
@@ -38,6 +39,12 @@ describe("game catalog", () => {
           game.slug === "number-line-jumper" || (game.status === "coming-soon" && !game.release)
       )
     ).toBe(true);
+    expect(games.find((game) => game.slug === "weather-command")?.status).toBe("playable");
+    expect(games.find((game) => game.slug === "weather-command")?.release).toEqual({
+      kind: "static-web",
+      version: "0.1.0-qualification.1",
+      entryFile: "index.html"
+    });
     expect(games.find((game) => game.slug === "number-line-jumper")?.status).toBe("playable");
     expect(signalGarden?.status).toBe("playable");
     expect(signalGarden?.release).toEqual({
@@ -139,14 +146,18 @@ describe("game catalog", () => {
     });
   });
 
-  it("keeps Weather Command coming-soon unless an exact preview is selected", async () => {
+  it("pins Weather Command to the qualification candidate, overridable by preview env", async () => {
     vi.stubEnv("WEATHER_COMMAND_PREVIEW_VERSION", "");
     vi.resetModules();
     let module = await import("../src/data/games");
     let game = module.games.find((entry) => entry.slug === "weather-command");
 
-    expect(game?.status).toBe("coming-soon");
-    expect(game?.release).toBeUndefined();
+    expect(game?.status).toBe("playable");
+    expect(game?.release).toEqual({
+      kind: "static-web",
+      version: "0.1.0-qualification.1",
+      entryFile: "index.html"
+    });
     expect(game?.route).toBe("/weather-command/");
     expect(module.getGamePlayRoute(game!)).toBe("/weather-command/play/");
 
