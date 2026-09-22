@@ -8,6 +8,7 @@ import {
 
 interface GameAssetsEnv extends Env {
   GAME_ASSETS_ENABLE_FIXTURE?: string;
+  WEATHER_COMMAND_PREVIEW_VERSION?: string;
 }
 
 export const onRequest: PagesFunction<GameAssetsEnv> = async (context) => {
