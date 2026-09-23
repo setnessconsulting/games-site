@@ -72,7 +72,9 @@ version; they never overwrite an accepted version.
 
 The publisher must preserve correct `Content-Type`, `Content-Encoding` when compression is used,
 and cache metadata. The Pages Function serves approved assets with immutable caching and
-`X-Content-Type-Options: nosniff`.
+`X-Content-Type-Options: nosniff`. HTML documents additionally receive a document CSP and
+`X-Frame-Options: SAMEORIGIN` from the Function (`public/_headers` does not apply to Function
+responses), so same-origin play iframes keep working while cross-origin embedding is blocked.
 
 ## Candidate validation
 
