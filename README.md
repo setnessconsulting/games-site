@@ -18,6 +18,42 @@ Run the full local verification suite with:
 npm run verify
 ```
 
+### Playable assets locally
+
+`npm run preview` serves only the static Astro output. `/game-assets/*` is a Cloudflare Pages
+Function backed by R2, so Unity loaders and static-web iframes will not resolve under plain
+`astro preview` (the iframe may still fire `load` on a 404 document; the play frame now probes the
+entry URL and shows the error panel instead).
+
+To exercise play routes with real assets, build then run Pages + Functions locally:
+
+```bash
+npm run build
+npm run preview:pages
+```
+
+That uses `wrangler pages dev dist` with the `GAME_ASSETS` R2 binding from `wrangler.jsonc`
+(Cloudflare login required). For fixture-only WebGL smoke without production artifacts, see
+[`fixtures/webgl-smoke/README.md`](fixtures/webgl-smoke/README.md).
+
+### Route integrity
+
+Internal routes and links are validated statically (no browser or dev server) before code reaches
+CI:
+
+```bash
+npm run validate:routes
+```
+
+The check derives the site's routes from `src/pages` and `public/_routes.json`, then verifies every
+registry route, play route, unavailable-game target, and known static link (header, launcher,
+back links) resolves. It also fails on duplicate or conflicting catalog routes. Broken routes are
+reported with their source, for example:
+
+```
+weather-comand: configured route "/weather-comand/" has no matching site route
+```
+
 The site is designed to run at the root of `games.setnessconsulting.com`:
 
 - `/` — arcade collection

@@ -1,70 +1,42 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import GameUnavailable from "../../components/GameUnavailable.astro";
+import PlayToolbar from "../../components/PlayToolbar.astro";
 import SiteHeader from "../../components/SiteHeader.astro";
 import WebglGameFrame from "../../components/WebglGameFrame.astro";
-import { getGame, getGameAssetBase } from "../../data/games";
+import { getGame, getUnityWebglPlaySource } from "../../data/games";
 
 const game = getGame("signal-garden");
 if (!game) throw new Error("Signal Garden is missing from the catalog");
 
-const release =
-  game.status === "playable" && game.release?.kind === "unity-webgl" ? game.release : undefined;
-const assetBase = release ? getGameAssetBase(game) : undefined;
+const playSource = getUnityWebglPlaySource(game);
 ---
 
 <BaseLayout title={`Play ${game.title}`} description={`Play ${game.title} at Setness Games.`}>
   <SiteHeader compact />
   <main class="play-page page-shell">
-    <div class="play-toolbar">
-      <a class="back-link" href={game.route}>
-        ← Game page
-      </a>
-      <span class="play-label">{game.title}</span>
-      {assetBase && release ? (
-        <button class="text-button" type="button" data-fullscreen>
-          Fullscreen
-        </button>
-      ) : null}
-    </div>
-    {assetBase && release ? (
+    <PlayToolbar
+      game={game}
+      canFullscreen={Boolean(playSource)}
+      fullscreenStage="[data-game-stage]"
+    />
+    {playSource ? (
       <WebglGameFrame
         title={game.title}
-        version={release.version}
-        assetBase={assetBase}
-        loaderFile={release.loaderFile}
-        dataFile={release.dataFile}
-        frameworkFile={release.frameworkFile}
-        wasmFile={release.wasmFile}
+        version={playSource.release.version}
+        assetBase={playSource.assetBase}
+        loaderFile={playSource.release.loaderFile}
+        dataFile={playSource.release.dataFile}
+        frameworkFile={playSource.release.frameworkFile}
+        wasmFile={playSource.release.wasmFile}
         returnRoute={game.route}
       />
     ) : (
-      <section class="not-ready-panel">
-        <p class="eyebrow">Coming soon</p>
-        <h1>The garden is still growing.</h1>
-        <p>There isn’t a playable build here yet. Come back after the next release.</p>
-        <a class="button button-primary" href={game.route}>
-          Return to {game.title}
-        </a>
-      </section>
+      <GameUnavailable
+        game={game}
+        heading="The garden is still growing."
+        description="There isn’t a playable build here yet. Come back after the next release."
+      />
     )}
   </main>
 </BaseLayout>
-
-<script is:inline>
-  const button = document.querySelector("[data-fullscreen]");
-  const stage = document.querySelector("[data-game-stage]");
-
-  button?.addEventListener("click", async () => {
-    try {
-      if (!document.fullscreenElement) {
-        await stage?.requestFullscreen();
-        button.textContent = "Exit fullscreen";
-      } else {
-        await document.exitFullscreen();
-        button.textContent = "Fullscreen";
-      }
-    } catch {
-      button.textContent = "Fullscreen unavailable";
-    }
-  });
-</script>

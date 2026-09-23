@@ -1,0 +1,54 @@
+---
+import type { GameEntry } from "../data/games";
+
+interface Props {
+  game: GameEntry;
+  /** Only show the fullscreen control when a promoted build is available. */
+  canFullscreen: boolean;
+  /** Selector for the element that should enter fullscreen. */
+  fullscreenStage: string;
+}
+
+const { game, canFullscreen, fullscreenStage } = Astro.props;
+---
+
+<div class="play-toolbar">
+  <a class="back-link" href={game.route}>
+    ← Game page
+  </a>
+  <span class="play-label">{game.title}</span>
+  {canFullscreen ? (
+    <button
+      class="text-button"
+      type="button"
+      data-play-fullscreen
+      data-fullscreen-stage={fullscreenStage}
+    >
+      Fullscreen
+    </button>
+  ) : null}
+</div>
+
+{canFullscreen ? (
+  <script is:inline>
+    const fullscreenButton = document.querySelector("[data-play-fullscreen]");
+    const fullscreenStageSelector = fullscreenButton?.dataset.fullscreenStage;
+    const fullscreenStage = fullscreenStageSelector
+      ? document.querySelector(fullscreenStageSelector)
+      : null;
+
+    fullscreenButton?.addEventListener("click", async () => {
+      try {
+        if (!document.fullscreenElement) {
+          await fullscreenStage?.requestFullscreen();
+          fullscreenButton.textContent = "Exit fullscreen";
+        } else {
+          await document.exitFullscreen();
+          fullscreenButton.textContent = "Fullscreen";
+        }
+      } catch {
+        fullscreenButton.textContent = "Fullscreen unavailable";
+      }
+    });
+  </script>
+) : null}

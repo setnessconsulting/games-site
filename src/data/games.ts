@@ -27,6 +27,9 @@ export type GameRelease = UnityWebglRelease | StaticWebRelease;
 export const BRIDGE_BUILDER_PRODUCTION_VERSION = "0.1.0-qualification.12";
 export const NUMBER_LINE_JUMPER_PRODUCTION_VERSION = "main-12641c0";
 export const MATH_DETECTIVE_PRODUCTION_VERSION = "2026.09.21-playtest-enhancements.1";
+export const ECOSYSTEM_RESCUE_PRODUCTION_VERSION = "0.1.0-qualification.6";
+export const WEATHER_COMMAND_PRODUCTION_VERSION = "0.1.0-qualification.2";
+export const FRACTION_MATCH_PRODUCTION_VERSION = "0.1.0-qualification.1";
 
 // Production selects the approved immutable release directly. Pages preview
 // builds may override the version to exercise a different pinned candidate.
@@ -38,6 +41,9 @@ const runtimeProcess = (
 const bridgeBuilderPreviewVersion = runtimeProcess?.env?.BRIDGE_BUILDER_PREVIEW_VERSION;
 const numberLineJumperPreviewVersion = runtimeProcess?.env?.NUMBER_LINE_JUMPER_PREVIEW_VERSION;
 const mathDetectivePreviewVersion = runtimeProcess?.env?.MATH_DETECTIVE_PREVIEW_VERSION;
+const weatherCommandPreviewVersion = runtimeProcess?.env?.WEATHER_COMMAND_PREVIEW_VERSION;
+const ecosystemRescuePreviewVersion = runtimeProcess?.env?.ECOSYSTEM_RESCUE_PREVIEW_VERSION;
+const fractionMatchPreviewVersion = runtimeProcess?.env?.FRACTION_MATCH_PREVIEW_VERSION;
 const bridgeBuilderProductionRelease: StaticWebRelease = {
   kind: "static-web",
   version: BRIDGE_BUILDER_PRODUCTION_VERSION,
@@ -62,6 +68,33 @@ const mathDetectiveProductionRelease: StaticWebRelease = {
 const mathDetectiveRelease: StaticWebRelease = mathDetectivePreviewVersion
   ? { ...mathDetectiveProductionRelease, version: mathDetectivePreviewVersion }
   : mathDetectiveProductionRelease;
+const weatherCommandProductionRelease: StaticWebRelease = {
+  kind: "static-web",
+  version: WEATHER_COMMAND_PRODUCTION_VERSION,
+  entryFile: "index.html"
+};
+const weatherCommandRelease: StaticWebRelease = weatherCommandPreviewVersion
+  ? { ...weatherCommandProductionRelease, version: weatherCommandPreviewVersion }
+  : weatherCommandProductionRelease;
+// Ecosystem Rescue's release: production selects the promoted immutable version, and a preview
+// build can pin a different candidate for qualification. The catalog entry is playable either way,
+// which is what makes the promoted version reachable at /ecosystem-rescue/play/ in production.
+const ecosystemRescueProductionRelease: StaticWebRelease = {
+  kind: "static-web",
+  version: ECOSYSTEM_RESCUE_PRODUCTION_VERSION,
+  entryFile: "index.html"
+};
+const ecosystemRescueRelease: StaticWebRelease = ecosystemRescuePreviewVersion
+  ? { ...ecosystemRescueProductionRelease, version: ecosystemRescuePreviewVersion }
+  : ecosystemRescueProductionRelease;
+const fractionMatchProductionRelease: StaticWebRelease = {
+  kind: "static-web",
+  version: FRACTION_MATCH_PRODUCTION_VERSION,
+  entryFile: "index.html"
+};
+const fractionMatchRelease: StaticWebRelease = fractionMatchPreviewVersion
+  ? { ...fractionMatchProductionRelease, version: fractionMatchPreviewVersion }
+  : fractionMatchProductionRelease;
 
 export interface GameEntry {
   slug: string;
@@ -146,6 +179,55 @@ export const games: readonly GameEntry[] = [
     release: mathDetectiveRelease
   },
   {
+    slug: "fraction-match",
+    title: "Fraction Match",
+    status: "playable",
+    eyebrow: "Same amount, different faces",
+    description: fractionMatchPreviewVersion
+      ? "Turn two cards that show the same amount, even when the pictures look different. This candidate build is being tested before it joins the collection."
+      : "Turn two cards that show the same amount, even when the pictures look different.",
+    cardImage: "/art/fraction-match-card.svg",
+    route: "/fraction-match/",
+    controls: [
+      { input: "Mouse / touch", action: "Turn a card and look for its match" },
+      { input: "Keyboard", action: "Move between cards and select" },
+      { input: "Reduce motion", action: "Keep the inspection window, skip the decoration" }
+    ],
+    release: fractionMatchRelease
+  },
+  {
+    slug: "weather-command",
+    title: "Weather Command",
+    status: "playable",
+    eyebrow: "Read the atmosphere",
+    description: weatherCommandPreviewVersion
+      ? "Inspect atmospheric evidence, make a forecast, and compare your prediction with a simulated weather system in this qualification preview."
+      : "Inspect atmospheric evidence, make a forecast, and compare your prediction with a simulated weather system.",
+    cardImage: "/art/coming-soon.svg",
+    route: "/weather-command/",
+    controls: [
+      { input: "Mouse / touch", action: "Inspect evidence and build a forecast" },
+      { input: "Keyboard", action: "Navigate evidence and forecast controls" }
+    ],
+    release: weatherCommandRelease
+  },
+  {
+    slug: "ecosystem-rescue",
+    title: "Ecosystem Rescue",
+    status: "playable",
+    eyebrow: "Read the whole pond",
+    description: ecosystemRescuePreviewVersion
+      ? "Follow fertiliser from the fields into a pond: watch the algae bloom, the water cloud over, and the animals that need the most oxygen feel it first, then decide what to do about it. This candidate build is being tested before it joins the collection."
+      : "Follow fertiliser from the fields into a pond: watch the algae bloom, the water cloud over, and the animals that need the most oxygen feel it first, then decide what to do about it.",
+    cardImage: "/art/ecosystem-rescue-card.svg",
+    route: "/ecosystem-rescue/",
+    controls: [
+      { input: "Mouse / touch", action: "Advance days and take an intervention" },
+      { input: "Keyboard", action: "Advance, intervene, and read the evidence table" }
+    ],
+    release: ecosystemRescueRelease
+  },
+  {
     slug: "new-world-01",
     title: "A new world is growing",
     status: "coming-soon",
@@ -179,6 +261,31 @@ export function getPlayableGame(slug: string): GameEntry | undefined {
 export function getGameAssetBase(game: GameEntry): string | undefined {
   if (game.status !== "playable" || !game.release) return undefined;
   return `/game-assets/${game.slug}/${game.release.version}`;
+}
+
+export interface GamePlaySource<TRelease extends GameRelease = GameRelease> {
+  assetBase: string;
+  release: TRelease;
+}
+
+// Play routes must not launch a build the catalog has not promoted, so the
+// readiness check lives here instead of being repeated in every play page.
+export function getStaticWebPlaySource(
+  game: GameEntry
+): GamePlaySource<StaticWebRelease> | undefined {
+  const assetBase = getGameAssetBase(game);
+  const release = game.release;
+  if (!assetBase || release?.kind !== "static-web") return undefined;
+  return { assetBase, release };
+}
+
+export function getUnityWebglPlaySource(
+  game: GameEntry
+): GamePlaySource<UnityWebglRelease> | undefined {
+  const assetBase = getGameAssetBase(game);
+  const release = game.release;
+  if (!assetBase || release?.kind !== "unity-webgl") return undefined;
+  return { assetBase, release };
 }
 
 export function getGamePlayRoute(game: GameEntry): string {

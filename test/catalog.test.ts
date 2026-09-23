@@ -2,8 +2,11 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { GameEntry } from "../src/data/games";
 import {
   BRIDGE_BUILDER_PRODUCTION_VERSION,
+  ECOSYSTEM_RESCUE_PRODUCTION_VERSION,
+  FRACTION_MATCH_PRODUCTION_VERSION,
   MATH_DETECTIVE_PRODUCTION_VERSION,
   NUMBER_LINE_JUMPER_PRODUCTION_VERSION,
+  WEATHER_COMMAND_PRODUCTION_VERSION,
   games,
   getGamePlayRoute
 } from "../src/data/games";
@@ -28,7 +31,10 @@ describe("game catalog", () => {
       (game) =>
         game.slug !== "bridge-builder" &&
         game.slug !== "signal-garden" &&
-        game.slug !== "math-detective"
+        game.slug !== "math-detective" &&
+        game.slug !== "ecosystem-rescue" &&
+        game.slug !== "weather-command" &&
+        game.slug !== "fraction-match"
     );
     expect(
       unrelatedGames.every(
@@ -36,6 +42,18 @@ describe("game catalog", () => {
           game.slug === "number-line-jumper" || (game.status === "coming-soon" && !game.release)
       )
     ).toBe(true);
+    expect(games.find((game) => game.slug === "fraction-match")?.status).toBe("playable");
+    expect(games.find((game) => game.slug === "fraction-match")?.release).toEqual({
+      kind: "static-web",
+      version: FRACTION_MATCH_PRODUCTION_VERSION,
+      entryFile: "index.html"
+    });
+    expect(games.find((game) => game.slug === "weather-command")?.status).toBe("playable");
+    expect(games.find((game) => game.slug === "weather-command")?.release).toEqual({
+      kind: "static-web",
+      version: WEATHER_COMMAND_PRODUCTION_VERSION,
+      entryFile: "index.html"
+    });
     expect(games.find((game) => game.slug === "number-line-jumper")?.status).toBe("playable");
     expect(signalGarden?.status).toBe("playable");
     expect(signalGarden?.release).toEqual({
@@ -133,6 +151,88 @@ describe("game catalog", () => {
     expect(game?.release).toEqual({
       kind: "static-web",
       version: "2026.09.20-visual-pass.1-preview",
+      entryFile: "index.html"
+    });
+  });
+
+  it("keeps Weather Command on its promoted production release unless a preview is pinned", async () => {
+    vi.stubEnv("WEATHER_COMMAND_PREVIEW_VERSION", "");
+    vi.resetModules();
+    let module = await import("../src/data/games");
+    let game = module.games.find((entry) => entry.slug === "weather-command");
+
+    expect(game?.status).toBe("playable");
+    expect(game?.release).toEqual({
+      kind: "static-web",
+      version: WEATHER_COMMAND_PRODUCTION_VERSION,
+      entryFile: "index.html"
+    });
+    expect(game?.route).toBe("/weather-command/");
+    expect(module.getGamePlayRoute(game!)).toBe("/weather-command/play/");
+
+    vi.stubEnv("WEATHER_COMMAND_PREVIEW_VERSION", "main-foundation-preview");
+    vi.resetModules();
+    module = await import("../src/data/games");
+    game = module.games.find((entry) => entry.slug === "weather-command");
+
+    expect(game?.status).toBe("playable");
+    expect(game?.release).toEqual({
+      kind: "static-web",
+      version: "main-foundation-preview",
+      entryFile: "index.html"
+    });
+  });
+
+  it("keeps Ecosystem Rescue on its promoted production release unless a preview is pinned", async () => {
+    vi.stubEnv("ECOSYSTEM_RESCUE_PREVIEW_VERSION", "");
+    vi.resetModules();
+    let module = await import("../src/data/games");
+    let game = module.games.find((entry) => entry.slug === "ecosystem-rescue");
+
+    expect(game?.status).toBe("playable");
+    expect(game?.release).toEqual({
+      kind: "static-web",
+      version: ECOSYSTEM_RESCUE_PRODUCTION_VERSION,
+      entryFile: "index.html"
+    });
+    expect(game?.route).toBe("/ecosystem-rescue/");
+    expect(module.getGamePlayRoute(game!)).toBe("/ecosystem-rescue/play/");
+
+    vi.stubEnv("ECOSYSTEM_RESCUE_PREVIEW_VERSION", "0.1.0-qualification.9");
+    vi.resetModules();
+    module = await import("../src/data/games");
+    game = module.games.find((entry) => entry.slug === "ecosystem-rescue");
+
+    expect(game?.release).toEqual({
+      kind: "static-web",
+      version: "0.1.0-qualification.9",
+      entryFile: "index.html"
+    });
+  });
+
+  it("keeps Fraction Match on its promoted production release unless a preview is pinned", async () => {
+    vi.stubEnv("FRACTION_MATCH_PREVIEW_VERSION", "");
+    vi.resetModules();
+    let module = await import("../src/data/games");
+    let game = module.games.find((entry) => entry.slug === "fraction-match");
+
+    expect(game?.status).toBe("playable");
+    expect(game?.release).toEqual({
+      kind: "static-web",
+      version: FRACTION_MATCH_PRODUCTION_VERSION,
+      entryFile: "index.html"
+    });
+    expect(game?.route).toBe("/fraction-match/");
+    expect(module.getGamePlayRoute(game!)).toBe("/fraction-match/play/");
+
+    vi.stubEnv("FRACTION_MATCH_PREVIEW_VERSION", "0.1.0-qualification.9");
+    vi.resetModules();
+    module = await import("../src/data/games");
+    game = module.games.find((entry) => entry.slug === "fraction-match");
+
+    expect(game?.release).toEqual({
+      kind: "static-web",
+      version: "0.1.0-qualification.9",
       entryFile: "index.html"
     });
   });

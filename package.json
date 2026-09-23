@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "astro dev",
     "preview": "astro preview",
+    "preview:pages": "wrangler pages dev dist",
     "build": "astro check && astro build",
     "check": "astro check",
     "lint": "eslint .",
@@ -14,10 +15,11 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "validate:catalog": "tsx scripts/validate-catalog.ts",
+    "validate:routes": "tsx scripts/validate-routes.ts",
     "check:functions": "tsc -p functions/tsconfig.json --noEmit",
     "check:wrangler": "wrangler types --check --path=functions/types.d.ts",
     "types:wrangler": "wrangler types --path=functions/types.d.ts",
-    "verify": "npm run types:wrangler && npm run validate:catalog && npm run lint && npm run format:check && npm run check && npm run check:functions && npm run test && npm run build"
+    "verify": "npm run types:wrangler && npm run validate:catalog && npm run validate:routes && npm run lint && npm run format:check && npm run check && npm run check:functions && npm run test && npm run build"
   },
   "dependencies": {
     "astro": "^7.3.2"
@@ -29,6 +31,7 @@
     "@types/node": "^22.20.3",
     "eslint": "^10.10.0",
     "eslint-plugin-astro": "^3.1.0",
+    "happy-dom": "^20.14.5",
     "prettier": "^3.9.6",
     "prettier-plugin-astro": "^1.0.0",
     "tsx": "^4.23.13",

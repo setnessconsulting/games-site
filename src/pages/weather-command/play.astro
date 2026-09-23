@@ -6,8 +6,8 @@ import SiteHeader from "../../components/SiteHeader.astro";
 import StaticGameFrame from "../../components/StaticGameFrame.astro";
 import { getGame, getStaticWebPlaySource } from "../../data/games";
 
-const game = getGame("math-detective");
-if (!game) throw new Error("Math Detective is missing from the catalog");
+const game = getGame("weather-command");
+if (!game) throw new Error("Weather Command is missing from the catalog");
 
 const playSource = getStaticWebPlaySource(game);
 const entryUrl = playSource ? `${playSource.assetBase}/${playSource.release.entryFile}` : undefined;
@@ -26,8 +26,8 @@ const entryUrl = playSource ? `${playSource.assetBase}/${playSource.release.entr
     ) : (
       <GameUnavailable
         game={game}
-        heading="The case file is still being prepared."
-        description="There isn’t a playable build here yet. Return to the game page and try again later."
+        heading="The forecast desk is still being prepared."
+        description="There isn’t a qualified Weather Command build here yet. Production stays intentionally unavailable until the immutable game candidate passes its science, accessibility, comparator, device, and playtest gates."
       />
     )}
   </main>

@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   BRIDGE_BUILDER_PRODUCTION_VERSION,
-  NUMBER_LINE_JUMPER_PRODUCTION_VERSION
+  FRACTION_MATCH_PRODUCTION_VERSION,
+  NUMBER_LINE_JUMPER_PRODUCTION_VERSION,
+  WEATHER_COMMAND_PRODUCTION_VERSION
 } from "../src/data/games";
 import {
   buildAssetKey,
@@ -53,6 +55,94 @@ describe("game asset contract", () => {
     ).toBe(false);
     expect(
       isApprovedRelease("bridge-builder", previewVersion, false, undefined, previewVersion)
+    ).toBe(false);
+  });
+
+  it("approves the production Weather Command release and exact preview override", () => {
+    const previewVersion = "main-foundation-preview";
+
+    expect(isApprovedRelease("weather-command", WEATHER_COMMAND_PRODUCTION_VERSION, false)).toBe(
+      true
+    );
+    expect(
+      isApprovedRelease(
+        "weather-command",
+        previewVersion,
+        false,
+        undefined,
+        undefined,
+        undefined,
+        previewVersion
+      )
+    ).toBe(true);
+    expect(
+      isApprovedRelease(
+        "weather-command",
+        "other-version",
+        false,
+        undefined,
+        undefined,
+        undefined,
+        previewVersion
+      )
+    ).toBe(false);
+    expect(
+      isApprovedRelease(
+        "other-game",
+        previewVersion,
+        false,
+        undefined,
+        undefined,
+        undefined,
+        previewVersion
+      )
+    ).toBe(false);
+  });
+
+  it("approves the production Fraction Match release and exact preview override", () => {
+    const previewVersion = "0.1.0-qualification.9";
+
+    expect(isApprovedRelease("fraction-match", FRACTION_MATCH_PRODUCTION_VERSION, false)).toBe(
+      true
+    );
+    expect(
+      isApprovedRelease(
+        "fraction-match",
+        previewVersion,
+        false,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        previewVersion
+      )
+    ).toBe(true);
+    expect(
+      isApprovedRelease(
+        "fraction-match",
+        "other-version",
+        false,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        previewVersion
+      )
+    ).toBe(false);
+    expect(
+      isApprovedRelease(
+        "other-game",
+        previewVersion,
+        false,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        previewVersion
+      )
     ).toBe(false);
   });
 

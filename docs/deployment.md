@@ -32,6 +32,10 @@ test-fixture/0.0.0/Build/
 
 Enable `GAME_ASSETS_ENABLE_FIXTURE=true` only in local or staging environments.
 
+Plain `astro preview` does not execute Pages Functions, so `/game-assets/...` will 404 there
+(including Signal Garden’s Unity loader). After `npm run build`, use `npm run preview:pages` to
+run `wrangler pages dev dist` with the `GAME_ASSETS` binding from this file’s `wrangler.jsonc`.
+
 For a Bridge Builder hosted qualification preview, publish the immutable static release from the
 standalone game repository under `bridge-builder/<version>/`, then build a non-production Pages
 preview with `BRIDGE_BUILDER_PREVIEW_VERSION=<version>`. This opt-in pointer makes
@@ -63,6 +67,24 @@ version is `main-12641c0`. A non-production Pages preview may override it with
 preview Function. Rollback changes only the checked-in production pointer to a previously published
 immutable version. Do not overwrite or delete published prefixes. The 2026-09-20 rehearsal is
 recorded in [`number-line-jumper-rollback.md`](number-line-jumper-rollback.md).
+
+For a Weather Command release, publish the immutable static-web artifact from
+`setnessconsulting/game-weather-command` under `weather-command/<version>/`, then update the
+checked-in production pointer `WEATHER_COMMAND_PRODUCTION_VERSION` in `src/data/games.ts` and
+deploy `main`. The current production version is `0.1.0-qualification.2` (source SHA
+`0c8563f72ea4490ea419fddbb37a7e2bad74ecfe`). A non-production Pages preview may override it with
+`WEATHER_COMMAND_PREVIEW_VERSION=<version>`; the same exact pointer must be supplied to the
+preview Function. Rollback changes only the checked-in production pointer (or restores a prior
+games-site deployment). Do not overwrite or delete published prefixes. See
+[`weather-command-rollback.md`](weather-command-rollback.md).
+
+For a Fraction Match release, publish the immutable static-web artifact from
+`setnessconsulting/game-fraction-match` under `fraction-match/<version>/`, then update the
+checked-in production pointer in `src/data/games.ts` and deploy `main`. The current production
+version is `0.1.0-qualification.1` (source SHA `3652699870699e9d92a78fb3eb781b3ec3ccde3a`). A
+non-production Pages preview may override it with `FRACTION_MATCH_PREVIEW_VERSION=<version>`;
+the same exact pointer must be supplied to the preview Function. Rollback changes only the
+checked-in production pointer. Do not overwrite or delete published prefixes.
 
 ## Secrets
 

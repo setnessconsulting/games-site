@@ -1,61 +1,38 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import GameUnavailable from "../../components/GameUnavailable.astro";
+import PlayToolbar from "../../components/PlayToolbar.astro";
 import SiteHeader from "../../components/SiteHeader.astro";
 import StaticWebGameFrame from "../../components/StaticWebGameFrame.astro";
-import { getGame, getGameAssetBase } from "../../data/games";
+import { getGame, getStaticWebPlaySource } from "../../data/games";
 
 const game = getGame("number-line-jumper");
 if (!game) throw new Error("Number Line Jumper is missing from the catalog");
 
-const release =
-  game.status === "playable" && game.release?.kind === "static-web" ? game.release : undefined;
-const assetBase = release ? getGameAssetBase(game) : undefined;
+const playSource = getStaticWebPlaySource(game);
 ---
 
 <BaseLayout title={`Play ${game.title}`} description={`Play ${game.title} at Setness Games.`}>
   <SiteHeader compact />
   <main class="play-page page-shell">
-    <div class="play-toolbar">
-      <a class="back-link" href={game.route}>
-        ← Game page
-      </a>
-      <span class="play-label">{game.title}</span>
-      {assetBase && release ? (
-        <button class="text-button" type="button" data-fullscreen>
-          Fullscreen
-        </button>
-      ) : null}
-    </div>
-    {assetBase && release ? (
-      <StaticWebGameFrame title={game.title} assetBase={assetBase} entryFile={release.entryFile} />
+    <PlayToolbar
+      game={game}
+      canFullscreen={Boolean(playSource)}
+      fullscreenStage="[data-game-stage]"
+    />
+    {playSource ? (
+      <StaticWebGameFrame
+        title={game.title}
+        assetBase={playSource.assetBase}
+        entryFile={playSource.release.entryFile}
+        gamePageUrl={game.route}
+      />
     ) : (
-      <section class="not-ready-panel">
-        <p class="eyebrow">Coming soon</p>
-        <h1>Number Line Jumper is not published yet.</h1>
-        <p>The arcade route is ready, but no validated production release has been promoted.</p>
-        <a class="button button-primary" href={game.route}>
-          Return to {game.title}
-        </a>
-      </section>
+      <GameUnavailable
+        game={game}
+        heading="Number Line Jumper is not published yet."
+        description="The arcade route is ready, but no validated production release has been promoted."
+      />
     )}
   </main>
 </BaseLayout>
-
-<script is:inline>
-  const button = document.querySelector("[data-fullscreen]");
-  const stage = document.querySelector("[data-game-stage]");
-
-  button?.addEventListener("click", async () => {
-    try {
-      if (!document.fullscreenElement) {
-        await stage?.requestFullscreen();
-        button.textContent = "Exit fullscreen";
-      } else {
-        await document.exitFullscreen();
-        button.textContent = "Fullscreen";
-      }
-    } catch {
-      button.textContent = "Fullscreen unavailable";
-    }
-  });
-</script>
