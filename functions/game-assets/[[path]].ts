@@ -5,6 +5,11 @@ import {
   parseByteRange,
   parseAssetPath
 } from "../../src/lib/game-assets";
+import {
+  applyGameAssetDocumentSecurityHeaders,
+  GAME_ASSET_IMMUTABLE_CACHE_CONTROL,
+  isHtmlContentType
+} from "../../src/lib/game-asset-security-headers";
 
 interface GameAssetsEnv extends Env {
   GAME_ASSETS_ENABLE_FIXTURE?: string;
@@ -54,12 +59,16 @@ export const onRequest: PagesFunction<GameAssetsEnv> = async (context) => {
     headers.set("x-content-type-options", "nosniff");
     headers.set(
       "cache-control",
-      headers.get("cache-control") ?? "public, max-age=31536000, immutable"
+      headers.get("cache-control") ?? GAME_ASSET_IMMUTABLE_CACHE_CONTROL
     );
     headers.set(
       "content-type",
       headers.get("content-type") ?? fallbackContentType(parsed.assetPath)
     );
+    // _headers does not apply to Function responses; HTML documents need policy here.
+    if (isHtmlContentType(headers.get("content-type"))) {
+      applyGameAssetDocumentSecurityHeaders(headers);
+    }
     const isBrotliAsset = parsed.assetPath.toLowerCase().endsWith(".br");
     if (isBrotliAsset) {
       headers.set("content-encoding", "br");
