@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { BRIDGE_BUILDER_PRODUCTION_VERSION } from "../src/data/games";
 import {
   buildAssetKey,
   fallbackContentType,
@@ -29,6 +30,7 @@ describe("game asset contract", () => {
     expect(isApprovedRelease("test-fixture", "0.0.0", true)).toBe(true);
     expect(isApprovedRelease("signal-garden", "0.0.1", true)).toBe(false);
     expect(isApprovedRelease("bridge-builder", "0.1.0", false)).toBe(false);
+    expect(isApprovedRelease("bridge-builder", BRIDGE_BUILDER_PRODUCTION_VERSION, false)).toBe(true);
     expect(isApprovedRelease("bridge-builder", "0.1.0", false, "0.1.0")).toBe(true);
   });
 

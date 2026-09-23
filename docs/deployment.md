@@ -36,8 +36,9 @@ For a Bridge Builder hosted qualification preview, publish the immutable static 
 standalone game repository under `bridge-builder/<version>/`, then build a non-production Pages
 preview with `BRIDGE_BUILDER_PREVIEW_VERSION=<version>`. This opt-in pointer makes
 `/bridge-builder/play/` load the exact versioned `index.html` through the same-origin R2 function;
-the same variable is supplied to the preview Function so the version is approved for reads. Leave
-it unset on `main` until the named approval gate passes.
+the same variable is supplied to the preview Function so the version is approved for reads. The
+approved production version is pinned directly in `src/data/games.ts`; do not use the preview
+variable as the production release pointer.
 
 For a Number Line Jumper hosted qualification preview, publish the immutable static release from
 `setnessconsulting/game-number-line-jumper` under `number-line-jumper/<version>/`, then build a
