@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import type { GameEntry, GameRelease } from "../data/games";
+import type { GameEntry, GamePreview, GameRelease } from "../data/games";
 
 // Resolve public/ relative to this module so validation works regardless of the
 // caller's working directory (scripts, vitest, and editor tooling).
@@ -47,6 +47,30 @@ function validateRelease(slug: string, release: GameRelease): string[] {
     if (!isSafeRelativeAssetPath(value) || value.includes("/")) {
       errors.push(`${slug}: unity-webgl ${field} must be a safe filename`);
     }
+  }
+
+  return errors;
+}
+
+/**
+ * Validate a qualification-candidate pointer.
+ *
+ * Mirrors the static-web release shape because the candidate is served the same way,
+ * while staying a distinct type so it can never be mistaken for a promoted release.
+ */
+function validatePreview(slug: string, preview: GamePreview): string[] {
+  const errors: string[] = [];
+
+  if (!VERSION_PATTERN.test(preview.version)) {
+    errors.push(`${slug}: preview version must be an immutable path-safe identifier`);
+  }
+
+  if (!isSafeRelativeAssetPath(preview.entryFile)) {
+    errors.push(`${slug}: preview entryFile must be a safe relative asset path`);
+  }
+
+  if (!preview.entryFile.toLowerCase().endsWith(".html")) {
+    errors.push(`${slug}: preview entryFile must be an HTML document`);
   }
 
   return errors;
@@ -104,6 +128,29 @@ export function validateCatalog(entries: readonly GameEntry[]): string[] {
 
     if (game.release) {
       errors.push(...validateRelease(game.slug, game.release));
+    }
+
+    // --- Preview pointers must never become production pointers ----------------
+    // The two pointer kinds mean opposite things, so every combination that would
+    // blur them is rejected here rather than left to review discipline.
+    if (game.preview) {
+      if (game.status === "playable") {
+        errors.push(
+          `${game.slug}: a playable game must not also carry a preview pointer; promotion selects the release instead`
+        );
+      }
+      if (game.release) {
+        errors.push(
+          `${game.slug}: an entry must not declare both a production release and a preview pointer; preview and production pointers must stay distinct`
+        );
+      }
+      errors.push(...validatePreview(game.slug, game.preview));
+    }
+
+    if (game.previewEnabled && game.status !== "coming-soon") {
+      errors.push(
+        `${game.slug}: previewEnabled only applies to a coming-soon entry; a playable game's play route is already promoted`
+      );
     }
   }
 

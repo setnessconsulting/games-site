@@ -23,7 +23,15 @@
         "MATH_DETECTIVE_PREVIEW_VERSION": "2026.09.21-playtest-enhancements.1",
         "ECOSYSTEM_RESCUE_PREVIEW_VERSION": "0.1.0-qualification.5",
         "WEATHER_COMMAND_PREVIEW_VERSION": "0.1.0-qualification.2",
-        "FRACTION_MATCH_PREVIEW_VERSION": "0.1.0-qualification.1"
+        "FRACTION_MATCH_PREVIEW_VERSION": "0.1.0-qualification.1",
+        // Deliberately empty, and declared rather than omitted. Planetary Survey has no
+        // published candidate yet, so naming a version here would point the preview
+        // environment at an R2 object that does not exist. Empty is treated as
+        // "not configured" everywhere it is read, so this changes nothing at runtime
+        // while keeping the variable declared and typed for the qualification pass
+        // that will set it. The other games carry real versions because their
+        // candidates are published.
+        "PLANETARY_SURVEY_PREVIEW_VERSION": ""
       }
     }
   }

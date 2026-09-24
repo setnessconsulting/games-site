@@ -31,6 +31,21 @@ export const ECOSYSTEM_RESCUE_PRODUCTION_VERSION = "0.1.0-qualification.6";
 export const WEATHER_COMMAND_PRODUCTION_VERSION = "0.1.0-qualification.2";
 export const FRACTION_MATCH_PRODUCTION_VERSION = "0.1.0-qualification.1";
 
+/**
+ * Planetary Survey has NO production version, deliberately.
+ *
+ * GAME-365 / PS-HOST exists to prepare the host for this game without promoting an
+ * unfinished build. There is no `PLANETARY_SURVEY_PRODUCTION_VERSION` constant
+ * because there is no promoted release: the entry stays `coming-soon` and carries no
+ * `release` at all until PS-PROMOTE selects an immutable artifact through a reviewed
+ * catalog change.
+ *
+ * A missing constant is a stronger guarantee than a placeholder one. Any code that
+ * needs a production pointer for this game fails to compile rather than silently
+ * reading a version nobody qualified.
+ */
+export const PLANETARY_SURVEY_SLUG = "planetary-survey";
+
 // Production selects the approved immutable release directly. Pages preview
 // builds may override the version to exercise a different pinned candidate.
 const runtimeProcess = (
@@ -44,6 +59,9 @@ const mathDetectivePreviewVersion = runtimeProcess?.env?.MATH_DETECTIVE_PREVIEW_
 const weatherCommandPreviewVersion = runtimeProcess?.env?.WEATHER_COMMAND_PREVIEW_VERSION;
 const ecosystemRescuePreviewVersion = runtimeProcess?.env?.ECOSYSTEM_RESCUE_PREVIEW_VERSION;
 const fractionMatchPreviewVersion = runtimeProcess?.env?.FRACTION_MATCH_PREVIEW_VERSION;
+// The only Planetary Survey pointer that can exist before promotion. It is a
+// PREVIEW pointer, never a production one: see `getGamePreviewSource`.
+const planetarySurveyPreviewVersion = runtimeProcess?.env?.PLANETARY_SURVEY_PREVIEW_VERSION;
 const bridgeBuilderProductionRelease: StaticWebRelease = {
   kind: "static-web",
   version: BRIDGE_BUILDER_PRODUCTION_VERSION,
@@ -96,6 +114,22 @@ const fractionMatchRelease: StaticWebRelease = fractionMatchPreviewVersion
   ? { ...fractionMatchProductionRelease, version: fractionMatchPreviewVersion }
   : fractionMatchProductionRelease;
 
+/**
+ * A qualification-only candidate pointer for a game that is NOT promoted.
+ *
+ * This is deliberately NOT a `GameRelease`. A `release` means "the catalog promotes
+ * this exact version to production", and `validateCatalog` rejects a `release` on a
+ * `coming-soon` entry for exactly that reason. A preview pointer means the opposite:
+ * "a hosted qualification build exists, and production must not use it".
+ *
+ * Keeping them different types is what makes the two pointers impossible to confuse.
+ * If they shared a shape, a preview version would eventually be promoted by accident.
+ */
+export interface GamePreview {
+  readonly version: string;
+  readonly entryFile: string;
+}
+
 export interface GameEntry {
   slug: string;
   title: string;
@@ -106,6 +140,23 @@ export interface GameEntry {
   route: string;
   controls: readonly GameControl[];
   release?: GameRelease;
+  /**
+   * Hosted qualification candidate. Only meaningful for a `coming-soon` entry, and
+   * only present when an explicit preview pointer is configured for this build.
+   */
+  preview?: GamePreview;
+  /**
+   * Declares that this game's play page is preview-gated rather than promoted.
+   *
+   * Present so route validation can stay STATIC. The alternative — asking whether a
+   * preview is configured — depends on deployment environment, so a production build
+   * would validate differently from a preview build, which is precisely the kind of
+   * drift this repository's checks exist to prevent. This flag is a reviewable source
+   * statement; the runtime guarantee that production cannot render the candidate is
+   * enforced by `getGamePreviewSource` and asserted by tests in both environment
+   * states.
+   */
+  previewEnabled?: boolean;
 }
 
 export const games: readonly GameEntry[] = [
@@ -228,6 +279,28 @@ export const games: readonly GameEntry[] = [
     release: ecosystemRescueRelease
   },
   {
+    slug: PLANETARY_SURVEY_SLUG,
+    title: "Planetary Survey",
+    status: "coming-soon",
+    eyebrow: "Read the worlds next door",
+    description: planetarySurveyPreviewVersion
+      ? "Run a planetary survey: measure worlds, keep the evidence, compare them, and make a claim the data can back up. This qualification candidate is being tested before it joins the collection."
+      : "Run a planetary survey: measure worlds, keep the evidence, compare them, and make a claim the data can back up.",
+    cardImage: "/art/coming-soon.svg",
+    route: "/planetary-survey/",
+    controls: [
+      { input: "Pointer or touch", action: "Approach a world and choose an instrument" },
+      { input: "Keyboard", action: "Take every measurement and cite every claim" },
+      { input: "Reduce motion", action: "Keep the evidence, skip the animation" }
+    ],
+    // Present only when this build was given a preview pointer. No `release` is ever
+    // set here: promotion is a separate, reviewed change owned by PS-PROMOTE.
+    ...(planetarySurveyPreviewVersion
+      ? { preview: { version: planetarySurveyPreviewVersion, entryFile: "index.html" } }
+      : {}),
+    previewEnabled: true
+  },
+  {
     slug: "new-world-01",
     title: "A new world is growing",
     status: "coming-soon",
@@ -290,4 +363,45 @@ export function getUnityWebglPlaySource(
 
 export function getGamePlayRoute(game: GameEntry): string {
   return `${game.route}play/`;
+}
+
+/**
+ * The hosted qualification candidate, if this build was given one.
+ *
+ * Returns `undefined` for a promoted game on purpose. A game with a `release` already
+ * has an authoritative production pointer, and letting a preview override it is the
+ * confusion this function exists to prevent — the older `*_PREVIEW_VERSION` mechanism
+ * swaps the PRODUCTION version of an already-promoted game, which is a different and
+ * riskier thing than hosting a candidate that is not promoted at all.
+ */
+export function getGamePreviewSource(
+  game: GameEntry
+): GamePlaySource<StaticWebRelease> | undefined {
+  if (game.status !== "coming-soon") return undefined;
+  const preview = game.preview;
+  if (!preview) return undefined;
+  return {
+    assetBase: `/game-assets/${game.slug}/${preview.version}`,
+    release: { kind: "static-web", version: preview.version, entryFile: preview.entryFile }
+  };
+}
+
+/**
+ * What a play page may actually run, in priority order.
+ *
+ * A promoted release wins; otherwise a configured qualification candidate; otherwise
+ * nothing, and the play page renders the shared unavailable panel. Because the two
+ * sources are disjoint by construction (a promoted game has no preview), this can
+ * never return a candidate pointer for a promoted game, and production — which sets
+ * no preview pointer — always falls through to `undefined`.
+ */
+export function getReachablePlaySource(
+  game: GameEntry
+): GamePlaySource<StaticWebRelease> | undefined {
+  return getStaticWebPlaySource(game) ?? getGamePreviewSource(game);
+}
+
+/** True when this entry would run something in the CURRENT build environment. */
+export function isGameReachable(game: GameEntry): boolean {
+  return getReachablePlaySource(game) !== undefined;
 }

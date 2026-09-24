@@ -1,4 +1,4 @@
-import { games } from "../data/games";
+import { PLANETARY_SURVEY_SLUG, games } from "../data/games";
 
 const SAFE_SEGMENT = /^[A-Za-z0-9._-]+$/;
 
@@ -44,7 +44,8 @@ export function isApprovedRelease(
   mathDetectivePreviewVersion?: string,
   weatherCommandPreviewVersion?: string,
   ecosystemRescuePreviewVersion?: string,
-  fractionMatchPreviewVersion?: string
+  fractionMatchPreviewVersion?: string,
+  planetarySurveyPreviewVersion?: string
 ): boolean {
   if (allowFixture && slug === "test-fixture" && version === "0.0.0") return true;
 
@@ -92,6 +93,19 @@ export function isApprovedRelease(
     slug === "fraction-match" &&
     fractionMatchPreviewVersion &&
     version === fractionMatchPreviewVersion
+  ) {
+    return true;
+  }
+
+  // Planetary Survey is not promoted, so this is the ONLY path that can approve one
+  // of its assets: an exact preview pointer supplied by the deployment. The catalog
+  // fallback below cannot approve it, because the entry has no `release` and is not
+  // `playable`. A deployment that forgets to set the pointer serves nothing rather
+  // than serving an unqualified candidate.
+  if (
+    slug === PLANETARY_SURVEY_SLUG &&
+    planetarySurveyPreviewVersion &&
+    version === planetarySurveyPreviewVersion
   ) {
     return true;
   }

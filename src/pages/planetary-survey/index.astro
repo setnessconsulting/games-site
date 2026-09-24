@@ -1,0 +1,54 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import GameLauncher from "../../components/GameLauncher.astro";
+import SiteHeader from "../../components/SiteHeader.astro";
+import { PLANETARY_SURVEY_SLUG, getGame, getGamePreviewSource } from "../../data/games";
+
+const game = getGame(PLANETARY_SURVEY_SLUG);
+if (!game) throw new Error("Planetary Survey is missing from the catalog");
+
+// The host-state block below states this build's pointer situation in machine-readable
+// form. GAME-365 / PS-HOST requires the host target to be documented AND testable, and a
+// test that only reads documentation can drift from what the site actually serves. These
+// attributes let the repository assert the real state of a real build.
+const previewSource = getGamePreviewSource(game);
+---
+
+<BaseLayout title={game.title} description={game.description}>
+  <SiteHeader compact />
+  <main class="page-shell launcher-page">
+    <a class="back-link" href="/">
+      ← Collection
+    </a>
+    <GameLauncher game={game} />
+    <p class="game-note">
+      Planetary Survey is a browser-first planetary-science game for grades 6–8. Learners run a
+      survey probe: they measure worlds, keep the evidence, compare bodies, and make a claim the
+      data can back up. It is a survey, not a fact quiz, and no value ships without a recorded
+      scientific source.
+    </p>
+    <section
+      class="game-note"
+      aria-label="Host status"
+      data-slot="planetary-survey-host-status"
+      data-catalog-status={game.status}
+      data-preview-pointer={previewSource?.release.version ?? "none"}
+      data-preview-asset-base={previewSource?.assetBase ?? "none"}
+    >
+      {previewSource ? (
+        <p>
+          This build carries a <strong>qualification candidate</strong> at{" "}
+          <code>{previewSource.assetBase}/</code>. It is not a promotion: production still has no
+          selected Planetary Survey release, and this pointer disappears as soon as the preview
+          environment stops supplying it.
+        </p>
+      ) : (
+        <p>
+          No Planetary Survey build is selected here. Production stays intentionally unavailable
+          until an immutable candidate passes its science, accessibility, comparator, device,
+          rollback, and playtest gates.
+        </p>
+      )}
+    </section>
+  </main>
+</BaseLayout>

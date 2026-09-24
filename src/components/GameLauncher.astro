@@ -1,6 +1,6 @@
 ---
 import type { GameEntry } from "../data/games";
-import { getGameAssetBase, getGamePlayRoute } from "../data/games";
+import { getGameAssetBase, getGamePlayRoute, getGamePreviewSource } from "../data/games";
 
 interface Props {
   game: GameEntry;
@@ -9,6 +9,13 @@ interface Props {
 const { game } = Astro.props;
 const assetBase = getGameAssetBase(game);
 const playable = game.status === "playable" && Boolean(assetBase);
+// A qualification candidate is offered only when this build was given a preview
+// pointer. The link is safe in production because the play page resolves its source
+// the same way: with no pointer it renders the shared unavailable panel rather than a
+// dead frame. The label is deliberately different from "Play", because a hosted
+// candidate is not a promoted game and must not read like one.
+const previewSource = getGamePreviewSource(game);
+const hasPreview = Boolean(previewSource);
 ---
 
 <section class="launcher-panel" aria-labelledby="launcher-title">
@@ -25,6 +32,10 @@ const playable = game.status === "playable" && Boolean(assetBase);
       {playable ? (
         <a class="button button-primary" href={getGamePlayRoute(game)}>
           Play {game.title} <span aria-hidden="true">→</span>
+        </a>
+      ) : hasPreview ? (
+        <a class="button button-quiet" href={getGamePlayRoute(game)}>
+          Open the qualification preview <span aria-hidden="true">→</span>
         </a>
       ) : (
         <span class="button button-disabled" aria-disabled="true">
@@ -49,6 +60,11 @@ const playable = game.status === "playable" && Boolean(assetBase);
       ) : (
         <p class="muted-label">Controls will be shared when the game is ready.</p>
       )}
+      {hasPreview ? (
+        <p class="muted-label">
+          This build carries a qualification candidate, not a promoted release.
+        </p>
+      ) : null}
     </div>
   </div>
 </section>

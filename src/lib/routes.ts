@@ -63,7 +63,8 @@ export type ViolationId =
   | "conflicting-route"
   | "missing-route"
   | "missing-play-route"
-  | "unavailable-game-play-route";
+  | "unavailable-game-play-route"
+  | "missing-preview-play-route";
 
 export interface Violation {
   /** Machine-stable check id, e.g. "missing-route". */
@@ -312,12 +313,30 @@ export function validateRoutes(options: RoutesOptions = {}): RouteValidationResu
     // a dead game frame. Sharing a placeholder route instead is fine: point the
     // entry's route at the placeholder (declared in INTENTIONAL_ROUTES) or let
     // the play page render the shared unavailable panel.
-    if (!playable && exists) {
+    //
+    // A preview-gated entry is the sanctioned exception, and it is opt-in rather
+    // than inferred: `previewEnabled` is a reviewable source statement. It is safe
+    // because the promoted-release helper is status-gated, so a coming-soon entry
+    // cannot resolve a production pointer no matter what the page renders, and the
+    // candidate only appears when a deployment supplies a preview pointer. The page
+    // test asserts the production build renders the shared unavailable panel.
+    if (!playable && exists && !game.previewEnabled) {
       violations.push({
         id: "unavailable-game-play-route",
         source: game.slug,
         href: playRoute,
         message: `coming-soon game exposes a playable page at "${playRoute}"; remove the page or point the entry at the shared placeholder route`
+      });
+    }
+
+    // The reverse drift: `previewEnabled` claims a preview-gated play page exists,
+    // so a missing one means reviewable intent no longer matches the tree.
+    if (game.previewEnabled && !exists) {
+      violations.push({
+        id: "missing-preview-play-route",
+        source: game.slug,
+        href: playRoute,
+        message: `coming-soon game declares previewEnabled but "${playRoute}" has no matching site route`
       });
     }
   }
