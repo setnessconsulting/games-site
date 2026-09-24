@@ -1,0 +1,38 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import GameUnavailable from "../../components/GameUnavailable.astro";
+import PlayToolbar from "../../components/PlayToolbar.astro";
+import SiteHeader from "../../components/SiteHeader.astro";
+import StaticGameFrame from "../../components/StaticGameFrame.astro";
+import { PLANETARY_SURVEY_SLUG, getGame, getReachablePlaySource } from "../../data/games";
+
+const game = getGame(PLANETARY_SURVEY_SLUG);
+if (!game) throw new Error("Planetary Survey is missing from the catalog");
+
+// This route is preview-gated, not promoted. `getReachablePlaySource` prefers a promoted
+// release, then a configured qualification candidate, then nothing. Production supplies no
+// preview pointer, so `entryUrl` is undefined there and the page renders the shared
+// unavailable panel instead of an iframe pointing at an unapproved artifact.
+const playSource = getReachablePlaySource(game);
+const entryUrl = playSource ? `${playSource.assetBase}/${playSource.release.entryFile}` : undefined;
+---
+
+<BaseLayout title={`Play ${game.title}`} description={`Play ${game.title} at Setness Games.`}>
+  <SiteHeader compact />
+  <main class="play-page page-shell">
+    <PlayToolbar
+      game={game}
+      canFullscreen={Boolean(entryUrl)}
+      fullscreenStage="[data-static-game-stage]"
+    />
+    {entryUrl ? (
+      <StaticGameFrame title={game.title} entryUrl={entryUrl} gamePageUrl={game.route} />
+    ) : (
+      <GameUnavailable
+        game={game}
+        heading="The survey probe is still being prepared."
+        description="There isn’t a qualified Planetary Survey build here yet. Production stays intentionally unavailable until the immutable candidate passes its science, accessibility, comparator, device, rollback, and playtest gates. A hosted preview never promotes the game."
+      />
+    )}
+  </main>
+</BaseLayout>

@@ -168,6 +168,27 @@ and uses the checked-in production pointer.
 LevelBest is a separate host product; this promotion publishes the game on games-site and does not
 copy the game runtime into LevelBest.
 
+## Planetary Survey
+
+`setnessconsulting/Game-Planetary-Survey` produces the static-web artifact and its release
+manifest. This repository owns the `planetary-survey` card, launcher, preview-gated play route,
+selected version, promotion, and rollback.
+
+**Planetary Survey is not promoted, and has no production version or release.** Its catalog entry
+is `coming-soon` in every environment. Promotion is owned by PS-PROMOTE and must follow the
+qualified-candidate process in [`planetary-survey-host-contract.md`](planetary-survey-host-contract.md).
+
+This game is the first to need a qualification preview _without_ a promoted release. The existing
+`*_PREVIEW_VERSION` variables above swap the production version of an entry that is already
+`playable`, so using them here would have required flipping the entry to `playable` first — making
+the preview and the promotion the same change, and a mistaken merge a silent promotion.
+
+Instead the catalog carries two distinct pointer types: a `GameRelease` ("production promotes
+this") and a `GamePreview` ("a hosted candidate exists and production must not use it").
+`PLANETARY_SURVEY_PREVIEW_VERSION` supplies only the latter, the validator rejects every
+combination that would blur the two, and the catalog status stays `coming-soon` whether or not the
+variable is set. Details, invariants, and the readback checklist are in the host contract.
+
 ## Fraction Match
 
 `setnessconsulting/game-fraction-match` produces the static-web artifact and its release manifest.

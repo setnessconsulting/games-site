@@ -7,7 +7,11 @@ vi.mock("../src/data/games", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../src/data/games")>();
   const unpromoted = (slug: string) => {
     const game = actual.getGame(slug);
-    return game ? { ...game, status: "coming-soon" as const, release: undefined } : undefined;
+    if (!game) return undefined;
+    // `preview` is stripped as well: this suite is about the UNPROMOTED state, and a
+    // qualification candidate surviving here would render an iframe and make the
+    // suite assert the opposite of what it means to.
+    return { ...game, status: "coming-soon" as const, release: undefined, preview: undefined };
   };
 
   return { ...actual, getGame: unpromoted };
@@ -18,6 +22,7 @@ import EcosystemRescuePlay from "../src/pages/ecosystem-rescue/play.astro";
 import FractionMatchPlay from "../src/pages/fraction-match/play.astro";
 import MathDetectivePlay from "../src/pages/math-detective/play.astro";
 import NumberLineJumperPlay from "../src/pages/number-line-jumper/play.astro";
+import PlanetarySurveyPlay from "../src/pages/planetary-survey/play.astro";
 import SignalGardenPlay from "../src/pages/signal-garden/play.astro";
 import WeatherCommandPlay from "../src/pages/weather-command/play.astro";
 import { getGame } from "../src/data/games";
@@ -70,6 +75,13 @@ const unavailablePages = [
     description:
       "There isn’t a qualified Fraction Match build here yet. Production stays intentionally unavailable until the candidate passes its accessibility, comparator, device, and playtest gates.",
     Page: FractionMatchPlay
+  },
+  {
+    slug: "planetary-survey",
+    heading: "The survey probe is still being prepared.",
+    description:
+      "There isn’t a qualified Planetary Survey build here yet. Production stays intentionally unavailable until the immutable candidate passes its science, accessibility, comparator, device, rollback, and playtest gates. A hosted preview never promotes the game.",
+    Page: PlanetarySurveyPlay
   }
 ] as const;
 
