@@ -111,9 +111,11 @@ export function isApprovedRelease(
     return true;
   }
 
-  // Motion Lab is not promoted either, so an exact preview pointer supplied by the
-  // deployment is the ONLY path that can approve one of its assets. The catalog fallback
-  // below cannot approve it, because the entry carries no `release` and is not `playable`.
+  // Motion Lab was promoted by GAME-401 / ML-PROMOTE, so the catalog fallback below now
+  // approves its promoted version. This branch is the deployment-only override: a preview
+  // build can pin one exact candidate for a further qualification pass, exactly as the
+  // other promoted static-web games do. It can approve a version that is NOT the promoted
+  // one, which is why it is checked first and only for that exact string.
   if (slug === MOTION_LAB_SLUG && motionLabPreviewVersion && version === motionLabPreviewVersion) {
     return true;
   }

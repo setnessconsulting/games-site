@@ -32,12 +32,11 @@
         // that will set it. The other games carry real versions because their
         // candidates are published.
         "PLANETARY_SURVEY_PREVIEW_VERSION": "",
-        // Deliberately empty, and declared rather than omitted, for the same reason as
-        // Planetary Survey. Motion Lab has no published candidate yet, so naming a version
-        // would point the preview environment at an R2 object that does not exist. Empty is
-        // treated as "not configured" everywhere it is read, so this changes nothing at
-        // runtime while keeping the variable declared and typed for the qualification pass
-        // that will set it (GAME-399 / ML-15).
+        // Motion Lab is promoted (GAME-401 / ML-PROMOTE), so this is the same preview-only
+        // exact-version override the other promoted static-web games carry. Empty means "not
+        // configured", so every environment selects the committed
+        // MOTION_LAB_PRODUCTION_VERSION from the catalog. Setting it pins one candidate for a
+        // future qualification pass; it cannot promote anything by itself.
         "MOTION_LAB_PREVIEW_VERSION": ""
       }
     }

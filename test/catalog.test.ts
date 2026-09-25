@@ -5,6 +5,7 @@ import {
   ECOSYSTEM_RESCUE_PRODUCTION_VERSION,
   FRACTION_MATCH_PRODUCTION_VERSION,
   MATH_DETECTIVE_PRODUCTION_VERSION,
+  MOTION_LAB_PRODUCTION_VERSION,
   NUMBER_LINE_JUMPER_PRODUCTION_VERSION,
   WEATHER_COMMAND_PRODUCTION_VERSION,
   games,
@@ -34,7 +35,8 @@ describe("game catalog", () => {
         game.slug !== "math-detective" &&
         game.slug !== "ecosystem-rescue" &&
         game.slug !== "weather-command" &&
-        game.slug !== "fraction-match"
+        game.slug !== "fraction-match" &&
+        game.slug !== "motion-lab"
     );
     expect(
       unrelatedGames.every(
@@ -52,6 +54,12 @@ describe("game catalog", () => {
     expect(games.find((game) => game.slug === "weather-command")?.release).toEqual({
       kind: "static-web",
       version: WEATHER_COMMAND_PRODUCTION_VERSION,
+      entryFile: "index.html"
+    });
+    expect(games.find((game) => game.slug === "motion-lab")?.status).toBe("playable");
+    expect(games.find((game) => game.slug === "motion-lab")?.release).toEqual({
+      kind: "static-web",
+      version: MOTION_LAB_PRODUCTION_VERSION,
       entryFile: "index.html"
     });
     expect(games.find((game) => game.slug === "number-line-jumper")?.status).toBe("playable");

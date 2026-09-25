@@ -30,6 +30,7 @@ export const MATH_DETECTIVE_PRODUCTION_VERSION = "2026.09.21-playtest-enhancemen
 export const ECOSYSTEM_RESCUE_PRODUCTION_VERSION = "0.1.0-qualification.6";
 export const WEATHER_COMMAND_PRODUCTION_VERSION = "0.1.0-qualification.2";
 export const FRACTION_MATCH_PRODUCTION_VERSION = "0.1.0-qualification.1";
+export const MOTION_LAB_PRODUCTION_VERSION = "0.1.0-ml-host-evidence.1";
 
 /**
  * Planetary Survey has NO production version, deliberately.
@@ -47,14 +48,25 @@ export const FRACTION_MATCH_PRODUCTION_VERSION = "0.1.0-qualification.1";
 export const PLANETARY_SURVEY_SLUG = "planetary-survey";
 
 /**
- * Motion Lab has NO production version, deliberately.
+ * Motion Lab is now promoted (GAME-401 / ML-PROMOTE owns the promotion).
  *
- * GAME-385 / ML-HOST exists to prepare the host for this game without promoting an
- * unfinished build. There is no `MOTION_LAB_PRODUCTION_VERSION` constant for the same
- * reason Planetary Survey has none: a missing constant fails to compile, which is a
- * stronger guarantee than a placeholder version nobody qualified. The entry stays
- * `coming-soon` and carries no `release` until ML-PROMOTE selects an immutable artifact
- * through a reviewed catalog change.
+ * GAME-385 / ML-HOST prepared the host without promoting anything: for the same reason
+ * Planetary Survey still has none, there was no `MOTION_LAB_PRODUCTION_VERSION` constant,
+ * so any code needing a production pointer failed to compile rather than silently reading
+ * a version nobody qualified. ML-PROMOTE has now selected one immutable artifact, and the
+ * constant names exactly the version published under `motion-lab/<version>/` in the
+ * `setnessconsulting-games` R2 bucket.
+ *
+ * Read the promotion honestly: several qualification gates were NOT performed when it was
+ * recorded — no independent science review, no accessibility sign-off, no target-age
+ * playtest, no real-device testing, and no rollback rehearsal. See section 5 of
+ * `docs/motion-lab-host-contract.md`, which states this in the host contract itself rather
+ * than only in a ticket.
+ *
+ * `MOTION_LAB_PREVIEW_VERSION` keeps its pre-promotion name but reads as a release
+ * override for an already-promoted entry, which is the mechanism the other promoted
+ * static-web games use. It can never be mistaken for production: the committed constant
+ * above is what production selects when the variable is unset or empty.
  */
 export const MOTION_LAB_SLUG = "motion-lab";
 
@@ -74,7 +86,9 @@ const fractionMatchPreviewVersion = runtimeProcess?.env?.FRACTION_MATCH_PREVIEW_
 // The only Planetary Survey pointer that can exist before promotion. It is a
 // PREVIEW pointer, never a production one: see `getGamePreviewSource`.
 const planetarySurveyPreviewVersion = runtimeProcess?.env?.PLANETARY_SURVEY_PREVIEW_VERSION;
-// Motion Lab's only pre-promotion pointer, for the same reason.
+// Motion Lab's deployment-only override. Before promotion it was the sole pointer that could
+// reach the game at all; after promotion it pins a qualification candidate by overriding the
+// promoted release version, and production (which sets nothing) selects the committed constant.
 const motionLabPreviewVersion = runtimeProcess?.env?.MOTION_LAB_PREVIEW_VERSION;
 const bridgeBuilderProductionRelease: StaticWebRelease = {
   kind: "static-web",
@@ -127,6 +141,18 @@ const fractionMatchProductionRelease: StaticWebRelease = {
 const fractionMatchRelease: StaticWebRelease = fractionMatchPreviewVersion
   ? { ...fractionMatchProductionRelease, version: fractionMatchPreviewVersion }
   : fractionMatchProductionRelease;
+// Motion Lab's release: the promoted immutable version, with a deployment-only preview
+// pointer able to pin a different candidate for a further qualification pass. The catalog
+// entry is playable either way, which is what makes the promoted version reachable at
+// /motion-lab/play/ in production.
+const motionLabProductionRelease: StaticWebRelease = {
+  kind: "static-web",
+  version: MOTION_LAB_PRODUCTION_VERSION,
+  entryFile: "index.html"
+};
+const motionLabRelease: StaticWebRelease = motionLabPreviewVersion
+  ? { ...motionLabProductionRelease, version: motionLabPreviewVersion }
+  : motionLabProductionRelease;
 
 /**
  * A qualification-only candidate pointer for a game that is NOT promoted.
@@ -317,10 +343,10 @@ export const games: readonly GameEntry[] = [
   {
     slug: MOTION_LAB_SLUG,
     title: "Motion Lab",
-    status: "coming-soon",
+    status: "playable",
     eyebrow: "Design the experiment, not the answer",
     description: motionLabPreviewVersion
-      ? "Run controlled experiments with a cart and a track: change one thing, measure what happens, compare trials, and back your claim with evidence. This qualification candidate is being tested before it joins the collection."
+      ? "Run controlled experiments with a cart and a track: change one thing, measure what happens, compare trials, and back your claim with evidence. This candidate build is being tested before it joins the collection."
       : "Run controlled experiments with a cart and a track: change one thing, measure what happens, compare trials, and back your claim with evidence.",
     cardImage: "/art/coming-soon.svg",
     route: "/motion-lab/",
@@ -329,12 +355,7 @@ export const games: readonly GameEntry[] = [
       { input: "Keyboard", action: "Take every reading and cite every claim" },
       { input: "Reduce motion", action: "Keep the measurement, skip the animation" }
     ],
-    // Present only when this build was given a preview pointer. No `release` is ever set
-    // here: promotion is a separate, reviewed change owned by ML-PROMOTE.
-    ...(motionLabPreviewVersion
-      ? { preview: { version: motionLabPreviewVersion, entryFile: "index.html" } }
-      : {}),
-    previewEnabled: true
+    release: motionLabRelease
   },
   {
     slug: "new-world-01",

@@ -1,24 +1,27 @@
-// GAME-385 / ML-HOST: the Motion Lab host contract.
+// GAME-385 / ML-HOST prepared this host WITHOUT promoting a build, and asserted that
+// production selected nothing. GAME-401 / ML-PROMOTE has since selected one immutable
+// release, so the two claims that matter have inverted:
 //
-// The story exists to prepare the host for this game WITHOUT promoting an unfinished build.
-// The two claims that matter, and the reason this file is this thorough:
+//   1. production selects exactly the promoted immutable release, and
+//   2. a supplied preview pointer is a candidate override, never a second promotion.
 //
-//   1. production selects nothing for this game, and
-//   2. a supplied preview pointer is a candidate, never a promotion.
-//
-// Both are asserted in both environment states, because a check that only ever runs in one of
-// them cannot distinguish "safe by design" from "safe by luck".
+// Both are asserted in both environment states, because a check that only ever runs in one
+// of them cannot distinguish "safe by design" from "safe by luck". The catalog-invariant and
+// asset-approval suites below are the ML-HOST ones, retargeted at the promoted entry rather
+// than deleted, so the properties ML-HOST established are still enforced.
 import { join } from "node:path";
 
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { experimental_AstroContainer as AstroContainer } from "astro/container";
 
 import {
+  MOTION_LAB_PRODUCTION_VERSION,
   MOTION_LAB_SLUG,
   games,
   getGame,
   getGameAssetBase,
   getGamePlayRoute,
+  getGamePreviewSource,
   getReachablePlaySource,
   getStaticWebPlaySource,
   isGameReachable,
@@ -29,7 +32,11 @@ import { isApprovedRelease } from "../src/lib/game-assets";
 import MotionLabLauncher from "../src/pages/motion-lab/index.astro";
 import MotionLabPlay from "../src/pages/motion-lab/play.astro";
 
-const PREVIEW_VERSION = "0.1.0-ml-host-evidence.1";
+/** The promoted version. It is a committed catalog value, never a test-local invention. */
+const PROMOTED_VERSION = MOTION_LAB_PRODUCTION_VERSION;
+const PROMOTED_ASSET_BASE = `/game-assets/${MOTION_LAB_SLUG}/${PROMOTED_VERSION}`;
+/** A different, unpromoted candidate a qualification pass could pin. */
+const CANDIDATE_VERSION = "0.1.0-ml-next.1";
 
 const motionLab = (): GameEntry => {
   const game = getGame(MOTION_LAB_SLUG);
@@ -37,7 +44,14 @@ const motionLab = (): GameEntry => {
   return game;
 };
 
-/** Load the registry with a preview pointer configured, as a preview build would. */
+/** A Motion Lab entry derived from the real one, so the real shape is what gets mutated. */
+const entry = (overrides: Partial<GameEntry> = {}): GameEntry => ({ ...motionLab(), ...overrides });
+
+/** The pre-promotion shape, still used to exercise the rules that forbid it. */
+const comingSoonEntry = (overrides: Partial<GameEntry> = {}): GameEntry =>
+  entry({ status: "coming-soon", release: undefined, previewEnabled: undefined, ...overrides });
+
+/** Load the registry with a preview pointer configured, as a qualification build would. */
 async function importWithPreview(version: string) {
   vi.stubEnv("MOTION_LAB_PREVIEW_VERSION", version);
   vi.resetModules();
@@ -50,10 +64,10 @@ describe("motion lab host identity", () => {
     vi.resetModules();
   });
 
-  it("is in the catalog as coming-soon with an ordered route and real controls", () => {
+  it("is in the catalog as playable with an ordered route and real controls", () => {
     const game = motionLab();
 
-    expect(game.status).toBe("coming-soon");
+    expect(game.status).toBe("playable");
     expect(game.route).toBe("/motion-lab/");
     expect(getGamePlayRoute(game)).toBe("/motion-lab/play/");
     expect(game.title).toBe("Motion Lab");
@@ -61,196 +75,214 @@ describe("motion lab host identity", () => {
     expect(game.controls.length).toBeGreaterThan(0);
   });
 
-  it("keeps the whole catalog valid with the entry added", () => {
+  it("keeps the whole catalog valid with the entry promoted", () => {
     expect(validateCatalog(games)).toEqual([]);
   });
 });
 
-describe("production selects no Motion Lab release", () => {
+describe("production selects the promoted Motion Lab release", () => {
   afterEach(() => {
     vi.unstubAllEnvs();
     vi.resetModules();
   });
 
-  it("declares no production release and no preview pointer", () => {
+  it("selects exactly the committed immutable version", () => {
     const game = motionLab();
 
-    // There is no MOTION_LAB_PRODUCTION_VERSION constant either: a missing constant fails
-    // to compile, which is a stronger guarantee than a placeholder.
-    expect(game.release).toBeUndefined();
+    expect(game.release).toEqual({
+      kind: "static-web",
+      version: PROMOTED_VERSION,
+      entryFile: "index.html"
+    });
+    // Promotion replaces the candidate mechanism rather than joining it: a promoted entry
+    // carrying a preview pointer is rejected by the catalog validator.
     expect(game.preview).toBeUndefined();
+    expect(game.previewEnabled).toBeUndefined();
   });
 
-  it("resolves no asset base, no play source, and is not reachable", () => {
+  it("resolves the promoted asset base and play source, and is reachable", () => {
     const game = motionLab();
 
-    expect(getGameAssetBase(game)).toBeUndefined();
-    expect(getStaticWebPlaySource(game)).toBeUndefined();
-    expect(getReachablePlaySource(game)).toBeUndefined();
-    expect(isGameReachable(game)).toBe(false);
+    expect(getGameAssetBase(game)).toBe(PROMOTED_ASSET_BASE);
+    expect(getStaticWebPlaySource(game)).toEqual({
+      assetBase: PROMOTED_ASSET_BASE,
+      release: { kind: "static-web", version: PROMOTED_VERSION, entryFile: "index.html" }
+    });
+    expect(getReachablePlaySource(game)).toEqual(getStaticWebPlaySource(game));
+    expect(isGameReachable(game)).toBe(true);
+    // There is no candidate pointer for a promoted game. The accessor that reads one must
+    // stay empty, so a promotion cannot leave a second, quieter pointer behind.
+    expect(getGamePreviewSource(game)).toBeUndefined();
   });
 
-  it("does not advertise the play route from the collection", () => {
-    // The collection only links playable entries, so an unfinished candidate cannot be
-    // reached by browsing even though its play route exists as a page.
-    const game = motionLab();
-    expect(game.status === "playable").toBe(false);
+  it("advertises the play route from the collection", () => {
+    expect(motionLab().status).toBe("playable");
   });
 
-  it("renders the launcher with no pointer and honest unavailable copy", async () => {
+  it("renders the launcher with the promoted release and a real Play affordance", async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(MotionLabLauncher, { partial: false });
 
     expect(html).toContain('data-slot="motion-lab-host-status"');
-    expect(html).toContain('data-catalog-status="coming-soon"');
-    expect(html).toContain('data-preview-pointer="none"');
-    expect(html).toContain('data-preview-asset-base="none"');
-    expect(html).toContain("No Motion Lab build is selected here.");
-    // The promoted-play affordance must be absent, not merely relabelled.
-    expect(html).not.toContain(">Play Motion Lab");
+    expect(html).toContain('data-catalog-status="playable"');
+    expect(html).toContain(`data-release-version="${PROMOTED_VERSION}"`);
+    expect(html).toContain(`data-play-asset-base="${PROMOTED_ASSET_BASE}"`);
+    expect(html).toContain(">Play Motion Lab");
+    // The candidate affordance and its label are absent, not merely relabelled.
+    expect(html).not.toContain("Open the qualification preview");
+    expect(html).not.toContain("qualification candidate");
   });
 
-  it("renders the play route as the shared unavailable panel, never a frame", async () => {
+  it("frames exactly the nested entry document the game repository proved", async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(MotionLabPlay, { partial: false });
 
-    expect(html).toContain('class="not-ready-panel"');
-    expect(html).toContain("The experiment bench is still being set up.");
-    expect(html).not.toContain("<iframe");
-    // No asset request may be emitted for an unapproved candidate.
-    expect(html).not.toContain("game-assets");
-    expect(html).not.toContain("data-play-fullscreen");
+    // This exact URL shape is what game-motion-lab's host lane serves and asserts
+    // (tests/host/nestedAssetBase.spec.ts). If either side changes it, the other fails.
+    expect(html).toContain(`src="${PROMOTED_ASSET_BASE}/index.html"`);
+    expect(html).not.toContain('class="not-ready-panel"');
+  });
+
+  it("resolves nothing to frame once the entry stops selecting a release", () => {
+    // What the play page frames is exactly `getStaticWebPlaySource(game)`. Asserting the
+    // accessor is what makes "the unavailable panel, never a frame" a property of the data
+    // rather than of the rendered markup passing by luck.
+    const unpromoted = comingSoonEntry();
+    expect(getStaticWebPlaySource(unpromoted)).toBeUndefined();
+    expect(getReachablePlaySource(unpromoted)).toBeUndefined();
+    expect(isGameReachable(unpromoted)).toBe(false);
   });
 });
 
-describe("a supplied preview pointer is a candidate, not a promotion", () => {
+describe("a supplied preview pointer pins a candidate, not a second promotion", () => {
   afterEach(() => {
     vi.unstubAllEnvs();
     vi.resetModules();
   });
 
-  it("still declares no production release while the candidate is configured", async () => {
-    const { games: catalog, getGame: getPreviewGame } = await importWithPreview(PREVIEW_VERSION);
+  it("overrides the release version while the catalog entry stays promoted", async () => {
+    const { games: catalog, getGame: getPreviewGame } = await importWithPreview(CANDIDATE_VERSION);
     const game = getPreviewGame(MOTION_LAB_SLUG)!;
 
-    expect(game.status).toBe("coming-soon");
-    expect(game.release).toBeUndefined();
-    expect(game.preview).toEqual({ version: PREVIEW_VERSION, entryFile: "index.html" });
+    expect(game.status).toBe("playable");
+    expect(game.release).toEqual({
+      kind: "static-web",
+      version: CANDIDATE_VERSION,
+      entryFile: "index.html"
+    });
+    // The override must not create a second pointer kind. There is still no `preview`, and
+    // the entry still validates as a promoted release.
+    expect(game.preview).toBeUndefined();
     expect(validateCatalog(catalog)).toEqual([]);
   });
 
-  it("distinguishes the preview pointer from the production pointer", async () => {
-    const games = await importWithPreview(PREVIEW_VERSION);
-    const game = games.getGame(MOTION_LAB_SLUG)!;
+  it("keeps the production accessors pointed at the pinned candidate only", async () => {
+    const catalog = await importWithPreview(CANDIDATE_VERSION);
+    const game = catalog.getGame(MOTION_LAB_SLUG)!;
 
-    // The production accessor stays empty in the preview state. That is the whole point:
-    // hosting a candidate must not populate the promoted-release pointer.
-    expect(games.getStaticWebPlaySource(game)).toBeUndefined();
-    expect(games.getGameAssetBase(game)).toBeUndefined();
-
-    expect(games.getGamePreviewSource(game)).toEqual({
-      assetBase: `/game-assets/${MOTION_LAB_SLUG}/${PREVIEW_VERSION}`,
-      release: { kind: "static-web", version: PREVIEW_VERSION, entryFile: "index.html" }
-    });
-    expect(games.isGameReachable(game)).toBe(true);
+    expect(catalog.getGameAssetBase(game)).toBe(
+      `/game-assets/${MOTION_LAB_SLUG}/${CANDIDATE_VERSION}`
+    );
+    expect(catalog.getStaticWebPlaySource(game)?.release.version).toBe(CANDIDATE_VERSION);
+    expect(catalog.getGamePreviewSource(game)).toBeUndefined();
+    expect(catalog.isGameReachable(game)).toBe(true);
   });
 
-  it("renders the launcher pointer and a clearly-labelled candidate link", async () => {
-    await importWithPreview(PREVIEW_VERSION);
+  it("treats an empty pointer as not configured, exactly as production does", async () => {
+    const catalog = await importWithPreview("");
+    const game = catalog.getGame(MOTION_LAB_SLUG)!;
+
+    expect(game.release).toEqual({
+      kind: "static-web",
+      version: PROMOTED_VERSION,
+      entryFile: "index.html"
+    });
+    expect(catalog.getGameAssetBase(game)).toBe(PROMOTED_ASSET_BASE);
+  });
+
+  it("renders the pinned candidate and keeps the promoted label", async () => {
+    await importWithPreview(CANDIDATE_VERSION);
     // Imported dynamically on purpose. A top-level static import would already have been
     // evaluated with the production environment, so the component would keep rendering the
-    // no-pointer state and the test would pass for the wrong reason.
+    // promoted version and the test would pass for the wrong reason.
     const { default: Launcher } = await import("../src/pages/motion-lab/index.astro");
     const container = await AstroContainer.create();
     const html = await container.renderToString(Launcher, { partial: false });
 
-    expect(html).toContain(`data-preview-pointer="${PREVIEW_VERSION}"`);
+    expect(html).toContain(`data-release-version="${CANDIDATE_VERSION}"`);
     expect(html).toContain(
-      `data-preview-asset-base="/game-assets/${MOTION_LAB_SLUG}/${PREVIEW_VERSION}"`
+      `data-play-asset-base="/game-assets/${MOTION_LAB_SLUG}/${CANDIDATE_VERSION}"`
     );
-    expect(html).toContain("qualification candidate");
-    // Labelled as a candidate. It must not read like a promoted game.
-    expect(html).toContain("Open the qualification preview");
-    expect(html).not.toContain(">Play Motion Lab");
+    // The entry is still promoted, so the affordance stays "Play": a pinned candidate of a
+    // promoted game is not a different kind of pointer and must not read like one.
+    expect(html).toContain(">Play Motion Lab");
+    expect(html).not.toContain("qualification candidate");
   });
 
-  it("frames exactly the nested entry document the game repository proved", async () => {
-    await importWithPreview(PREVIEW_VERSION);
+  it("frames the pinned candidate when the pointer is set", async () => {
+    await importWithPreview(CANDIDATE_VERSION);
     const { default: Play } = await import("../src/pages/motion-lab/play.astro");
     const container = await AstroContainer.create();
     const html = await container.renderToString(Play, { partial: false });
 
-    // This exact URL shape is what game-motion-lab's host lane serves and asserts
-    // (tests/host/nestedAssetBase.spec.ts). If either side changes it, the other fails.
-    expect(html).toContain(`src="/game-assets/${MOTION_LAB_SLUG}/${PREVIEW_VERSION}/index.html"`);
+    expect(html).toContain(`src="/game-assets/${MOTION_LAB_SLUG}/${CANDIDATE_VERSION}/index.html"`);
     expect(html).not.toContain('class="not-ready-panel"');
   });
 });
 
 describe("catalog invariants that keep the pointers distinct", () => {
-  const base = (): GameEntry => ({ ...motionLab() });
+  it("accepts the real promoted entry", () => {
+    expect(validateCatalog([motionLab()])).toEqual([]);
+  });
 
   it("accepts a coming-soon entry carrying only a preview pointer", () => {
-    const entry: GameEntry = {
-      ...base(),
+    const candidate: GameEntry = comingSoonEntry({
       preview: { version: "0.1.0", entryFile: "index.html" }
-    };
-    expect(validateCatalog([entry])).toEqual([]);
+    });
+    expect(validateCatalog([candidate])).toEqual([]);
   });
 
   it("rejects a playable entry that also carries a preview pointer", () => {
-    const entry: GameEntry = {
-      ...base(),
-      status: "playable",
-      release: { kind: "static-web", version: "1.0.0", entryFile: "index.html" },
+    const blurred: GameEntry = entry({
       preview: { version: "0.1.0", entryFile: "index.html" }
-    };
-    expect(validateCatalog([entry]).join("\n")).toContain("must not also carry a preview");
+    });
+    expect(validateCatalog([blurred]).join("\n")).toContain("must not also carry a preview");
   });
 
   it("rejects an entry declaring both production and preview pointers", () => {
-    const entry: GameEntry = {
-      ...base(),
+    const blurred: GameEntry = comingSoonEntry({
       release: { kind: "static-web", version: "1.0.0", entryFile: "index.html" },
       preview: { version: "0.1.0", entryFile: "index.html" }
-    };
-    const errors = validateCatalog([entry]).join("\n");
+    });
+    const errors = validateCatalog([blurred]).join("\n");
     expect(errors).toContain("coming-soon games cannot select a production release");
     expect(errors).toContain("must not declare both a production release and a preview");
   });
 
   it("still rejects a coming-soon entry with a production release", () => {
-    const entry: GameEntry = {
-      ...base(),
+    const unpromoted: GameEntry = comingSoonEntry({
       release: { kind: "static-web", version: "1.0.0", entryFile: "index.html" }
-    };
-    expect(validateCatalog([entry]).join("\n")).toContain(
+    });
+    expect(validateCatalog([unpromoted]).join("\n")).toContain(
       "coming-soon games cannot select a production release"
     );
   });
 
-  it("rejects previewEnabled on a promoted entry", () => {
-    const entry: GameEntry = {
-      ...base(),
-      status: "playable",
-      release: { kind: "static-web", version: "1.0.0", entryFile: "index.html" }
-    };
-    expect(validateCatalog([entry]).join("\n")).toContain("previewEnabled only applies");
+  it("rejects previewEnabled on the promoted entry", () => {
+    const stale: GameEntry = entry({ previewEnabled: true });
+    expect(validateCatalog([stale]).join("\n")).toContain("previewEnabled only applies");
   });
 
   it("rejects an unsafe preview entry file and version", () => {
-    const traversal: GameEntry = {
-      ...base(),
+    const traversal: GameEntry = comingSoonEntry({
       preview: { version: "0.1.0", entryFile: "../index.html" }
-    };
-    const notHtml: GameEntry = {
-      ...base(),
+    });
+    const notHtml: GameEntry = comingSoonEntry({
       preview: { version: "0.1.0", entryFile: "index.js" }
-    };
-    const unsafeVersion: GameEntry = {
-      ...base(),
+    });
+    const unsafeVersion: GameEntry = comingSoonEntry({
       preview: { version: "../escape", entryFile: "index.html" }
-    };
+    });
 
     expect(validateCatalog([traversal]).join("\n")).toContain("safe relative asset path");
     expect(validateCatalog([notHtml]).join("\n")).toContain("must be an HTML document");
@@ -259,56 +291,77 @@ describe("catalog invariants that keep the pointers distinct", () => {
 });
 
 describe("asset serving requires an exact approved pointer", () => {
-  it("serves nothing for an unapproved candidate version", () => {
-    expect(isApprovedRelease(MOTION_LAB_SLUG, PREVIEW_VERSION, false)).toBe(false);
+  /**
+   * `isApprovedRelease` takes every deployment pointer positionally, so the helper takes the
+   * requested version and the pointer separately. Passing one value for both would make every
+   * request look approved and the test would pass for the wrong reason.
+   */
+  const withMotionLabPointer = (requested: string, pointer: string): boolean =>
+    isApprovedRelease(
+      MOTION_LAB_SLUG,
+      requested,
+      false,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      pointer
+    );
+
+  it("serves the promoted version through the catalog fallback", () => {
+    // This is what promotion actually buys: the catalog, not an environment variable, is
+    // now what approves the artifact. Without this, promoting the entry would put a Play
+    // button on a page whose assets still 404.
+    expect(isApprovedRelease(MOTION_LAB_SLUG, PROMOTED_VERSION, false)).toBe(true);
+  });
+
+  it("serves nothing for a version the catalog does not promote", () => {
+    expect(isApprovedRelease(MOTION_LAB_SLUG, CANDIDATE_VERSION, false)).toBe(false);
     expect(isApprovedRelease(MOTION_LAB_SLUG, "0.1.0", false)).toBe(false);
+    expect(isApprovedRelease(MOTION_LAB_SLUG, `${PROMOTED_VERSION}-next`, false)).toBe(false);
   });
 
-  it("serves only the exact version the deployment approved", () => {
-    const withPointer = (version: string) =>
-      isApprovedRelease(
-        MOTION_LAB_SLUG,
-        version,
-        false,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        PREVIEW_VERSION
-      );
-
-    expect(withPointer(PREVIEW_VERSION)).toBe(true);
-    expect(withPointer("0.1.0")).toBe(false);
-    expect(withPointer(`${PREVIEW_VERSION}-next`)).toBe(false);
+  it("serves only the exact version a deployment pointer approved", () => {
+    expect(withMotionLabPointer(CANDIDATE_VERSION, CANDIDATE_VERSION)).toBe(true);
+    expect(withMotionLabPointer(`${CANDIDATE_VERSION}-next`, CANDIDATE_VERSION)).toBe(false);
+    expect(withMotionLabPointer("0.1.0", CANDIDATE_VERSION)).toBe(false);
+    // A version the catalog promotes is served even with no pointer at all; a version the
+    // catalog does not promote is not served just because a pointer exists for something else.
+    expect(withMotionLabPointer(PROMOTED_VERSION, CANDIDATE_VERSION)).toBe(true);
   });
 
-  it("cannot approve the game through the promoted-release fallback", () => {
-    // The catalog fallback only approves a playable game's selected release. Motion Lab is
-    // not playable and selects nothing, so no catalog state can approve it — only an exact
-    // deployment pointer can. A deployment that forgets the pointer serves 404s rather than
-    // serving an unqualified candidate.
-    const promoted = games
-      .filter((game) => game.slug === MOTION_LAB_SLUG)
-      .every((game) => game.status !== "playable" || !game.release);
-    expect(promoted).toBe(true);
+  it("approves Motion Lab through the catalog fallback only because it is playable", () => {
+    // The mirror of the ML-HOST assertion: the same fallback that approves the promoted
+    // version must refuse a nearly-identical but unpromoted version.
+    const promoted = games.filter(
+      (game) => game.slug === MOTION_LAB_SLUG && game.status === "playable" && Boolean(game.release)
+    );
+    expect(promoted).toHaveLength(1);
+    expect(isApprovedRelease(MOTION_LAB_SLUG, promoted[0]!.release!.version, false)).toBe(true);
   });
 });
 
-describe("route validation covers the preview-gated route", () => {
+describe("route validation covers the Motion Lab play route", () => {
   // Page files must be supplied explicitly: with no discovered routes the registry route
   // itself is missing, and validateRoutes stops before the play-route checks.
   const launcherPage = join(process.cwd(), "src", "pages", MOTION_LAB_SLUG, "index.astro");
   const playPage = join(process.cwd(), "src", "pages", MOTION_LAB_SLUG, "play.astro");
 
+  it("accepts the promoted play route in the real repository tree", async () => {
+    const { validateRoutes } = await import("../src/lib/routes");
+    const result = validateRoutes({ projectRoot: process.cwd() });
+
+    expect(result.violations).toEqual([]);
+  });
+
   it("flags previewEnabled when the play page is missing", async () => {
     const { validateRoutes } = await import("../src/lib/routes");
-    const entry: GameEntry = { ...motionLab(), previewEnabled: true };
     const result = validateRoutes({
       projectRoot: process.cwd(),
-      catalog: [entry],
+      catalog: [comingSoonEntry({ previewEnabled: true })],
       pageFiles: [launcherPage]
     });
 
@@ -319,22 +372,14 @@ describe("route validation covers the preview-gated route", () => {
 
   it("still flags a coming-soon game that exposes a play page without opting in", async () => {
     const { validateRoutes } = await import("../src/lib/routes");
-    const entry: GameEntry = { ...motionLab(), previewEnabled: false };
     const result = validateRoutes({
       projectRoot: process.cwd(),
-      catalog: [entry],
+      catalog: [comingSoonEntry({ previewEnabled: false })],
       pageFiles: [launcherPage, playPage]
     });
 
     expect(result.violations.map((violation) => violation.id)).toContain(
       "unavailable-game-play-route"
     );
-  });
-
-  it("accepts the preview-gated play route in the real repository tree", async () => {
-    const { validateRoutes } = await import("../src/lib/routes");
-    const result = validateRoutes({ projectRoot: process.cwd() });
-
-    expect(result.violations).toEqual([]);
   });
 });

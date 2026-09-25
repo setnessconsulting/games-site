@@ -1,15 +1,26 @@
 # Motion Lab rollback and pointer semantics
 
-Status: established by GAME-385 / ML-HOST
+Status: established by GAME-385 / ML-HOST; promotion applied by GAME-401 / ML-PROMOTE
 Game repository: `setnessconsulting/game-motion-lab`
-Jira: GAME-382 (Epic), GAME-385 (ML-HOST), promotion and rollback owned by GAME-401 (ML-PROMOTE)
+Jira: GAME-382 (Epic), GAME-385 (ML-HOST), GAME-401 (ML-PROMOTE)
 
 This document satisfies ML-HOST acceptance criterion 5: rollback and pointer semantics are
-documented. It records the semantics that **will** apply, and states plainly that no rollback has
-been exercised, because nothing has been promoted.
+documented. It now also records what promotion actually changed and what the live rollback anchor
+is, because there is finally a production pointer that a rollback would move.
 
-> **No rollback has been performed for Motion Lab.** Nothing is promoted, so there is no production
-> pointer to roll back and no rehearsal to report. This is a documented plan, not evidence.
+> **No rollback has been performed for Motion Lab.** Nothing has been rolled back and no rehearsal
+> has been run. What exists now is a named restore target and a documented procedure; that is a plan
+> with an anchor, not evidence of a working rollback. Anyone claiming otherwise is claiming
+> something nobody observed.
+>
+> **Live as of promotion:** production serves the catalog revision that selected
+> `0.1.0-ml-host-evidence.1` (source SHA `f2b89866134e4b106bb17a74730d2e55ef7fdab8`). The last
+> known-good deployment before it is `8091aea0-ec63-47b4-a3b3-c0844b31b134`, built from games-site
+> commit `f162bd2`, reachable at `https://8091aea0.games-site-7pn.pages.dev`. Restoring it returns the
+> collection to the coming-soon card; it does not touch the immutable R2 prefix.
+> **Remaining gates:** no independent science review, accessibility sign-off, target-age playtest,
+> real-device testing, comparator review, or rollback rehearsal was performed for the promoted
+> version. The owner authorised promoting with those gates open.
 
 ---
 
@@ -28,11 +39,14 @@ identify anything.
 
 ---
 
-## 2. Pointer semantics while Motion Lab is unpromoted
+## 2. Pointer semantics while Motion Lab was unpromoted (historical)
 
-Motion Lab has no `release` and no `MOTION_LAB_PRODUCTION_VERSION`. There is therefore no production
-pointer to move. The only pointer that can exist is `MOTION_LAB_PREVIEW_VERSION`, and it is a
-**deployment variable**, not a committed value:
+This section describes the state that ended at promotion. It is kept because the invariants it
+records — a pointer that cannot be read as production — are still enforced and still tested.
+
+Motion Lab had no `release` and no `MOTION_LAB_PRODUCTION_VERSION`. There was therefore no
+production pointer to move. The only pointer that could exist was `MOTION_LAB_PREVIEW_VERSION`, and
+it is a **deployment variable**, not a committed value:
 
 - **Different environments, one catalog.** The catalog entry is `coming-soon` everywhere. Nothing in
   the repository has to change to move a preview pointer, because the pointer does not live in the
@@ -48,11 +62,11 @@ is to empty one variable, and it needs no catalog edit, no cache purge, and no a
 
 ---
 
-## 3. Pointer semantics after promotion
+## 3. Pointer semantics after promotion (current)
 
-Once ML-PROMOTE selects an immutable release, the catalog carries both a committed production
-version and, if a further qualification pass is running, a deployment preview pointer. The same
-discipline applies as for the six promoted games:
+This is the state Motion Lab is in now. The catalog carries a committed production version, and — if
+a further qualification pass is running — a deployment preview pointer. The same discipline applies
+as for the six promoted games:
 
 - the production pointer is a committed, reviewable catalog value;
 - the preview pointer is a deployment variable and can never be read as production
@@ -62,7 +76,7 @@ discipline applies as for the six promoted games:
 
 ---
 
-## 4. The rollback procedure (to be rehearsed at ML-PROMOTE)
+## 4. The rollback procedure (not yet rehearsed)
 
 1. identify the last known-good **games-site commit** whose catalog pointer was correct;
 2. create a Cloudflare Pages deployment from that commit, or switch the production alias to a
@@ -83,7 +97,7 @@ stops being reachable.
 ## 5. What ML-PROMOTE must produce
 
 A rollback is not exercised until it is executed against a real deployment and its result is
-observed. For Motion Lab, ML-PROMOTE must record:
+observed. For Motion Lab, ML-PROMOTE was to record:
 
 - the deployment id and commit SHA used as the restore target;
 - the exact artifact prefix observed before and after;
@@ -91,4 +105,8 @@ observed. For Motion Lab, ML-PROMOTE must record:
 - confirmation that no immutable object was deleted or overwritten;
 - the current pointer state, read back from the real site rather than from this document.
 
-Until that exists, the honest status of Motion Lab rollback is **not exercised**.
+**None of that was produced, because no rollback was executed.** Only the restore target exists (see
+the note at the top of this document and the deployment id above). The honest status of Motion Lab
+rollback remains **not exercised**, and the procedure above is untested against a real deployment.
+Recording a target is not the same as proving the route back to it works, and this document does not
+claim otherwise.
