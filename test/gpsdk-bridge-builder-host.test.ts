@@ -29,9 +29,7 @@ describe("Bridge Builder GPSDK host (SDK-6)", () => {
     expect(appendGpsdkQuery("/game-assets/bridge-builder/1.0.0/index.html", ids)).toBe(
       "/game-assets/bridge-builder/1.0.0/index.html?gpsdkChannel=ch&gpsdkSession=se"
     );
-    expect(
-      appendGpsdkQuery("/game-assets/bridge-builder/1.0.0/index.html?x=1", ids)
-    ).toBe(
+    expect(appendGpsdkQuery("/game-assets/bridge-builder/1.0.0/index.html?x=1", ids)).toBe(
       "/game-assets/bridge-builder/1.0.0/index.html?x=1&gpsdkChannel=ch&gpsdkSession=se"
     );
   });
