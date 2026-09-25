@@ -192,19 +192,31 @@ variable is set. Details, invariants, and the readback checklist are in the host
 ## Motion Lab
 
 `setnessconsulting/game-motion-lab` produces the static-web artifact and its release manifest. This
-repository owns the `motion-lab` card, launcher, preview-gated play route, selected version,
-promotion, and rollback.
+repository owns the `motion-lab` card, launcher, play route, selected version, promotion, and
+rollback.
 
-**Motion Lab is not promoted, and has no production version or release.** Its catalog entry is
-`coming-soon` in every environment. Promotion is owned by ML-PROMOTE and must follow the
-qualified-candidate process in [`motion-lab-host-contract.md`](motion-lab-host-contract.md).
+**Motion Lab is promoted.** GAME-401 / ML-PROMOTE selected `0.1.0-ml-host-evidence.1`, published at
+`motion-lab/0.1.0-ml-host-evidence.1/` in the `setnessconsulting-games` bucket from source SHA
+`f2b89866134e4b106bb17a74730d2e55ef7fdab8`. The catalog entry is `playable` and carries that
+`release`; `MOTION_LAB_PRODUCTION_VERSION` names it.
 
-It is the second game to need a qualification preview _without_ a promoted release, and it reuses
-the Planetary Survey mechanism rather than adding a second one: a `GamePreview` pointer supplied by
-`MOTION_LAB_PREVIEW_VERSION` (declared in `wrangler.jsonc`, currently empty), a `previewEnabled`
-entry, and the same validator rules that keep the preview and production pointers from blurring into
-each other. No `MOTION_LAB_PRODUCTION_VERSION` constant exists, deliberately: a missing constant
-fails to compile, which is a stronger guarantee than a placeholder nobody qualified.
+**Read the promotion honestly.** No independent science review, accessibility sign-off, target-age
+playtest, real-device testing, or rollback rehearsal was performed for this version, and none is
+claimed. What the promoted build gives a player today is the experiment bench: a prediction, four
+controls, the real Phaser lab, instrument readouts, and a trials table. It does **not** contain
+missions, scoring, graphs-as-evidence, or the Mystery Cart investigation — the authored content for
+those exists in the game repository (ML-05), but the runtime that plays it is GAME-391 (ML-07) and
+GAME-394 (ML-10). Those gates stay recorded rather than claimed complete. Details are in
+[`motion-lab-host-contract.md`](motion-lab-host-contract.md) and
+[`motion-lab-rollback.md`](motion-lab-rollback.md).
+
+Before promotion, Motion Lab was the second game to need a qualification preview _without_ a
+promoted release, and it reused the Planetary Survey `GamePreview` mechanism rather than adding a
+second one. Promotion retired that shape: `MOTION_LAB_PREVIEW_VERSION` (declared in `wrangler.jsonc`)
+is now the same preview-only exact-version override the other promoted static-web games carry. When
+unset, the catalog selects the checked-in production version; when set, the preview catalog selects
+only that version and the matching `motion-lab/<version>/` prefix is served. Production leaves the
+override unset.
 
 One host requirement was surfaced by that game's ML-02 baseline and is recorded here because it is a
 hosting obligation rather than a game defect: **host compression changes measured LCP by more than

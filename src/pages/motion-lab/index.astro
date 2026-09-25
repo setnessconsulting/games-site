@@ -2,16 +2,20 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import GameLauncher from "../../components/GameLauncher.astro";
 import SiteHeader from "../../components/SiteHeader.astro";
-import { MOTION_LAB_SLUG, getGame, getGamePreviewSource } from "../../data/games";
+import { MOTION_LAB_SLUG, getGame, getStaticWebPlaySource } from "../../data/games";
 
 const game = getGame(MOTION_LAB_SLUG);
 if (!game) throw new Error("Motion Lab is missing from the catalog");
 
-// The host-state block below states this build's pointer situation in machine-readable form.
-// GAME-385 / ML-HOST requires the host target to be documented AND testable, and a test that
-// only reads documentation can drift from what the site actually serves. These attributes let
-// the repository assert the real state of a real build.
-const previewSource = getGamePreviewSource(game);
+// GAME-385 / ML-HOST required the host target to be documented AND testable, and a test that only
+// reads prose can drift from what the site actually serves. This block is therefore
+// machine-readable. GAME-401 / ML-PROMOTE flipped it from "no pointer at all" to "promoted
+// release" rather than deleting it, so the real state of a real build stays assertable.
+//
+// `getStaticWebPlaySource` is status-gated: it returns nothing unless the entry is `playable` and
+// selects a release, and the release version is the committed promoted constant unless a
+// deployment preview pointer pins a candidate for qualification.
+const playSource = getStaticWebPlaySource(game);
 ---
 
 <BaseLayout title={game.title} description={game.description}>
@@ -23,31 +27,35 @@ const previewSource = getGamePreviewSource(game);
     <GameLauncher game={game} />
     <p class="game-note">
       Motion Lab is a browser-first forces-and-motion game for grades 6–8, built to NGSS MS-PS2-2.
-      Learners act as junior motion engineers: they read the mission, make a prediction, change one
-      variable at a time, measure the run, keep the trial as evidence, compare trials, and back a
-      claim with the data. The scientific values come from a deterministic analytical model, never
-      from the animation.
+      Learners act as junior motion engineers: they change one thing at a time, measure the run,
+      keep the trial as evidence, and compare trials. The scientific values come from a
+      deterministic analytical model, never from the animation.
+    </p>
+    <p class="game-note">
+      <strong>What you can do in this build:</strong> the experiment bench is live. Set the cart's
+      mass, the force applied to it, its starting velocity, and how long you observe for; run it;
+      read the instruments; and keep each run in a trials table. Missions, scoring, and
+      graphs-as-evidence are still being built — no run is scored yet.
     </p>
     <section
       class="game-note"
       aria-label="Host status"
       data-slot="motion-lab-host-status"
       data-catalog-status={game.status}
-      data-preview-pointer={previewSource?.release.version ?? "none"}
-      data-preview-asset-base={previewSource?.assetBase ?? "none"}
+      data-release-version={playSource?.release.version ?? "none"}
+      data-play-asset-base={playSource?.assetBase ?? "none"}
     >
-      {previewSource ? (
+      {playSource ? (
         <p>
-          This build carries a <strong>qualification candidate</strong> at{" "}
-          <code>{previewSource.assetBase}/</code>. It is not a promotion: production still has no
-          selected Motion Lab release, and this pointer disappears as soon as the preview
-          environment stops supplying it.
+          This is the promoted release <code>{playSource.release.version}</code>, served from{" "}
+          <code>{playSource.assetBase}/</code>. It is the immutable artifact published under{" "}
+          <code>motion-lab/{playSource.release.version}/</code>: a later build gets its own version
+          rather than replacing this one.
         </p>
       ) : (
         <p>
-          No Motion Lab build is selected here. Production stays intentionally unavailable until an
-          immutable candidate passes its science, accessibility, comparator, device, rollback, and
-          playtest gates.
+          This build selects no Motion Lab release. The catalog entry is <code>playable</code>, so
+          that is a configuration fault rather than an intentional state.
         </p>
       )}
     </section>

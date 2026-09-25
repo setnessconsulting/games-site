@@ -1,22 +1,32 @@
 # Motion Lab host contract
 
-Status: established by GAME-385 / ML-HOST
+Status: established by GAME-385 / ML-HOST; promotion applied by GAME-401 / ML-PROMOTE
 Game repository: `setnessconsulting/game-motion-lab`
-Jira: GAME-382 (Epic), GAME-385 (ML-HOST), promotion owned by GAME-401 (ML-PROMOTE)
+Jira: GAME-382 (Epic), GAME-385 (ML-HOST), GAME-401 (ML-PROMOTE)
 
 This document is the host target for Motion Lab. It exists so the game repository can build
-against a known contract without coupling itself to games-site internals, and so **production
-stays unavailable until promotion**.
+against a known contract without coupling itself to games-site internals.
 
-> **Nothing is promoted.** Motion Lab has no production release, no
-> `MOTION_LAB_PRODUCTION_VERSION`, and no `release` in the catalog. The catalog entry is
-> `coming-soon`. That is the current, intended state, not an oversight.
+> **Motion Lab is promoted.** GAME-401 / ML-PROMOTE selected one immutable release,
+> `0.1.0-ml-host-evidence.1`, from source SHA `f2b89866134e4b106bb17a74730d2e55ef7fdab8`. The
+> catalog entry is `playable`, carries that `release`, and `MOTION_LAB_PRODUCTION_VERSION` names
+> exactly it.
+>
+> **Read the promotion honestly.** No independent science review, accessibility sign-off,
+> target-age playtest, real-device testing, or rollback rehearsal was performed for this version,
+> and none is claimed. What the promoted build contains is the experiment bench only: a
+> prediction, four controls, the real Phaser lab, instrument readouts, and a trials table. It has
+> no missions, no scoring, no graphs-as-evidence, and no Mystery Cart. The authored content for
+> those exists in the game repository (ML-05); the runtime that plays it is GAME-391 (ML-07) and
+> GAME-394 (ML-10). Sections 5 and 7 below record this in the same place as the mechanism, so the
+> contract cannot be read as a claim that the gates passed.
 
 This contract deliberately follows the Planetary Survey precedent
 ([`planetary-survey-host-contract.md`](planetary-survey-host-contract.md)) rather than inventing a
-second mechanism. Two unreleased games sharing one host pattern is worth more than two bespoke ones,
-and the catalog invariants that keep a preview pointer from becoming a promotion are already
-enforced and tested.
+second mechanism for the pre-promotion phase. Two unreleased games sharing one host pattern is
+worth more than two bespoke ones, and the catalog invariants that keep a candidate pointer from
+becoming a promotion were written before there was anything to promote — which is why promotion
+could be a plain reviewed catalog change rather than a rewrite of the host.
 
 ---
 
@@ -25,7 +35,7 @@ enforced and tested.
 | Fact             | Value                                        |
 | ---------------- | -------------------------------------------- |
 | Slug             | `motion-lab`                                 |
-| Release kind     | `static-web` (planned; not yet selected)     |
+| Release kind     | `static-web` (selected)                      |
 | Index route      | `/motion-lab/`                               |
 | Play route       | `/motion-lab/play/`                          |
 | Asset base       | `/game-assets/motion-lab/<version>/`         |
@@ -38,16 +48,20 @@ The identity above is declared once, in the game repository, at `host-identity.j
 manifest all read that one module, so a prefix that drifts in one place cannot disagree with the
 other.
 
-`<version>` is an immutable, path-safe identifier. For the ML-HOST evidence artifact it is
-`0.1.0-ml-host-evidence.1`, derived as `<package.json version>-<releaseQualifier>`. A real release
-uses the same shape with a qualifier that names the qualification pass. An override is available
-through `MOTION_LAB_VERSION` for pinning an exact candidate during qualification.
+`<version>` is an immutable, path-safe identifier, derived as `<package.json version>-<releaseQualifier>`.
+The promoted version is `0.1.0-ml-host-evidence.1`. An override is available through
+`MOTION_LAB_VERSION` for pinning an exact candidate during qualification.
 
-Be precise about what that identifier was proven against. The ML-HOST evidence was produced from the
-**ML-02 foundation build** — the application shell, the real Phaser renderer, and the balanced-force
-bootstrap — served at the exact prefix above by a local host and driven by a real browser. It proves
-the _path, base-URL and asset contract_, which is what this story owns. It is not evidence about the
-finished game, and no part of it was uploaded or deployed.
+Be precise about what that identifier was proven against, and about where the bytes came from. The
+qualifier is the one declared in the game repository's `host-identity.json` (`ml-host-evidence.1`),
+which was written for the ML-HOST evidence build. It was not renamed at promotion, so the version
+string names ML-HOST's release identity while the published bytes are a build from
+`f2b89866134e4b106bb17a74730d2e55ef7fdab8` — the ML-05 merge, not the ML-02 foundation build. The
+release manifest's `sourceSha` is what actually identifies the artifact, and `npm run release:check`
+fails if it does not match the tree. What ML-HOST proved at this prefix is the _path, base-URL and
+asset contract_: it was proven against the ML-02 foundation build, served at the exact prefix above
+by a local host and driven by a real browser, and no part of that evidence build was uploaded or
+deployed. The ML-HOST evidence is evidence about the contract, not about this artifact's contents.
 
 ### Base path expectations
 
@@ -120,43 +134,54 @@ candidate by copying the wrong field. The validator rejects every combination th
 - a `coming-soon` entry carrying a `release`;
 - `previewEnabled` on a `playable` entry.
 
-**Why not reuse the older `*_PREVIEW_VERSION` mechanism.** For the six promoted games, that
-mechanism swaps the _production_ version of an entry that is already `playable`. Applying it here
-would require flipping `status` to `playable` first — making the qualification preview and the
-promotion the same change, so a mistaken merge would silently promote an unqualified build. Here the
-entry stays `coming-soon` in every environment; only the presence of a preview pointer changes, and
-that pointer can never be read as production.
+**Why the older `*_PREVIEW_VERSION` mechanism was not used before promotion.** For the six promoted
+games, that mechanism swaps the _production_ version of an entry that is already `playable`. Using it
+before promotion would have required flipping `status` to `playable` first — making the qualification
+preview and the promotion the same change, so a mistaken merge would have silently promoted an
+unqualified build. While unpromoted, the entry therefore stayed `coming-soon` in every environment
+and only the presence of a preview pointer changed.
+
+Promotion retired that shape. The `preview`/`previewEnabled` pair is gone from the Motion Lab entry,
+and `MOTION_LAB_PREVIEW_VERSION` now works exactly as it does for the other six promoted games: it
+overrides the released version for a qualification pass. The `GamePreview` mechanism, and every
+validator rule above that keeps it from blurring with a promotion, remains in place and still
+enforced — Planetary Survey still relies on it, and the rules are now asserted against Motion Lab's
+_promoted_ entry as the negative case.
 
 ---
 
-## 3. Preview behaviour
+## 3. Preview behaviour after promotion
 
 `MOTION_LAB_PREVIEW_VERSION` is a **preview-only** exact-version override. It is declared in
-`wrangler.jsonc` and currently empty, because no Motion Lab candidate has been published yet: empty
-is treated as "not configured" everywhere it is read, so declaring it changes nothing at runtime
-while keeping the variable typed for the qualification pass that sets it.
+`wrangler.jsonc` and empty, which is treated as "not configured" everywhere it is read, so the
+committed production version is what every environment selects by default.
 
-| Environment             | Variable                | Result                                                                                                                                    |
-| ----------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| Production              | unset                   | no pointer of any kind; `/motion-lab/play/` renders the shared unavailable panel; the collection does not link the game                   |
-| Preview / qualification | set to an exact version | that version is the candidate asset base; the launcher offers "Open the qualification preview"; the play route frames the exact candidate |
+| Environment               | Variable                          | Result                                                                                                                                                             |
+| ------------------------- | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Production                | unset                             | the committed release `0.1.0-ml-host-evidence.1`; `/motion-lab/play/` frames that exact artifact and the collection links the game                                 |
+| Preview / qualification   | set to an exact version           | that version replaces the release version for this deployment only; the play route frames the pinned candidate, and only that exact `motion-lab/<version>/` prefix |
+| Production, misconfigured | set to a version nobody published | asset requests 404 and the play route's frame has nothing to load; nothing is promoted by the variable                                                             |
 
-Preview behaviour is intentionally explicit rather than automatic:
+Behaviour is intentionally explicit rather than automatic:
 
-- the launcher label says **qualification preview**, never "Play";
+- the launcher label is **Play**, because the entry is promoted; a pinned candidate changes the
+  version it runs, not the kind of pointer it is;
 - the launcher page renders a machine-readable host-status block
-  (`data-slot="motion-lab-host-status"` with `data-catalog-status`, `data-preview-pointer`,
-  `data-preview-asset-base`) so a real build's real state can be asserted rather than trusting this
-  prose;
-- asset serving still requires an exact match. `isApprovedRelease` cannot approve Motion Lab through
-  its catalog fallback, because the catalog promotes nothing — only a deployment-supplied pointer can
-  approve an asset, and only for that exact version. A deployment that forgets the pointer serves
-  404s rather than serving an unqualified candidate.
+  (`data-slot="motion-lab-host-status"` with `data-catalog-status`, `data-release-version`,
+  `data-play-asset-base`) so a real build's real state can be asserted rather than trusting this
+  prose. ML-HOST introduced the block when it reported "no pointer"; promotion flipped its values
+  rather than deleting it, so the same assertions still describe the deployed state;
+- asset serving still requires an exact match, and promotion changed only _who_ approves. Before
+  promotion, only a deployment pointer could approve a Motion Lab asset. Now `isApprovedRelease`
+  approves the promoted version through its catalog fallback — a playable entry's selected release —
+  and the deployment pointer approves only its own exact string. A deployment that pins a version
+  nobody published serves 404s rather than serving an unqualified candidate.
 
-`previewEnabled: true` on the entry is what permits the play route to exist for a `coming-soon`
-game. It is a reviewable source statement, not an environment check, so production and preview
-validate identically. Route validation additionally fails if `previewEnabled` is declared without a
-matching play page, and still fails if a `coming-soon` game exposes a play page without opting in.
+Route validation is static, driven by catalog values rather than the deployment environment, so a
+production build validates exactly as a preview build does. It fails if `previewEnabled` is declared
+without a matching play page, and fails if a `coming-soon` game exposes a play page without opting
+in. Motion Lab no longer needs `previewEnabled`: the entry is `playable`, so its play route is
+promoted and the flag would now be rejected by the catalog validator.
 
 ---
 
@@ -208,7 +233,7 @@ a manifest naming a commit whose source was not what was built, which is why `so
 
 ---
 
-## 5. Promotion (not done here, owned by ML-PROMOTE)
+## 5. Promotion (applied by GAME-401 / ML-PROMOTE)
 
 Promotion is a reviewed catalog change in this repository:
 
@@ -219,8 +244,25 @@ Promotion is a reviewed catalog change in this repository:
 4. pass repository CI and hosted preview qualification;
 5. merge. The merge commit is the production promotion identity.
 
-Until step 5 lands, no Motion Lab build is reachable in production, and the entry must remain
-`coming-soon`.
+**Steps 2, 3 and 4 were performed. Step 1 was not.** Say it in the same place as the mechanism, so
+this document cannot be read as a claim that the gates passed:
+
+| Gate                                                                                                    | Status                                                                                              |
+| ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| Immutable candidate published to `setnessconsulting-games` under `motion-lab/0.1.0-ml-host-evidence.1/` | **done** — six objects, each re-downloaded and sha256-matched against the manifest                  |
+| Manifest `sourceTreeDirty: false`, `sourceSha` matching the merge commit                                | **done**                                                                                            |
+| Catalog change to `playable` with a committed release, and `MOTION_LAB_PRODUCTION_VERSION` added        | **done**                                                                                            |
+| Repository CI                                                                                           | **done**                                                                                            |
+| Independent science review                                                                              | **not performed**                                                                                   |
+| Accessibility sign-off, including a screen-reader pass                                                  | **not performed**                                                                                   |
+| Target-age (grades 6–8) playtest                                                                        | **not performed**                                                                                   |
+| Real-device / cross-device testing                                                                      | **not performed**                                                                                   |
+| Comparator review                                                                                       | **not performed**                                                                                   |
+| Rollback rehearsal                                                                                      | **not performed** — see [`motion-lab-rollback.md`](motion-lab-rollback.md)                          |
+| Hosted preview qualification against a real deployment                                                  | **not performed** — the promotion was verified directly on the production hostnames after deploying |
+
+The owner authorised proceeding to production promotion with this gate set. The gates above are
+recorded rather than claimed.
 
 ---
 
@@ -243,32 +285,38 @@ integration is added, and none is implied.
 
 `test/motion-lab.test.ts` asserts, in both environment states:
 
-- **production selects nothing** — no `release`, no `preview`, no asset base, no play source, not
-  reachable, and the play route renders the shared unavailable panel with no iframe and no
-  `game-assets` reference at all;
-- **a preview pointer is a candidate, not a promotion** — the entry stays `coming-soon`, the
-  production accessor stays empty, and the rendered play route frames exactly the candidate asset
-  base;
-- **the pointers cannot be confused** — every blurring combination is rejected by the validator;
-- **asset serving needs an exact approved pointer** — no catalog state can approve the game, and only
-  the exact configured version is served;
-- **route validation covers the preview-gated route** in both drift directions, and the real
-  repository tree validates clean.
+- **production selects exactly the promoted release** — the committed version, its asset base, a
+  play source, `isGameReachable` true, and no `preview` on the entry at all;
+- **a preview pointer is a candidate override, not a second promotion** — the entry stays
+  `playable`, there is still no `preview`, the catalog still validates, and the rendered play route
+  frames exactly the pinned candidate asset base;
+- **the pointers cannot be confused** — every blurring combination is rejected by the validator,
+  now including the real promoted entry as the negative case for the rules that used to apply to it;
+- **asset serving is approved by the catalog** — the promoted version is served through the
+  fallback, a nearly-identical unpromoted version is not, and a deployment pointer approves only its
+  own exact string;
+- **route validation covers the promoted route** in both drift directions, and the real repository
+  tree validates clean.
 
 On the game side, `npm run test:host` proves the base-path contract against the real build, and that
 lane has been observed failing when the base path is deliberately broken.
 
-`test/play-routes.unavailable.test.ts` additionally forces the unpromoted state through the shared
+`test/play-routes.unavailable.test.ts` additionally forces an unpromoted state through the shared
 fallback suite, and `scripts/validate-catalog.ts` / `validate-routes.ts` run in `npm run verify`.
 
 ## 8. What is not claimed
 
-- No Motion Lab candidate has been uploaded to R2 yet. `MOTION_LAB_PREVIEW_VERSION` is empty, so the
-  preview environment currently serves the unavailable panel exactly as production does. Hosting a
-  real candidate is GAME-399 / ML-15.
-- No hosted qualification has been performed against a real deployment.
-- No science, accessibility, comparator, device, or playtest gate has passed for this game.
-- Nothing has been promoted, and no rollback has been exercised.
+- The promoted artifact is reachable in production. What it **contains** is the experiment bench:
+  a prediction, four controls, the real Phaser lab, instrument readouts, and a trials table. It has
+  no missions, no scoring, no graphs-as-evidence, and no Mystery Cart. ML-05 authored that content in
+  the game repository; the runtime that plays it is GAME-391 (ML-07) and GAME-394 (ML-10).
+- No independent science review, accessibility sign-off, target-age playtest, real-device testing,
+  comparator review, hosted preview qualification, or rollback rehearsal has been performed for this
+  version. Section 5 lists each one. The owner authorised promoting with those gates open.
+- No rollback has been exercised. `MOTION_LAB_PREVIEW_VERSION` is empty, so the preview environment
+  serves the same promoted version production does.
+- This promotion was verified directly on `games-site-7pn.pages.dev` and
+  `games.setnessconsulting.com` after deploying, not through a hosted preview pass first.
 
 ## 9. Rollback
 

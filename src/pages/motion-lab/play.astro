@@ -4,16 +4,16 @@ import GameUnavailable from "../../components/GameUnavailable.astro";
 import PlayToolbar from "../../components/PlayToolbar.astro";
 import SiteHeader from "../../components/SiteHeader.astro";
 import StaticGameFrame from "../../components/StaticGameFrame.astro";
-import { MOTION_LAB_SLUG, getGame, getReachablePlaySource } from "../../data/games";
+import { MOTION_LAB_SLUG, getGame, getStaticWebPlaySource } from "../../data/games";
 
 const game = getGame(MOTION_LAB_SLUG);
 if (!game) throw new Error("Motion Lab is missing from the catalog");
 
-// This route is preview-gated, not promoted. `getReachablePlaySource` prefers a promoted
-// release, then a configured qualification candidate, then nothing. Production supplies no
-// preview pointer, so `entryUrl` is undefined there and the page renders the shared
-// unavailable panel instead of an iframe pointing at an unapproved artifact.
-const playSource = getReachablePlaySource(game);
+// GAME-401 / ML-PROMOTE: this route is now a promoted play route, not a preview-gated one, so the
+// source comes from the status-gated promoted accessor. Under the promoted entry it always
+// resolves; the unavailable panel below is therefore a configuration fault rather than the
+// intentional production state it used to describe.
+const playSource = getStaticWebPlaySource(game);
 const entryUrl = playSource ? `${playSource.assetBase}/${playSource.release.entryFile}` : undefined;
 ---
 
@@ -30,8 +30,8 @@ const entryUrl = playSource ? `${playSource.assetBase}/${playSource.release.entr
     ) : (
       <GameUnavailable
         game={game}
-        heading="The experiment bench is still being set up."
-        description="There isn’t a qualified Motion Lab build here yet. Production stays intentionally unavailable until the immutable candidate passes its science, accessibility, comparator, device, rollback, and playtest gates. A hosted preview never promotes the game."
+        heading="The experiment bench could not be loaded."
+        description="This build selects no Motion Lab release, so there is nothing to frame here. The catalog entry is playable, which makes this a deployment fault rather than a deliberate state — the promoted release should always resolve."
       />
     )}
   </main>
