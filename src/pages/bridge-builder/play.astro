@@ -5,12 +5,22 @@ import PlayToolbar from "../../components/PlayToolbar.astro";
 import SiteHeader from "../../components/SiteHeader.astro";
 import StaticGameFrame from "../../components/StaticGameFrame.astro";
 import { getGame, getStaticWebPlaySource } from "../../data/games";
+import {
+  appendGpsdkQuery,
+  createGpsdkSessionIds
+} from "../../lib/gpsdk-bridge-builder-host";
 
 const game = getGame("bridge-builder");
 if (!game) throw new Error("Bridge Builder is missing from the catalog");
 
 const playSource = getStaticWebPlaySource(game);
-const entryUrl = playSource ? `${playSource.assetBase}/${playSource.release.entryFile}` : undefined;
+const baseEntryUrl = playSource
+  ? `${playSource.assetBase}/${playSource.release.entryFile}`
+  : undefined;
+// SDK-6: Bridge Builder is the first game to opt into the GPSDK host wire.
+const gpsdkIds = baseEntryUrl ? createGpsdkSessionIds() : undefined;
+const entryUrl =
+  baseEntryUrl && gpsdkIds ? appendGpsdkQuery(baseEntryUrl, gpsdkIds) : undefined;
 ---
 
 <BaseLayout title={`Play ${game.title}`} description={`Play ${game.title} at Setness Games.`}>
@@ -21,8 +31,14 @@ const entryUrl = playSource ? `${playSource.assetBase}/${playSource.release.entr
       canFullscreen={Boolean(entryUrl)}
       fullscreenStage="[data-static-game-stage]"
     />
-    {entryUrl ? (
-      <StaticGameFrame title={game.title} entryUrl={entryUrl} gamePageUrl={game.route} />
+    {entryUrl && gpsdkIds ? (
+      <StaticGameFrame
+        title={game.title}
+        entryUrl={entryUrl}
+        gamePageUrl={game.route}
+        gpsdkChannel={gpsdkIds.channelId}
+        gpsdkSession={gpsdkIds.sessionId}
+      />
     ) : (
       <GameUnavailable
         game={game}

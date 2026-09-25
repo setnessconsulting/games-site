@@ -5,12 +5,21 @@ interface Props {
   title: string;
   entryUrl: string;
   gamePageUrl: string;
+  /** Bridge Builder GPSDK opt-in (SDK-6). Other games omit these. */
+  gpsdkChannel?: string;
+  gpsdkSession?: string;
 }
 
-const { title, entryUrl, gamePageUrl } = Astro.props;
+const { title, entryUrl, gamePageUrl, gpsdkChannel, gpsdkSession } = Astro.props;
 ---
 
-<div class="static-game-stage" data-static-game-stage>
+<div
+  class="static-game-stage"
+  data-static-game-stage
+  {...(gpsdkChannel && gpsdkSession
+    ? { "data-gpsdk-channel": gpsdkChannel, "data-gpsdk-session": gpsdkSession }
+    : {})}
+>
   <GameFrameOverlays kind="static" title={title} returnHref={gamePageUrl} />
   <iframe
     class="static-game-frame"
@@ -26,6 +35,27 @@ const { title, entryUrl, gamePageUrl } = Astro.props;
 
 <script>
   import { wireStaticGameIframe } from "../lib/static-game-iframe";
+  import type { BridgeBuilderHostWire } from "../lib/gpsdk-bridge-builder-host";
 
-  wireStaticGameIframe(document.querySelector("[data-static-game-stage]"));
+  const stage = document.querySelector("[data-static-game-stage]");
+  const gpsdkOptIn = Boolean(
+    stage?.getAttribute("data-gpsdk-channel") && stage?.getAttribute("data-gpsdk-session")
+  );
+
+  wireStaticGameIframe(stage, {
+    onFrameReady: gpsdkOptIn
+      ? (frame) => {
+          let wire: BridgeBuilderHostWire | null = null;
+          let cancelled = false;
+          void import("../lib/gpsdk-bridge-builder-host").then(({ wireBridgeBuilderGpsdkHost }) => {
+            if (cancelled) return;
+            wire = wireBridgeBuilderGpsdkHost(stage, frame);
+          });
+          return () => {
+            cancelled = true;
+            wire?.destroy();
+          };
+        }
+      : undefined
+  });
 </script>
