@@ -1,0 +1,55 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import GameLauncher from "../../components/GameLauncher.astro";
+import SiteHeader from "../../components/SiteHeader.astro";
+import { MOTION_LAB_SLUG, getGame, getGamePreviewSource } from "../../data/games";
+
+const game = getGame(MOTION_LAB_SLUG);
+if (!game) throw new Error("Motion Lab is missing from the catalog");
+
+// The host-state block below states this build's pointer situation in machine-readable form.
+// GAME-385 / ML-HOST requires the host target to be documented AND testable, and a test that
+// only reads documentation can drift from what the site actually serves. These attributes let
+// the repository assert the real state of a real build.
+const previewSource = getGamePreviewSource(game);
+---
+
+<BaseLayout title={game.title} description={game.description}>
+  <SiteHeader compact />
+  <main class="page-shell launcher-page">
+    <a class="back-link" href="/">
+      ← Collection
+    </a>
+    <GameLauncher game={game} />
+    <p class="game-note">
+      Motion Lab is a browser-first forces-and-motion game for grades 6–8, built to NGSS MS-PS2-2.
+      Learners act as junior motion engineers: they read the mission, make a prediction, change one
+      variable at a time, measure the run, keep the trial as evidence, compare trials, and back a
+      claim with the data. The scientific values come from a deterministic analytical model, never
+      from the animation.
+    </p>
+    <section
+      class="game-note"
+      aria-label="Host status"
+      data-slot="motion-lab-host-status"
+      data-catalog-status={game.status}
+      data-preview-pointer={previewSource?.release.version ?? "none"}
+      data-preview-asset-base={previewSource?.assetBase ?? "none"}
+    >
+      {previewSource ? (
+        <p>
+          This build carries a <strong>qualification candidate</strong> at{" "}
+          <code>{previewSource.assetBase}/</code>. It is not a promotion: production still has no
+          selected Motion Lab release, and this pointer disappears as soon as the preview
+          environment stops supplying it.
+        </p>
+      ) : (
+        <p>
+          No Motion Lab build is selected here. Production stays intentionally unavailable until an
+          immutable candidate passes its science, accessibility, comparator, device, rollback, and
+          playtest gates.
+        </p>
+      )}
+    </section>
+  </main>
+</BaseLayout>
