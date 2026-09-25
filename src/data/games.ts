@@ -46,6 +46,18 @@ export const FRACTION_MATCH_PRODUCTION_VERSION = "0.1.0-qualification.1";
  */
 export const PLANETARY_SURVEY_SLUG = "planetary-survey";
 
+/**
+ * Motion Lab has NO production version, deliberately.
+ *
+ * GAME-385 / ML-HOST exists to prepare the host for this game without promoting an
+ * unfinished build. There is no `MOTION_LAB_PRODUCTION_VERSION` constant for the same
+ * reason Planetary Survey has none: a missing constant fails to compile, which is a
+ * stronger guarantee than a placeholder version nobody qualified. The entry stays
+ * `coming-soon` and carries no `release` until ML-PROMOTE selects an immutable artifact
+ * through a reviewed catalog change.
+ */
+export const MOTION_LAB_SLUG = "motion-lab";
+
 // Production selects the approved immutable release directly. Pages preview
 // builds may override the version to exercise a different pinned candidate.
 const runtimeProcess = (
@@ -62,6 +74,8 @@ const fractionMatchPreviewVersion = runtimeProcess?.env?.FRACTION_MATCH_PREVIEW_
 // The only Planetary Survey pointer that can exist before promotion. It is a
 // PREVIEW pointer, never a production one: see `getGamePreviewSource`.
 const planetarySurveyPreviewVersion = runtimeProcess?.env?.PLANETARY_SURVEY_PREVIEW_VERSION;
+// Motion Lab's only pre-promotion pointer, for the same reason.
+const motionLabPreviewVersion = runtimeProcess?.env?.MOTION_LAB_PREVIEW_VERSION;
 const bridgeBuilderProductionRelease: StaticWebRelease = {
   kind: "static-web",
   version: BRIDGE_BUILDER_PRODUCTION_VERSION,
@@ -297,6 +311,28 @@ export const games: readonly GameEntry[] = [
     // set here: promotion is a separate, reviewed change owned by PS-PROMOTE.
     ...(planetarySurveyPreviewVersion
       ? { preview: { version: planetarySurveyPreviewVersion, entryFile: "index.html" } }
+      : {}),
+    previewEnabled: true
+  },
+  {
+    slug: MOTION_LAB_SLUG,
+    title: "Motion Lab",
+    status: "coming-soon",
+    eyebrow: "Design the experiment, not the answer",
+    description: motionLabPreviewVersion
+      ? "Run controlled experiments with a cart and a track: change one thing, measure what happens, compare trials, and back your claim with evidence. This qualification candidate is being tested before it joins the collection."
+      : "Run controlled experiments with a cart and a track: change one thing, measure what happens, compare trials, and back your claim with evidence.",
+    cardImage: "/art/coming-soon.svg",
+    route: "/motion-lab/",
+    controls: [
+      { input: "Pointer or touch", action: "Set up a run and record a trial" },
+      { input: "Keyboard", action: "Take every reading and cite every claim" },
+      { input: "Reduce motion", action: "Keep the measurement, skip the animation" }
+    ],
+    // Present only when this build was given a preview pointer. No `release` is ever set
+    // here: promotion is a separate, reviewed change owned by ML-PROMOTE.
+    ...(motionLabPreviewVersion
+      ? { preview: { version: motionLabPreviewVersion, entryFile: "index.html" } }
       : {}),
     previewEnabled: true
   },

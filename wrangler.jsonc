@@ -31,7 +31,14 @@
         // while keeping the variable declared and typed for the qualification pass
         // that will set it. The other games carry real versions because their
         // candidates are published.
-        "PLANETARY_SURVEY_PREVIEW_VERSION": ""
+        "PLANETARY_SURVEY_PREVIEW_VERSION": "",
+        // Deliberately empty, and declared rather than omitted, for the same reason as
+        // Planetary Survey. Motion Lab has no published candidate yet, so naming a version
+        // would point the preview environment at an R2 object that does not exist. Empty is
+        // treated as "not configured" everywhere it is read, so this changes nothing at
+        // runtime while keeping the variable declared and typed for the qualification pass
+        // that will set it (GAME-399 / ML-15).
+        "MOTION_LAB_PREVIEW_VERSION": ""
       }
     }
   }

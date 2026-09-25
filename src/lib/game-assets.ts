@@ -1,4 +1,4 @@
-import { PLANETARY_SURVEY_SLUG, games } from "../data/games";
+import { MOTION_LAB_SLUG, PLANETARY_SURVEY_SLUG, games } from "../data/games";
 
 const SAFE_SEGMENT = /^[A-Za-z0-9._-]+$/;
 
@@ -45,7 +45,8 @@ export function isApprovedRelease(
   weatherCommandPreviewVersion?: string,
   ecosystemRescuePreviewVersion?: string,
   fractionMatchPreviewVersion?: string,
-  planetarySurveyPreviewVersion?: string
+  planetarySurveyPreviewVersion?: string,
+  motionLabPreviewVersion?: string
 ): boolean {
   if (allowFixture && slug === "test-fixture" && version === "0.0.0") return true;
 
@@ -107,6 +108,13 @@ export function isApprovedRelease(
     planetarySurveyPreviewVersion &&
     version === planetarySurveyPreviewVersion
   ) {
+    return true;
+  }
+
+  // Motion Lab is not promoted either, so an exact preview pointer supplied by the
+  // deployment is the ONLY path that can approve one of its assets. The catalog fallback
+  // below cannot approve it, because the entry carries no `release` and is not `playable`.
+  if (slug === MOTION_LAB_SLUG && motionLabPreviewVersion && version === motionLabPreviewVersion) {
     return true;
   }
 

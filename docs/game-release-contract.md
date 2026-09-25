@@ -189,6 +189,29 @@ this") and a `GamePreview` ("a hosted candidate exists and production must not u
 combination that would blur the two, and the catalog status stays `coming-soon` whether or not the
 variable is set. Details, invariants, and the readback checklist are in the host contract.
 
+## Motion Lab
+
+`setnessconsulting/game-motion-lab` produces the static-web artifact and its release manifest. This
+repository owns the `motion-lab` card, launcher, preview-gated play route, selected version,
+promotion, and rollback.
+
+**Motion Lab is not promoted, and has no production version or release.** Its catalog entry is
+`coming-soon` in every environment. Promotion is owned by ML-PROMOTE and must follow the
+qualified-candidate process in [`motion-lab-host-contract.md`](motion-lab-host-contract.md).
+
+It is the second game to need a qualification preview _without_ a promoted release, and it reuses
+the Planetary Survey mechanism rather than adding a second one: a `GamePreview` pointer supplied by
+`MOTION_LAB_PREVIEW_VERSION` (declared in `wrangler.jsonc`, currently empty), a `previewEnabled`
+entry, and the same validator rules that keep the preview and production pointers from blurring into
+each other. No `MOTION_LAB_PRODUCTION_VERSION` constant exists, deliberately: a missing constant
+fails to compile, which is a stronger guarantee than a placeholder nobody qualified.
+
+One host requirement was surfaced by that game's ML-02 baseline and is recorded here because it is a
+hosting obligation rather than a game defect: **host compression changes measured LCP by more than
+6×** for this payload (9061 ms raw against 1402 ms gzipped, same build, same session). The
+qualification pass must confirm the real host's compression and cache headers instead of assuming
+them. Details are in the host contract.
+
 ## Fraction Match
 
 `setnessconsulting/game-fraction-match` produces the static-web artifact and its release manifest.
