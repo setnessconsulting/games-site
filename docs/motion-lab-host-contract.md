@@ -247,19 +247,19 @@ Promotion is a reviewed catalog change in this repository:
 **Steps 2, 3 and 4 were performed. Step 1 was not.** Say it in the same place as the mechanism, so
 this document cannot be read as a claim that the gates passed:
 
-| Gate                                                                                                    | Status                                                                                              |
-| ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| Immutable candidate published to `setnessconsulting-games` under `motion-lab/0.1.0-ml-host-evidence.1/` | **done** — six objects, each re-downloaded and sha256-matched against the manifest                  |
-| Manifest `sourceTreeDirty: false`, `sourceSha` matching the merge commit                                | **done**                                                                                            |
-| Catalog change to `playable` with a committed release, and `MOTION_LAB_PRODUCTION_VERSION` added        | **done**                                                                                            |
-| Repository CI                                                                                           | **done**                                                                                            |
-| Independent science review                                                                              | **not performed**                                                                                   |
-| Accessibility sign-off, including a screen-reader pass                                                  | **not performed**                                                                                   |
-| Target-age (grades 6–8) playtest                                                                        | **not performed**                                                                                   |
-| Real-device / cross-device testing                                                                      | **not performed**                                                                                   |
-| Comparator review                                                                                       | **not performed**                                                                                   |
-| Rollback rehearsal                                                                                      | **not performed** — see [`motion-lab-rollback.md`](motion-lab-rollback.md)                          |
-| Hosted preview qualification against a real deployment                                                  | **not performed** — the promotion was verified directly on the production hostnames after deploying |
+| Gate                                                                                                    | Status                                                                                                                                                                                                                |
+| ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Immutable candidate published to `setnessconsulting-games` under `motion-lab/0.1.0-ml-host-evidence.1/` | **done** — six objects, each re-downloaded and sha256-matched against the manifest                                                                                                                                    |
+| Manifest `sourceTreeDirty: false`, `sourceSha` matching the merge commit                                | **done**                                                                                                                                                                                                              |
+| Catalog change to `playable` with a committed release, and `MOTION_LAB_PRODUCTION_VERSION` added        | **done**                                                                                                                                                                                                              |
+| Repository CI                                                                                           | **done**                                                                                                                                                                                                              |
+| Independent science review                                                                              | **not performed**                                                                                                                                                                                                     |
+| Accessibility sign-off, including a screen-reader pass                                                  | **not performed**                                                                                                                                                                                                     |
+| Target-age (grades 6–8) playtest                                                                        | **not performed**                                                                                                                                                                                                     |
+| Real-device / cross-device testing                                                                      | **not performed**                                                                                                                                                                                                     |
+| Comparator review                                                                                       | **not performed**                                                                                                                                                                                                     |
+| Rollback rehearsal                                                                                      | **not performed** — see [`motion-lab-rollback.md`](motion-lab-rollback.md)                                                                                                                                            |
+| Hosted preview qualification against a real deployment                                                  | **partly performed, and narrower than the gate it shares a name with** — the PR's own Cloudflare Pages preview deployment was verified before merge (see below); a qualification pass over the ML-16 gate set was not |
 
 The owner authorised proceeding to production promotion with this gate set. The gates above are
 recorded rather than claimed.
@@ -311,12 +311,26 @@ fallback suite, and `scripts/validate-catalog.ts` / `validate-routes.ts` run in 
   no missions, no scoring, no graphs-as-evidence, and no Mystery Cart. ML-05 authored that content in
   the game repository; the runtime that plays it is GAME-391 (ML-07) and GAME-394 (ML-10).
 - No independent science review, accessibility sign-off, target-age playtest, real-device testing,
-  comparator review, hosted preview qualification, or rollback rehearsal has been performed for this
+  comparator review, ML-16 qualification pass, or rollback rehearsal has been performed for this
   version. Section 5 lists each one. The owner authorised promoting with those gates open.
 - No rollback has been exercised. `MOTION_LAB_PREVIEW_VERSION` is empty, so the preview environment
   serves the same promoted version production does.
-- This promotion was verified directly on `games-site-7pn.pages.dev` and
-  `games.setnessconsulting.com` after deploying, not through a hosted preview pass first.
+- The promotion was verified on three hostnames: the PR's Cloudflare Pages preview deployment
+  `https://c64b6b8b.games-site-7pn.pages.dev` **before** merge, then `https://games-site-7pn.pages.dev`,
+  `https://games.setnessconsulting.com`, and the deployment URL `https://ff9bbfe8.games-site-7pn.pages.dev`
+  after deploying.
+- Be precise about what that preview check was, because it shares a name with an ML-16 gate it does
+  not satisfy. It checked the deployed _behaviour_: the launcher reported `playable` with the promoted
+  version, the collection linked `/motion-lab/`, the play route framed the exact promoted entry
+  document, all four assets returned 200, an unapproved version returned 404, and the entry document
+  and chunks came back `Content-Encoding: br` with `Cache-Control: public, max-age=31536000, immutable`,
+  `X-Frame-Options: SAMEORIGIN` and `nosniff`. It was **not** an ML-16 qualification pass: no
+  independent science review, accessibility sign-off, target-age playtest, real-device testing, or
+  comparator review fed into it, and passing it authorises nothing beyond the deployment facts above.
+- What was played in production was the experiment bench, end to end: the four controls rendered,
+  `Run preview` recorded a trial, and the trials table showed `2.00 kg / 0.0 N / 1.50 m/s / 4.00 s`
+  resolving to `6.00 m` and `1.50 m/s`, matching the documented balanced default. The on-screen copy
+  still reads _"No trial here is scored yet."_
 
 ## 9. Rollback
 
