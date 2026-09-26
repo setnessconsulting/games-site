@@ -66,7 +66,7 @@ describe("game catalog", () => {
     expect(signalGarden?.status).toBe("playable");
     expect(signalGarden?.release).toEqual({
       kind: "unity-webgl",
-      version: "2026-09-21-58f2c29",
+      version: "2026-09-26-da74c6a",
       loaderFile: "WebGL.loader.js",
       dataFile: "WebGL.data.br",
       frameworkFile: "WebGL.framework.js.br",
