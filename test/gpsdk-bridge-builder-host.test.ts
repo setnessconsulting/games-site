@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { runHostConformanceTests } from "@setnessconsulting/game-platform-sdk/testing";
 import {
   appendGpsdkQuery,
+  activateBridgeBuilderGpsdkFrame,
   BRIDGE_BUILDER_HOST_CONFIG,
   createGpsdkSessionIds,
   readGpsdkIdsFromStage,
@@ -66,5 +67,45 @@ describe("Bridge Builder GPSDK host (SDK-6)", () => {
     expect(wire!.transport.channelId).toBe("channel-a");
     expect(wire!.transport.sessionId).toBe("session-b");
     wire!.destroy();
+  });
+
+  it("creates runtime ids and installs the host listener before iframe navigation", () => {
+    const stage = document.createElement("div");
+    const frame = document.createElement("iframe");
+    const order: string[] = [];
+    let nextId = 0;
+    const wire = {
+      transport: {} as never,
+      teardownHandshake: vi.fn(),
+      destroy: vi.fn()
+    };
+    const setAttribute = frame.setAttribute.bind(frame);
+    vi.spyOn(frame, "setAttribute").mockImplementation((name, value) => {
+      if (name === "src") order.push("iframe-navigation");
+      setAttribute(name, value);
+    });
+
+    const activation = activateBridgeBuilderGpsdkFrame(
+      stage,
+      frame,
+      "/game-assets/bridge-builder/1.0.0/index.html",
+      {
+        randomUuid: () => `runtime-${++nextId}`,
+        wireHost: (wiredStage, wiredFrame) => {
+          expect(wiredStage).toBe(stage);
+          expect(wiredFrame).toBe(frame);
+          expect(stage.getAttribute("data-gpsdk-channel")).toBe("runtime-1");
+          expect(stage.getAttribute("data-gpsdk-session")).toBe("runtime-2");
+          order.push("host-listener");
+          return wire;
+        }
+      }
+    );
+
+    expect(activation?.ids).toEqual({ channelId: "runtime-1", sessionId: "runtime-2" });
+    expect(order).toEqual(["host-listener", "iframe-navigation"]);
+    expect(frame.getAttribute("src")).toBe(
+      "/game-assets/bridge-builder/1.0.0/index.html?gpsdkChannel=runtime-1&gpsdkSession=runtime-2"
+    );
   });
 });

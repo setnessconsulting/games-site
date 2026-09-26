@@ -63,6 +63,11 @@ export type BridgeBuilderHostWire = {
   destroy: () => void;
 };
 
+export type BridgeBuilderGpsdkFrameActivation = {
+  ids: GpsdkSessionIds;
+  wire: BridgeBuilderHostWire;
+};
+
 /**
  * Open IframeTransport + performHostHandshake against the play iframe.
  * Returns null when the stage is not Bridge Builder GPSDK-opted-in.
@@ -105,4 +110,34 @@ export function wireBridgeBuilderGpsdkHost(
       transport.destroy();
     }
   };
+}
+
+/**
+ * Create per-page session ids, install the host listener, then navigate the
+ * iframe. This prevents a one-shot HANDSHAKE_INIT from arriving before the
+ * parent is listening.
+ */
+export function activateBridgeBuilderGpsdkFrame(
+  stage: Element | null,
+  frame: HTMLIFrameElement | null,
+  entryUrl: string,
+  options: {
+    randomUuid?: () => string;
+    wireHost?: (
+      stage: Element | null,
+      frame: HTMLIFrameElement | null
+    ) => BridgeBuilderHostWire | null;
+  } = {}
+): BridgeBuilderGpsdkFrameActivation | null {
+  if (!stage || !frame) return null;
+
+  const ids = createGpsdkSessionIds(options.randomUuid);
+  stage.setAttribute("data-gpsdk-channel", ids.channelId);
+  stage.setAttribute("data-gpsdk-session", ids.sessionId);
+
+  const wire = (options.wireHost ?? wireBridgeBuilderGpsdkHost)(stage, frame);
+  if (!wire) return null;
+
+  frame.setAttribute("src", appendGpsdkQuery(entryUrl, ids));
+  return { ids, wire };
 }
