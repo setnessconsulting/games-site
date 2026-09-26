@@ -34,6 +34,10 @@ export async function probeEntryUrl(url: string, fetchImpl: FetchLike = fetch): 
  * Wire loading/error overlays for a static iframe stage.
  * Expects `[data-static-game-loading]`, `[data-static-game-error]`, and
  * `[data-static-game-frame]` under `stage`.
+ *
+ * When `onFrameReady` is supplied it runs once the entry URL probe succeeds.
+ * It may return a teardown callback that runs if the stage later shows an error
+ * (or when a subsequent ready is impossible — callers typically tear down on page unload).
  */
 export function wireStaticGameIframe(
   stage: Element | null,
@@ -41,6 +45,7 @@ export function wireStaticGameIframe(
     fetchImpl?: FetchLike;
     timeoutMs?: number;
     setTimeoutFn?: typeof setTimeout;
+    onFrameReady?: (frame: HTMLIFrameElement) => void | (() => void);
   } = {}
 ): void {
   const fetchImpl = options.fetchImpl ?? fetch;
@@ -52,10 +57,13 @@ export function wireStaticGameIframe(
   const frame = stage?.querySelector<HTMLIFrameElement>("[data-static-game-frame]");
 
   let settled = false;
+  let readyTeardown: (() => void) | undefined;
 
   const showError = () => {
     if (settled) return;
     settled = true;
+    readyTeardown?.();
+    readyTeardown = undefined;
     loading?.setAttribute("hidden", "true");
     frame?.setAttribute("hidden", "true");
     error?.removeAttribute("hidden");
@@ -65,6 +73,10 @@ export function wireStaticGameIframe(
     if (settled) return;
     settled = true;
     loading?.setAttribute("hidden", "true");
+    if (frame && options.onFrameReady) {
+      const teardown = options.onFrameReady(frame);
+      if (typeof teardown === "function") readyTeardown = teardown;
+    }
   };
 
   if (!stage || !loading || !error || !frame) {

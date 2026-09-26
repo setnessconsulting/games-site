@@ -18,12 +18,17 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GAME_PLATFORM_SDK_TOKEN }}
 
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version-file: .node-version
           cache: npm
+
+      - name: Fetch the private Game Platform SDK over HTTPS
+        run: git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
 
       - name: Install dependencies
         run: npm ci

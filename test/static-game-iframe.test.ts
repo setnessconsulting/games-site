@@ -86,6 +86,19 @@ describe("wireStaticGameIframe", () => {
     expect(frame.hasAttribute("hidden")).toBe(false);
   });
 
+  it("invokes onFrameReady once when the entry probe succeeds", async () => {
+    const { stage, frame } = buildStage();
+    const fetchImpl: FetchLike = vi.fn(async () => mockResponse(200));
+    const onFrameReady = vi.fn();
+
+    wireStaticGameIframe(stage, { fetchImpl, timeoutMs: 60_000, onFrameReady });
+    frame.dispatchEvent(new Event("load"));
+    await vi.waitFor(() => {
+      expect(onFrameReady).toHaveBeenCalledTimes(1);
+    });
+    expect(onFrameReady).toHaveBeenCalledWith(frame);
+  });
+
   it("shows the error panel when the iframe error event fires", () => {
     const { stage, loading, error, frame } = buildStage();
 
