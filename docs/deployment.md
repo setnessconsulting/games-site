@@ -16,6 +16,8 @@ Configure:
 
 Cloudflare Git integration creates previews for branches and deploys `main` to production.
 
+For Signal Garden, the production catalog selects `2026-09-26-da74c6a` from source commit `da74c6a544066a538e7f999f18972d2b6ebe33fb`. The immutable WebGL objects are under `signal-garden/2026-09-26-da74c6a/Build/`. The prior known-good pointer, `2026-09-21-58f2c29`, remains available for rollback. The current update is deployed for owner testing; formal owner qualification remains open in the game repository.
+
 ## R2
 
 Create a dedicated private bucket named `setnessconsulting-games`. Do not reuse unrelated private
