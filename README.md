@@ -18,6 +18,18 @@ Run the full local verification suite with:
 npm run verify
 ```
 
+### Game Platform SDK dependency
+
+`npm ci` installs `@setnessconsulting/game-platform-sdk` from a private GitHub
+repository over SSH. A contributor machine therefore needs an SSH key for
+`github.com` that can read `setnessconsulting/project-game-platform-sdk` — a
+personal key with read access, or the repository's read-only deploy key. Without
+one, `npm ci` stops mid-install with an SSH error.
+
+Cloudflare Pages builds and CI do not use a personal key: they install through
+the `GAME_PLATFORM_SDK_DEPLOY_KEY` secret and a pinned GitHub host key (see
+[`docs/deployment.md`](docs/deployment.md)). Never commit a key.
+
 ### Playable assets locally
 
 `npm run preview` serves only the static Astro output. `/game-assets/*` is a Cloudflare Pages
