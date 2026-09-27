@@ -8,13 +8,20 @@ repository.
 Configure:
 
 - Production branch: `main`
-- Build command: `npm run build`
+- Build command: `node scripts/build-cloudflare-pages.mjs`
 - Output directory: `dist`
 - Node version: `24` from `.node-version`
 - Custom domain: `games.setnessconsulting.com`
 - Web Analytics: enabled from the Pages project Metrics settings
 
 Cloudflare Git integration creates previews for branches and deploys `main` to production.
+
+The Pages project must have `SKIP_DEPENDENCY_INSTALL=1` as a plain build variable and
+`GAME_PLATFORM_SDK_DEPLOY_KEY` as an encrypted environment secret in both preview and production.
+The build script installs from the lockfile over the SDK repository's read-only deploy key, runs
+`npm run build`, and removes the temporary key. Keep the key out of source control. The same private
+SDK deploy key is stored as the `GAME_PLATFORM_SDK_DEPLOY_KEY` Actions secret in the Bridge Builder
+and games-site repositories; its public key is attached read-only to `project-game-platform-sdk`.
 
 ## R2
 
