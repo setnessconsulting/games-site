@@ -8,7 +8,6 @@ const PLAY_ROUTE_SLUGS = [
   "bridge-builder",
   "number-line-jumper",
   "math-detective",
-  "weather-command",
   "ecosystem-rescue"
 ] as const;
 

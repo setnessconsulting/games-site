@@ -28,6 +28,9 @@ export const BRIDGE_BUILDER_PRODUCTION_VERSION = "0.1.0-qualification.12";
 export const NUMBER_LINE_JUMPER_PRODUCTION_VERSION = "main-12641c0";
 export const MATH_DETECTIVE_PRODUCTION_VERSION = "2026.09.21-playtest-enhancements.1";
 export const ECOSYSTEM_RESCUE_PRODUCTION_VERSION = "0.1.0-qualification.6";
+// The current production pointer. The weather-command catalog entry is coming-soon until
+// WC-PROMOTE selects an approved immutable candidate; this constant records the last
+// published version for tests and the future promotion change.
 export const WEATHER_COMMAND_PRODUCTION_VERSION = "0.1.0-qualification.2";
 export const FRACTION_MATCH_PRODUCTION_VERSION = "0.1.0-qualification.1";
 export const MOTION_LAB_PRODUCTION_VERSION = "0.1.0-ml-host-evidence.1";
@@ -114,14 +117,10 @@ const mathDetectiveProductionRelease: StaticWebRelease = {
 const mathDetectiveRelease: StaticWebRelease = mathDetectivePreviewVersion
   ? { ...mathDetectiveProductionRelease, version: mathDetectivePreviewVersion }
   : mathDetectiveProductionRelease;
-const weatherCommandProductionRelease: StaticWebRelease = {
-  kind: "static-web",
-  version: WEATHER_COMMAND_PRODUCTION_VERSION,
-  entryFile: "index.html"
-};
-const weatherCommandRelease: StaticWebRelease = weatherCommandPreviewVersion
-  ? { ...weatherCommandProductionRelease, version: weatherCommandPreviewVersion }
-  : weatherCommandProductionRelease;
+// Weather Command production promotion is owned by WC-PROMOTE. Until then the catalog
+// entry stays coming-soon and selects no production release; only a non-production
+// preview pointer (when the build is given one) makes the qualified candidate
+// reachable on preview builds.
 // Ecosystem Rescue's release: production selects the promoted immutable version, and a preview
 // build can pin a different candidate for qualification. The catalog entry is playable either way,
 // which is what makes the promoted version reachable at /ecosystem-rescue/play/ in production.
@@ -289,7 +288,7 @@ export const games: readonly GameEntry[] = [
   {
     slug: "weather-command",
     title: "Weather Command",
-    status: "playable",
+    status: "coming-soon",
     eyebrow: "Read the atmosphere",
     description: weatherCommandPreviewVersion
       ? "Inspect atmospheric evidence, make a forecast, and compare your prediction with a simulated weather system in this qualification preview."
@@ -300,7 +299,13 @@ export const games: readonly GameEntry[] = [
       { input: "Mouse / touch", action: "Inspect evidence and build a forecast" },
       { input: "Keyboard", action: "Navigate evidence and forecast controls" }
     ],
-    release: weatherCommandRelease
+    // Production remains coming-soon until WC-PROMOTE selects an approved immutable
+    // candidate. The preview pointer below makes the qualified candidate reachable at
+    // /weather-command/play/ on preview builds only; it never promotes production.
+    ...(weatherCommandPreviewVersion
+      ? { preview: { version: weatherCommandPreviewVersion, entryFile: "index.html" } }
+      : {}),
+    previewEnabled: true
   },
   {
     slug: "ecosystem-rescue",

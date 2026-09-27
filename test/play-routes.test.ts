@@ -8,14 +8,12 @@ import FractionMatchPlay from "../src/pages/fraction-match/play.astro";
 import MathDetectivePlay from "../src/pages/math-detective/play.astro";
 import NumberLineJumperPlay from "../src/pages/number-line-jumper/play.astro";
 import SignalGardenPlay from "../src/pages/signal-garden/play.astro";
-import WeatherCommandPlay from "../src/pages/weather-command/play.astro";
 import {
   BRIDGE_BUILDER_PRODUCTION_VERSION,
   ECOSYSTEM_RESCUE_PRODUCTION_VERSION,
   FRACTION_MATCH_PRODUCTION_VERSION,
   MATH_DETECTIVE_PRODUCTION_VERSION,
   NUMBER_LINE_JUMPER_PRODUCTION_VERSION,
-  WEATHER_COMMAND_PRODUCTION_VERSION,
   getGame
 } from "../src/data/games";
 
@@ -43,12 +41,6 @@ const staticWebPages = [
     version: MATH_DETECTIVE_PRODUCTION_VERSION,
     stage: "[data-static-game-stage]",
     Page: MathDetectivePlay
-  },
-  {
-    slug: "weather-command",
-    version: WEATHER_COMMAND_PRODUCTION_VERSION,
-    stage: "[data-static-game-stage]",
-    Page: WeatherCommandPlay
   },
   {
     slug: "number-line-jumper",

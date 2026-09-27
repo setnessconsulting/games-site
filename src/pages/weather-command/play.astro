@@ -4,12 +4,16 @@ import GameUnavailable from "../../components/GameUnavailable.astro";
 import PlayToolbar from "../../components/PlayToolbar.astro";
 import SiteHeader from "../../components/SiteHeader.astro";
 import StaticGameFrame from "../../components/StaticGameFrame.astro";
-import { getGame, getStaticWebPlaySource } from "../../data/games";
+import { getGame, getReachablePlaySource } from "../../data/games";
 
 const game = getGame("weather-command");
 if (!game) throw new Error("Weather Command is missing from the catalog");
 
-const playSource = getStaticWebPlaySource(game);
+// This route is preview-gated, not promoted. `getReachablePlaySource` prefers a promoted
+// release, then a configured qualification candidate, then nothing. Production supplies no
+// preview pointer, so `entryUrl` is undefined there and the page renders the shared
+// unavailable panel instead of an iframe pointing at an unapproved artifact.
+const playSource = getReachablePlaySource(game);
 const entryUrl = playSource ? `${playSource.assetBase}/${playSource.release.entryFile}` : undefined;
 ---
 

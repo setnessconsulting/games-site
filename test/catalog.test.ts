@@ -7,7 +7,6 @@ import {
   MATH_DETECTIVE_PRODUCTION_VERSION,
   MOTION_LAB_PRODUCTION_VERSION,
   NUMBER_LINE_JUMPER_PRODUCTION_VERSION,
-  WEATHER_COMMAND_PRODUCTION_VERSION,
   games,
   getGamePlayRoute
 } from "../src/data/games";
@@ -50,12 +49,8 @@ describe("game catalog", () => {
       version: FRACTION_MATCH_PRODUCTION_VERSION,
       entryFile: "index.html"
     });
-    expect(games.find((game) => game.slug === "weather-command")?.status).toBe("playable");
-    expect(games.find((game) => game.slug === "weather-command")?.release).toEqual({
-      kind: "static-web",
-      version: WEATHER_COMMAND_PRODUCTION_VERSION,
-      entryFile: "index.html"
-    });
+    expect(games.find((game) => game.slug === "weather-command")?.status).toBe("coming-soon");
+    expect(games.find((game) => game.slug === "weather-command")?.release).toBeUndefined();
     expect(games.find((game) => game.slug === "motion-lab")?.status).toBe("playable");
     expect(games.find((game) => game.slug === "motion-lab")?.release).toEqual({
       kind: "static-web",
@@ -163,30 +158,27 @@ describe("game catalog", () => {
     });
   });
 
-  it("keeps Weather Command on its promoted production release unless a preview is pinned", async () => {
+  it("keeps Weather Command coming-soon until WC-PROMOTE, hosting only the preview candidate", async () => {
     vi.stubEnv("WEATHER_COMMAND_PREVIEW_VERSION", "");
     vi.resetModules();
     let module = await import("../src/data/games");
     let game = module.games.find((entry) => entry.slug === "weather-command");
 
-    expect(game?.status).toBe("playable");
-    expect(game?.release).toEqual({
-      kind: "static-web",
-      version: WEATHER_COMMAND_PRODUCTION_VERSION,
-      entryFile: "index.html"
-    });
+    expect(game?.status).toBe("coming-soon");
+    expect(game?.release).toBeUndefined();
+    expect(game?.preview).toBeUndefined();
     expect(game?.route).toBe("/weather-command/");
     expect(module.getGamePlayRoute(game!)).toBe("/weather-command/play/");
 
-    vi.stubEnv("WEATHER_COMMAND_PREVIEW_VERSION", "main-foundation-preview");
+    vi.stubEnv("WEATHER_COMMAND_PREVIEW_VERSION", "0.1.0-qualification.3");
     vi.resetModules();
     module = await import("../src/data/games");
     game = module.games.find((entry) => entry.slug === "weather-command");
 
-    expect(game?.status).toBe("playable");
-    expect(game?.release).toEqual({
-      kind: "static-web",
-      version: "main-foundation-preview",
+    expect(game?.status).toBe("coming-soon");
+    expect(game?.release).toBeUndefined();
+    expect(game?.preview).toEqual({
+      version: "0.1.0-qualification.3",
       entryFile: "index.html"
     });
   });

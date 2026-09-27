@@ -58,11 +58,13 @@ describe("game asset contract", () => {
     ).toBe(false);
   });
 
-  it("approves the production Weather Command release and exact preview override", () => {
-    const previewVersion = "main-foundation-preview";
+  it("approves only the exact Weather Command preview override while the game is coming-soon", () => {
+    const previewVersion = "0.1.0-qualification.3";
 
+    // The game is unpromoted until WC-PROMOTE, so even the last published production
+    // version is not an approved release: the catalog fallback requires status playable.
     expect(isApprovedRelease("weather-command", WEATHER_COMMAND_PRODUCTION_VERSION, false)).toBe(
-      true
+      false
     );
     expect(
       isApprovedRelease(

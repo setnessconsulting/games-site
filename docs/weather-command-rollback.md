@@ -1,23 +1,40 @@
 # Weather Command rollback
 
-## Production pointer
+## Production state (updated 2026-09-27)
 
 - Game: `weather-command`
 - Kind: `static-web`
+- **Catalog status: `coming-soon`** — production promotion is owned by WC-PROMOTE and has
+  not occurred. The catalog entry selects no production release; a non-production preview
+  pointer (`WEATHER_COMMAND_PREVIEW_VERSION`) hosts the qualified candidate on preview builds
+  only.
+- Last published immutable version: `0.1.0-qualification.2` (source SHA
+  `0c8563f72ea4490ea419fddbb37a7e2bad74ecfe`) — **superseded**: that candidate predates the
+  F11-F21 science-remediation (WC-04 second review) and must not be promoted.
+- Current qualified preview candidate: `0.1.0-qualification.3` (source SHA
+  `8ac0cbd` + the WC-04 remediation commits, content versions `wc04-*-3`/`wc04-warm-front-4`),
+  published to the immutable R2 prefix `weather-command/0.1.0-qualification.3/` and validated
+  through `WEATHER_COMMAND_PREVIEW_VERSION` (launcher, play route, nested assets, arbitrary
+  version/path-traversal rejection all verified locally).
+- Public routes: `/weather-command/`, `/weather-command/play/`
+- Assets: `/game-assets/weather-command/<version>/...`
+
+## Prior production pointer (historical — do not restore without WC-PROMOTE)
+
 - Production version: `0.1.0-qualification.2`
 - Source SHA: `0c8563f72ea4490ea419fddbb37a7e2bad74ecfe` (`setnessconsulting/game-weather-command`)
 - Immutable R2 prefix: `weather-command/0.1.0-qualification.2/`
 - Entry: `index.html`
-- Public routes: `/weather-command/`, `/weather-command/play/`
-- Assets: `/game-assets/weather-command/0.1.0-qualification.2/...`
 - games-site promotion SHA: `95d6cafaf1cea28ea896233df0246ec375816782`
 - Production Pages deployment: `bbc964d2-b748-4171-a1a7-11ea37c69d97`
   (`https://bbc964d2.games-site-7pn.pages.dev`)
 
 ## Rollback
 
-Rollback restores a previous known-good games-site catalog revision (or removes the Weather
-Command production selection). It never deletes or overwrites the immutable R2 prefix.
+To restore the coming-soon production state after the 2026-09-22 promotion: redeploy the
+catalog revision that carries `status: "coming-soon"` for weather-command (the current `main`
+after the 2026-09-27 correction), or restore Pages deployment `0d7e1c5e-ad97-427c-b9d1-598ff6dede0a`.
+Never delete or overwrite an immutable R2 prefix.
 
 Previous catalog / deployment restore targets (verified still HTTP 200):
 
