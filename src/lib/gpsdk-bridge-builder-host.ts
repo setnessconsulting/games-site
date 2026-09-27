@@ -26,8 +26,35 @@ export type GpsdkSessionIds = {
   sessionId: string;
 };
 
+function createFallbackUuid(): string {
+  const bytes = new Uint8Array(16);
+  const cryptoApi = globalThis.crypto;
+
+  if (typeof cryptoApi?.getRandomValues === "function") {
+    cryptoApi.getRandomValues(bytes);
+  } else {
+    // These ids correlate protocol messages; they are not authorization tokens.
+    for (let index = 0; index < bytes.length; index += 1) {
+      bytes[index] = Math.floor(Math.random() * 256);
+    }
+  }
+
+  bytes[6] = (bytes[6]! & 0x0f) | 0x40;
+  bytes[8] = (bytes[8]! & 0x3f) | 0x80;
+  const hex = Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
+
+function createDefaultUuid(): string {
+  const cryptoApi = globalThis.crypto;
+  return typeof cryptoApi?.randomUUID === "function"
+    ? cryptoApi.randomUUID()
+    : createFallbackUuid();
+}
+
 export function createGpsdkSessionIds(
-  randomUuid: () => string = () => crypto.randomUUID()
+  randomUuid: () => string = createDefaultUuid
 ): GpsdkSessionIds {
   return {
     channelId: randomUuid(),
@@ -66,6 +93,16 @@ export type BridgeBuilderHostWire = {
 export type BridgeBuilderHostOptions = {
   origin?: string;
   onGameReady?: (identity: GameIdentity) => void;
+};
+
+export type BridgeBuilderGpsdkActivationOptions = {
+  randomUuid?: () => string;
+  onGameReady?: (identity: GameIdentity) => void;
+  wireHost?: (
+    stage: Element | null,
+    frame: HTMLIFrameElement | null,
+    options?: Pick<BridgeBuilderHostOptions, "onGameReady">
+  ) => BridgeBuilderHostWire | null;
 };
 
 export type BridgeBuilderGpsdkFrameActivation = {
@@ -123,15 +160,7 @@ export function activateBridgeBuilderGpsdkFrame(
   stage: Element | null,
   frame: HTMLIFrameElement | null,
   entryUrl: string,
-  options: {
-    randomUuid?: () => string;
-    onGameReady?: (identity: GameIdentity) => void;
-    wireHost?: (
-      stage: Element | null,
-      frame: HTMLIFrameElement | null,
-      options?: Pick<BridgeBuilderHostOptions, "onGameReady">
-    ) => BridgeBuilderHostWire | null;
-  } = {}
+  options: BridgeBuilderGpsdkActivationOptions = {}
 ): BridgeBuilderGpsdkFrameActivation | null {
   if (!stage || !frame) return null;
 

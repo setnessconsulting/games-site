@@ -25,6 +25,29 @@ describe("Bridge Builder GPSDK host (SDK-6)", () => {
     expect(ids).toEqual({ channelId: "id-1", sessionId: "id-2" });
   });
 
+  it("creates UUID-shaped ids when crypto.randomUUID is unavailable", () => {
+    let fill = 0;
+    vi.stubGlobal("crypto", {
+      getRandomValues: (bytes: Uint8Array) => {
+        bytes.fill(++fill);
+        return bytes;
+      }
+    });
+
+    try {
+      const ids = createGpsdkSessionIds();
+      expect(ids.channelId).toMatch(
+        /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/
+      );
+      expect(ids.sessionId).toMatch(
+        /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/
+      );
+      expect(ids.channelId).not.toBe(ids.sessionId);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
   it("appends gpsdk query params without disturbing the asset path", () => {
     const ids = { channelId: "ch", sessionId: "se" };
     expect(appendGpsdkQuery("/game-assets/bridge-builder/1.0.0/index.html", ids)).toBe(
@@ -32,6 +55,9 @@ describe("Bridge Builder GPSDK host (SDK-6)", () => {
     );
     expect(appendGpsdkQuery("/game-assets/bridge-builder/1.0.0/index.html?x=1", ids)).toBe(
       "/game-assets/bridge-builder/1.0.0/index.html?x=1&gpsdkChannel=ch&gpsdkSession=se"
+    );
+    expect(appendGpsdkQuery("/game-assets/bridge-builder/1.0.0/index.html#level-2", ids)).toBe(
+      "/game-assets/bridge-builder/1.0.0/index.html?gpsdkChannel=ch&gpsdkSession=se#level-2"
     );
   });
 
