@@ -102,6 +102,14 @@ Promotion is a reviewed catalog change in this repository:
 
 The merge commit/SHA is the games-site production promotion identity.
 
+## Signal Garden
+
+`setnessconsulting/game-signal-garden` produces Signal Garden's Unity WebGL build. The games-site catalog selects the exact immutable release version; published R2 objects are never overwritten.
+
+The 2026-09-26 readability update selects `2026-09-26-da74c6a` from source commit `da74c6a544066a538e7f999f18972d2b6ebe33fb`, under `signal-garden/2026-09-26-da74c6a/Build/`. The update is live for owner testing. The standalone game's SG-12 closeout remains `NOT_READY`; deployment and readback do not satisfy the outstanding owner qualification gates.
+
+The previous known-good version `2026-09-21-58f2c29` remains published for rollback. See [`signal-garden-rollback.md`](signal-garden-rollback.md).
+
 ## Math Detective
 
 Math Detective uses the single-tester release policy defined in

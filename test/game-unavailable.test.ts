@@ -62,10 +62,10 @@ describe("play source resolution", () => {
     const game = getGame("signal-garden")!;
 
     expect(getUnityWebglPlaySource(game)).toEqual({
-      assetBase: "/game-assets/signal-garden/2026-09-21-58f2c29",
+      assetBase: "/game-assets/signal-garden/2026-09-26-da74c6a",
       release: {
         kind: "unity-webgl",
-        version: "2026-09-21-58f2c29",
+        version: "2026-09-26-da74c6a",
         loaderFile: "WebGL.loader.js",
         dataFile: "WebGL.data.br",
         frameworkFile: "WebGL.framework.js.br",

@@ -84,7 +84,7 @@ describe("play routes for promoted games", () => {
     const html = await renderPlayPage(SignalGardenPlay);
 
     expect(html).toContain('data-release-kind="unity-webgl"');
-    expect(html).toContain("/game-assets/signal-garden/2026-09-21-58f2c29");
+    expect(html).toContain("/game-assets/signal-garden/2026-09-26-da74c6a");
     expect(html).not.toContain("not-ready-panel");
     expect(html).not.toContain("Coming soon");
   });
