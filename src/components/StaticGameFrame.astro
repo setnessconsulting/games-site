@@ -18,6 +18,15 @@ const { title, entryUrl, gamePageUrl, gpsdkEnabled = false } = Astro.props;
   data-gpsdk-enabled={gpsdkEnabled ? "true" : undefined}
 >
   <GameFrameOverlays kind="static" title={title} returnHref={gamePageUrl} />
+  {gpsdkEnabled && (
+    <p
+      class="game-sdk-handshake-status"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+      data-gpsdk-handshake-status
+    ></p>
+  )}
   <iframe
     class="static-game-frame"
     data-static-game-frame
@@ -38,9 +47,14 @@ const { title, entryUrl, gamePageUrl, gpsdkEnabled = false } = Astro.props;
   const stage = document.querySelector("[data-static-game-stage]");
   const frame = stage?.querySelector<HTMLIFrameElement>("[data-static-game-frame]");
   const entryUrl = frame?.getAttribute("data-gpsdk-entry-url");
+  const handshakeStatus = stage?.querySelector<HTMLElement>("[data-gpsdk-handshake-status]");
 
   if (stage?.getAttribute("data-gpsdk-enabled") === "true" && frame && entryUrl) {
-    const activation = activateBridgeBuilderGpsdkFrame(stage, frame, entryUrl);
+    const activation = activateBridgeBuilderGpsdkFrame(stage, frame, entryUrl, {
+      onGameReady: () => {
+        if (handshakeStatus) handshakeStatus.textContent = "Game connection ready.";
+      }
+    });
     if (activation) {
       window.addEventListener("pagehide", activation.wire.destroy, { once: true });
     }
@@ -50,3 +64,17 @@ const { title, entryUrl, gamePageUrl, gpsdkEnabled = false } = Astro.props;
   // assigns the iframe URL. Other static games keep their original src path.
   wireStaticGameIframe(stage);
 </script>
+
+<style>
+  .game-sdk-handshake-status {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+</style>

@@ -63,6 +63,11 @@ export type BridgeBuilderHostWire = {
   destroy: () => void;
 };
 
+export type BridgeBuilderHostOptions = {
+  origin?: string;
+  onGameReady?: (identity: GameIdentity) => void;
+};
+
 export type BridgeBuilderGpsdkFrameActivation = {
   ids: GpsdkSessionIds;
   wire: BridgeBuilderHostWire;
@@ -75,10 +80,7 @@ export type BridgeBuilderGpsdkFrameActivation = {
 export function wireBridgeBuilderGpsdkHost(
   stage: Element | null,
   frame: HTMLIFrameElement | null,
-  options?: {
-    origin?: string;
-    onGameReady?: (identity: GameIdentity) => void;
-  }
+  options?: BridgeBuilderHostOptions
 ): BridgeBuilderHostWire | null {
   const ids = readGpsdkIdsFromStage(stage);
   if (!ids || !frame?.contentWindow) return null;
@@ -123,9 +125,11 @@ export function activateBridgeBuilderGpsdkFrame(
   entryUrl: string,
   options: {
     randomUuid?: () => string;
+    onGameReady?: (identity: GameIdentity) => void;
     wireHost?: (
       stage: Element | null,
-      frame: HTMLIFrameElement | null
+      frame: HTMLIFrameElement | null,
+      options?: Pick<BridgeBuilderHostOptions, "onGameReady">
     ) => BridgeBuilderHostWire | null;
   } = {}
 ): BridgeBuilderGpsdkFrameActivation | null {
@@ -135,7 +139,9 @@ export function activateBridgeBuilderGpsdkFrame(
   stage.setAttribute("data-gpsdk-channel", ids.channelId);
   stage.setAttribute("data-gpsdk-session", ids.sessionId);
 
-  const wire = (options.wireHost ?? wireBridgeBuilderGpsdkHost)(stage, frame);
+  const wire = (options.wireHost ?? wireBridgeBuilderGpsdkHost)(stage, frame, {
+    onGameReady: options.onGameReady
+  });
   if (!wire) return null;
 
   frame.setAttribute("src", appendGpsdkQuery(entryUrl, ids));
