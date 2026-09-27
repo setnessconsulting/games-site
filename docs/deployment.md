@@ -8,13 +8,21 @@ repository.
 Configure:
 
 - Production branch: `main`
-- Build command: `npm run build`
+- Build command: `node scripts/build-cloudflare-pages.mjs`
 - Output directory: `dist`
 - Node version: `24` from `.node-version`
 - Custom domain: `games.setnessconsulting.com`
 - Web Analytics: enabled from the Pages project Metrics settings
 
 Cloudflare Git integration creates previews for branches and deploys `main` to production.
+
+`wrangler.jsonc` declares `SKIP_DEPENDENCY_INSTALL=1` for both Production and Preview so the custom
+build command runs before Cloudflare's automatic installer. The Pages project must also have
+`GAME_PLATFORM_SDK_DEPLOY_KEY` as an encrypted build secret in both environments. The build script
+installs from the lockfile using that read-only deploy key and a pinned GitHub host key, removes its
+temporary key files, and runs `npm run build`. The SDK dependency stays pinned by `package-lock.json`
+to `sdk-v0.1.1` at commit `8933746ebefe128a23b08f3fc9fd6796f4d906bd`; keep all credential values out
+of source control.
 
 For Signal Garden, the production catalog selects `2026-09-26-da74c6a` from source commit `da74c6a544066a538e7f999f18972d2b6ebe33fb`. The immutable WebGL objects are under `signal-garden/2026-09-26-da74c6a/Build/`. The prior known-good pointer, `2026-09-21-58f2c29`, remains available for rollback. The current update is deployed for owner testing; formal owner qualification remains open in the game repository.
 

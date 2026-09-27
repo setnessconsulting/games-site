@@ -5,18 +5,34 @@ interface Props {
   title: string;
   entryUrl: string;
   gamePageUrl: string;
+  /** Bridge Builder GPSDK opt-in (SDK-6). Other games omit this. */
+  gpsdkEnabled?: boolean;
 }
 
-const { title, entryUrl, gamePageUrl } = Astro.props;
+const { title, entryUrl, gamePageUrl, gpsdkEnabled = false } = Astro.props;
 ---
 
-<div class="static-game-stage" data-static-game-stage>
+<div
+  class="static-game-stage"
+  data-static-game-stage
+  data-gpsdk-enabled={gpsdkEnabled ? "true" : undefined}
+>
   <GameFrameOverlays kind="static" title={title} returnHref={gamePageUrl} />
+  {gpsdkEnabled && (
+    <p
+      class="game-sdk-handshake-status"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+      data-gpsdk-handshake-status
+    ></p>
+  )}
   <iframe
     class="static-game-frame"
     data-static-game-frame
     title={`${title} game`}
-    src={entryUrl}
+    src={gpsdkEnabled ? undefined : entryUrl}
+    data-gpsdk-entry-url={gpsdkEnabled ? entryUrl : undefined}
     loading="eager"
     allow="fullscreen"
     allowfullscreen
@@ -25,7 +41,30 @@ const { title, entryUrl, gamePageUrl } = Astro.props;
 </div>
 
 <script>
-  import { wireStaticGameIframe } from "../lib/static-game-iframe";
+  import { initializeBridgeBuilderGpsdkFrame } from "../lib/bridge-builder-gpsdk-frame";
 
-  wireStaticGameIframe(document.querySelector("[data-static-game-stage]"));
+  const stage = document.querySelector("[data-static-game-stage]");
+  const frame = stage?.querySelector<HTMLIFrameElement>("[data-static-game-frame]") ?? null;
+  const entryUrl = frame?.getAttribute("data-gpsdk-entry-url") ?? null;
+  const handshakeStatus =
+    stage?.querySelector<HTMLElement>("[data-gpsdk-handshake-status]") ?? null;
+
+  // The initializer wires loading/error overlays before GPSDK activation. If
+  // activation fails, it falls back to the plain game URL; other games retain
+  // their original iframe src and behavior.
+  initializeBridgeBuilderGpsdkFrame(stage, frame, entryUrl, handshakeStatus);
 </script>
+
+<style>
+  .game-sdk-handshake-status {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+</style>

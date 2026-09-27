@@ -3,6 +3,9 @@
   "name": "games-site",
   "compatibility_date": "2026-09-15",
   "pages_build_output_dir": "./dist",
+  "vars": {
+    "SKIP_DEPENDENCY_INSTALL": "1"
+  },
   "r2_buckets": [
     {
       "binding": "GAME_ASSETS",
@@ -18,11 +21,12 @@
         }
       ],
       "vars": {
-        "BRIDGE_BUILDER_PREVIEW_VERSION": "0.1.0-qualification.10",
+        "SKIP_DEPENDENCY_INSTALL": "1",
+        "BRIDGE_BUILDER_PREVIEW_VERSION": "0.1.0-qualification.13",
         "NUMBER_LINE_JUMPER_PREVIEW_VERSION": "main-12641c0",
         "MATH_DETECTIVE_PREVIEW_VERSION": "2026.09.21-playtest-enhancements.1",
         "ECOSYSTEM_RESCUE_PREVIEW_VERSION": "0.1.0-qualification.5",
-        "WEATHER_COMMAND_PREVIEW_VERSION": "0.1.0-qualification.2",
+        "WEATHER_COMMAND_PREVIEW_VERSION": "0.1.0-qualification.3",
         "FRACTION_MATCH_PREVIEW_VERSION": "0.1.0-qualification.1",
         // Deliberately empty, and declared rather than omitted. Planetary Survey has no
         // published candidate yet, so naming a version here would point the preview

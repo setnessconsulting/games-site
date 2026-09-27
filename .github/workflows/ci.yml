@@ -25,8 +25,31 @@ jobs:
           node-version-file: .node-version
           cache: npm
 
+      - name: Configure read-only Game Platform SDK access
+        shell: bash
+        env:
+          GAME_PLATFORM_SDK_DEPLOY_KEY: ${{ secrets.GAME_PLATFORM_SDK_DEPLOY_KEY }}
+        run: |
+          install -m 700 -d "$HOME/.ssh"
+          printf '%s\n' "$GAME_PLATFORM_SDK_DEPLOY_KEY" > "$HOME/.ssh/game-platform-sdk"
+          chmod 600 "$HOME/.ssh/game-platform-sdk"
+          printf '%s\n' 'github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl' > "$HOME/.ssh/known_hosts"
+          printf '%s\n' \
+            'Host github.com' \
+            '  HostName github.com' \
+            '  User git' \
+            '  IdentityFile ~/.ssh/game-platform-sdk' \
+            '  IdentitiesOnly yes' \
+            '  StrictHostKeyChecking yes' \
+            '  UserKnownHostsFile ~/.ssh/known_hosts' > "$HOME/.ssh/config"
+          chmod 600 "$HOME/.ssh/known_hosts" "$HOME/.ssh/config"
+
       - name: Install dependencies
         run: npm ci
+
+      - name: Remove SDK deploy key after dependency installation
+        if: always()
+        run: rm -f "$HOME/.ssh/game-platform-sdk" "$HOME/.ssh/config" "$HOME/.ssh/known_hosts"
 
       - name: Generate Cloudflare types
         run: npm run types:wrangler

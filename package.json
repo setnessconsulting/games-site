@@ -22,6 +22,7 @@
     "verify": "npm run types:wrangler && npm run validate:catalog && npm run validate:routes && npm run lint && npm run format:check && npm run check && npm run check:functions && npm run test && npm run build"
   },
   "dependencies": {
+    "@setnessconsulting/game-platform-sdk": "https://github.com/setnessconsulting/project-game-platform-sdk.git#sdk-v0.1.1",
     "astro": "^7.3.2"
   },
   "devDependencies": {

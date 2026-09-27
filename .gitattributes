@@ -1,0 +1,6 @@
+# Normalize line endings in the working tree.
+#
+# The repo gates formatting with `prettier --check .` on Linux CI, but files
+# authored on Windows were landing as CRLF, which prettier rejects. Normalizing
+# at checkout keeps that failure mode from recurring.
+* text=auto eol=lf

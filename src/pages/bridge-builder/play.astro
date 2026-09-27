@@ -22,7 +22,12 @@ const entryUrl = playSource ? `${playSource.assetBase}/${playSource.release.entr
       fullscreenStage="[data-static-game-stage]"
     />
     {entryUrl ? (
-      <StaticGameFrame title={game.title} entryUrl={entryUrl} gamePageUrl={game.route} />
+      <StaticGameFrame
+        title={game.title}
+        entryUrl={entryUrl}
+        gamePageUrl={game.route}
+        gpsdkEnabled
+      />
     ) : (
       <GameUnavailable
         game={game}

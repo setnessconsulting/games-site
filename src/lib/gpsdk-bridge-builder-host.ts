@@ -1,0 +1,178 @@
+/**
+ * Bridge Builder–only Game Platform SDK host wire (SDK-6).
+ *
+ * Other static-web games keep the shared StaticGameFrame without this module.
+ * Activation requires data-gpsdk-channel and data-gpsdk-session on the stage.
+ */
+
+import type { GameIdentity, HostLaunchConfig } from "@setnessconsulting/game-platform-sdk/core";
+import {
+  IframeTransport,
+  performHostHandshake,
+  type HostTransport
+} from "@setnessconsulting/game-platform-sdk/host";
+
+export const BRIDGE_BUILDER_HOST_CONFIG: HostLaunchConfig = {
+  protocolVersion: "1.0",
+  sessionMode: "embedded",
+  surfaceContext: {
+    surface: "arcade",
+    launchReason: "direct"
+  }
+};
+
+export type GpsdkSessionIds = {
+  channelId: string;
+  sessionId: string;
+};
+
+function createFallbackUuid(): string {
+  const bytes = new Uint8Array(16);
+  const cryptoApi = globalThis.crypto;
+
+  if (typeof cryptoApi?.getRandomValues === "function") {
+    cryptoApi.getRandomValues(bytes);
+  } else {
+    // These ids correlate protocol messages; they are not authorization tokens.
+    for (let index = 0; index < bytes.length; index += 1) {
+      bytes[index] = Math.floor(Math.random() * 256);
+    }
+  }
+
+  bytes[6] = (bytes[6]! & 0x0f) | 0x40;
+  bytes[8] = (bytes[8]! & 0x3f) | 0x80;
+  const hex = Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
+
+function createDefaultUuid(): string {
+  const cryptoApi = globalThis.crypto;
+  return typeof cryptoApi?.randomUUID === "function"
+    ? cryptoApi.randomUUID()
+    : createFallbackUuid();
+}
+
+export function createGpsdkSessionIds(
+  randomUuid: () => string = createDefaultUuid
+): GpsdkSessionIds {
+  return {
+    channelId: randomUuid(),
+    sessionId: randomUuid()
+  };
+}
+
+/** Append gpsdkChannel / gpsdkSession to a relative or absolute entry URL. */
+export function appendGpsdkQuery(entryUrl: string, ids: GpsdkSessionIds): string {
+  const hashIndex = entryUrl.indexOf("#");
+  const withoutHash = hashIndex === -1 ? entryUrl : entryUrl.slice(0, hashIndex);
+  const hash = hashIndex === -1 ? "" : entryUrl.slice(hashIndex);
+  const joiner = withoutHash.includes("?") ? "&" : "?";
+  return (
+    `${withoutHash}${joiner}` +
+    `gpsdkChannel=${encodeURIComponent(ids.channelId)}` +
+    `&gpsdkSession=${encodeURIComponent(ids.sessionId)}` +
+    hash
+  );
+}
+
+export function readGpsdkIdsFromStage(stage: Element | null): GpsdkSessionIds | null {
+  if (!stage) return null;
+  const channelId = stage.getAttribute("data-gpsdk-channel");
+  const sessionId = stage.getAttribute("data-gpsdk-session");
+  if (!channelId || !sessionId) return null;
+  return { channelId, sessionId };
+}
+
+export type BridgeBuilderHostWire = {
+  transport: HostTransport;
+  teardownHandshake: () => void;
+  destroy: () => void;
+};
+
+export type BridgeBuilderHostOptions = {
+  origin?: string;
+  onGameReady?: (identity: GameIdentity) => void;
+};
+
+export type BridgeBuilderGpsdkActivationOptions = {
+  randomUuid?: () => string;
+  onGameReady?: (identity: GameIdentity) => void;
+  wireHost?: (
+    stage: Element | null,
+    frame: HTMLIFrameElement | null,
+    options?: Pick<BridgeBuilderHostOptions, "onGameReady">
+  ) => BridgeBuilderHostWire | null;
+};
+
+export type BridgeBuilderGpsdkFrameActivation = {
+  ids: GpsdkSessionIds;
+  wire: BridgeBuilderHostWire;
+};
+
+/**
+ * Open IframeTransport + performHostHandshake against the play iframe.
+ * Returns null when the stage is not Bridge Builder GPSDK-opted-in.
+ */
+export function wireBridgeBuilderGpsdkHost(
+  stage: Element | null,
+  frame: HTMLIFrameElement | null,
+  options?: BridgeBuilderHostOptions
+): BridgeBuilderHostWire | null {
+  const ids = readGpsdkIdsFromStage(stage);
+  if (!ids || !frame?.contentWindow) return null;
+
+  const origin = options?.origin ?? (typeof window !== "undefined" ? window.location.origin : "");
+  if (!origin) return null;
+
+  const transport = new IframeTransport({
+    channelId: ids.channelId,
+    sessionId: ids.sessionId,
+    targetWindow: frame.contentWindow,
+    targetOrigin: origin,
+    allowedOrigins: [origin]
+  });
+
+  const teardownHandshake = performHostHandshake(
+    transport,
+    BRIDGE_BUILDER_HOST_CONFIG,
+    (identity) => {
+      options?.onGameReady?.(identity);
+    }
+  );
+
+  return {
+    transport,
+    teardownHandshake,
+    destroy: () => {
+      teardownHandshake();
+      transport.destroy();
+    }
+  };
+}
+
+/**
+ * Create per-page session ids, install the host listener, then navigate the
+ * iframe. This prevents a one-shot HANDSHAKE_INIT from arriving before the
+ * parent is listening.
+ */
+export function activateBridgeBuilderGpsdkFrame(
+  stage: Element | null,
+  frame: HTMLIFrameElement | null,
+  entryUrl: string,
+  options: BridgeBuilderGpsdkActivationOptions = {}
+): BridgeBuilderGpsdkFrameActivation | null {
+  if (!stage || !frame) return null;
+
+  const ids = createGpsdkSessionIds(options.randomUuid);
+  stage.setAttribute("data-gpsdk-channel", ids.channelId);
+  stage.setAttribute("data-gpsdk-session", ids.sessionId);
+
+  const wire = (options.wireHost ?? wireBridgeBuilderGpsdkHost)(stage, frame, {
+    onGameReady: options.onGameReady
+  });
+  if (!wire) return null;
+
+  frame.setAttribute("src", appendGpsdkQuery(entryUrl, ids));
+  return { ids, wire };
+}
