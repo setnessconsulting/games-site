@@ -46,13 +46,20 @@ Plain `astro preview` does not execute Pages Functions, so `/game-assets/...` wi
 (including Signal Garden’s Unity loader). After `npm run build`, use `npm run preview:pages` to
 run `wrangler pages dev dist` with the `GAME_ASSETS` binding from this file’s `wrangler.jsonc`.
 
-For a Bridge Builder hosted qualification preview, publish the immutable static release from the
+Bridge Builder is promoted. The production catalog selects `0.1.0-qualification.13` (source commit
+`3f33896399e7c555bb80b71cde454cf8bb51b612`, SDK pin `sdk-v0.1.1` at
+`8933746ebefe128a23b08f3fc9fd6796f4d906bd`) through `BRIDGE_BUILDER_PRODUCTION_VERSION` in
+`src/data/games.ts`. That bundle carries the guest Game Platform SDK transport, so
+`/bridge-builder/play/` completes the host handshake in production. The previous known-good
+pointer, `0.1.0-qualification.12`, remains published for rollback.
+
+For a further Bridge Builder qualification candidate, publish the immutable static release from the
 standalone game repository under `bridge-builder/<version>/`, then build a non-production Pages
 preview with `BRIDGE_BUILDER_PREVIEW_VERSION=<version>`. This opt-in pointer makes
 `/bridge-builder/play/` load the exact versioned `index.html` through the same-origin R2 function;
-the same variable is supplied to the preview Function so the version is approved for reads. The
-approved production version is pinned directly in `src/data/games.ts`; do not use the preview
-variable as the production release pointer.
+the same variable is supplied to the preview Function so the version is approved for reads. Never
+use the preview variable as the production release pointer; promotion edits the committed constant
+instead.
 
 For a Math Detective hosted qualification preview, publish the immutable static release from the
 standalone game repository under `math-detective/<version>/`, then build a non-production Pages
