@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { chmod, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { chmod, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import process from "node:process";
@@ -31,6 +31,24 @@ function runNpm(args, description, environment) {
   return result.status ?? 1;
 }
 
+async function verifySdkLockResolution() {
+  const packagePath = "node_modules/@setnessconsulting/game-platform-sdk";
+  const packageLock = JSON.parse(await readFile(join(process.cwd(), "package-lock.json"), "utf8"));
+  const installedLock = JSON.parse(
+    await readFile(join(process.cwd(), "node_modules/.package-lock.json"), "utf8")
+  );
+  const expected = packageLock.packages?.[packagePath]?.resolved;
+  const installed = installedLock.packages?.[packagePath]?.resolved;
+
+  if (!expected || installed !== expected) {
+    throw new Error(
+      `Installed SDK resolution does not match package-lock.json (expected ${expected ?? "missing"}, received ${installed ?? "missing"}).`
+    );
+  }
+
+  process.stdout.write(`Verified SDK package-lock resolution: ${installed}\n`);
+}
+
 let installStatus;
 
 try {
@@ -53,6 +71,7 @@ try {
 if (installStatus !== 0) {
   process.exitCode = installStatus;
 } else {
+  await verifySdkLockResolution();
   const buildEnvironment = { ...process.env };
   delete buildEnvironment.GAME_PLATFORM_SDK_DEPLOY_KEY;
   delete buildEnvironment.GIT_SSH_COMMAND;
