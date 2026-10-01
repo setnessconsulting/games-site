@@ -22,7 +22,7 @@
       ],
       "vars": {
         "SKIP_DEPENDENCY_INSTALL": "1",
-        "BRIDGE_BUILDER_PREVIEW_VERSION": "0.1.0-qualification.13",
+        "BRIDGE_BUILDER_PREVIEW_VERSION": "0.1.0-qualification.14",
         "NUMBER_LINE_JUMPER_PREVIEW_VERSION": "main-12641c0",
         "MATH_DETECTIVE_PREVIEW_VERSION": "2026.09.21-playtest-enhancements.1",
         "ECOSYSTEM_RESCUE_PREVIEW_VERSION": "0.1.0-qualification.5",
