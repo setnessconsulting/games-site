@@ -2,7 +2,17 @@
 
 Recorded 2026-09-27 (owner-approved) for the Bridge Builder production release.
 
-## Release and targets
+## Current pointer
+
+Production now selects immutable R2 `bridge-builder/0.1.0-qualification.14/`
+(manifest commit `9b4fdb0f0826ab893c9b70b0a50ce1b9521cdb89`), promoted
+2026-10-01 for the GAME-297 reduced-motion success-payoff fix. The verified
+rollback target is `bridge-builder/0.1.0-qualification.13/` — the pointer that
+was live before this promotion and the last candidate to pass a full hosted
+GAME-297 state sweep. `0.1.0-qualification.12/` remains published as the older
+rehearsal rollback target.
+
+## Rehearsed release and targets
 
 - Promoted candidate: immutable R2 `bridge-builder/0.1.0-qualification.13/`
   (manifest commit `3f33896399e7c555bb80b71cde454cf8bb51b612`, production Pages

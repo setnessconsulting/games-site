@@ -46,12 +46,14 @@ Plain `astro preview` does not execute Pages Functions, so `/game-assets/...` wi
 (including Signal Garden’s Unity loader). After `npm run build`, use `npm run preview:pages` to
 run `wrangler pages dev dist` with the `GAME_ASSETS` binding from this file’s `wrangler.jsonc`.
 
-Bridge Builder is promoted. The production catalog selects `0.1.0-qualification.13` (source commit
-`3f33896399e7c555bb80b71cde454cf8bb51b612`, SDK pin `sdk-v0.1.1` at
+Bridge Builder is promoted. The production catalog selects `0.1.0-qualification.14` (source commit
+`9b4fdb0f0826ab893c9b70b0a50ce1b9521cdb89`, SDK pin `sdk-v0.1.1` at
 `8933746ebefe128a23b08f3fc9fd6796f4d906bd`) through `BRIDGE_BUILDER_PRODUCTION_VERSION` in
 `src/data/games.ts`. That bundle carries the guest Game Platform SDK transport, so
-`/bridge-builder/play/` completes the host handshake in production. The previous known-good
-pointer, `0.1.0-qualification.12`, remains published for rollback.
+`/bridge-builder/play/` completes the host handshake in production, and it holds the
+GAME-297 reduced-motion success payoff fix: with reduce-motion enabled the exact-fit
+celebration is now held for a readable interval instead of painting for a single frame.
+The previous known-good pointer, `0.1.0-qualification.13`, remains published for rollback.
 
 For a further Bridge Builder qualification candidate, publish the immutable static release from the
 standalone game repository under `bridge-builder/<version>/`, then build a non-production Pages
