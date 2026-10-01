@@ -6,11 +6,26 @@ Recorded 2026-09-27 (owner-approved) for the Bridge Builder production release.
 
 Production now selects immutable R2 `bridge-builder/0.1.0-qualification.14/`
 (manifest commit `9b4fdb0f0826ab893c9b70b0a50ce1b9521cdb89`), promoted
-2026-10-01 for the GAME-297 reduced-motion success-payoff fix. The verified
-rollback target is `bridge-builder/0.1.0-qualification.13/` — the pointer that
-was live before this promotion and the last candidate to pass a full hosted
-GAME-297 state sweep. `0.1.0-qualification.12/` remains published as the older
-rehearsal rollback target.
+2026-10-01 for the GAME-297 reduced-motion success-payoff fix.
+
+### How a rollback actually works
+
+`/game-assets/...` does **not** serve every published object. `isApprovedRelease`
+in `src/lib/game-assets.ts` approves only the exact versions the catalog and the
+deployment pointers name, so while the pointer reads `.14`, requests for
+`.13/index.html` and `.13/release-manifest.json` return **404** — verified live
+after this promotion.
+
+The rollback target is therefore two things together:
+
+1. the immutable `.13` artifact, still present and untouched in private R2
+   (re-read successfully on 2026-10-01), and
+2. a revert of the games-site pointer commit, which re-approves `.13` and makes
+   it reachable again.
+
+That is exactly the mechanism the `.13 → .12 → .13` rehearsal below exercised: a
+pointer move, never a re-publish or an overwrite. `0.1.0-qualification.12/` is
+retained the same way as the older rehearsal target.
 
 ## Rehearsed release and targets
 

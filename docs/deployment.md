@@ -53,7 +53,10 @@ Bridge Builder is promoted. The production catalog selects `0.1.0-qualification.
 `/bridge-builder/play/` completes the host handshake in production, and it holds the
 GAME-297 reduced-motion success payoff fix: with reduce-motion enabled the exact-fit
 celebration is now held for a readable interval instead of painting for a single frame.
-The previous known-good pointer, `0.1.0-qualification.13`, remains published for rollback.
+The previous known-good pointer, `0.1.0-qualification.13`, remains published in R2 as the
+rollback target. Note that `/game-assets/...` only serves the version the catalog approves,
+so that target returns 404 until the committed pointer is reverted — see
+`docs/bridge-builder-rollback.md`.
 
 For a further Bridge Builder qualification candidate, publish the immutable static release from the
 standalone game repository under `bridge-builder/<version>/`, then build a non-production Pages
