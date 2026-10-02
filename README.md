@@ -74,6 +74,21 @@ weather-comand: configured route "/weather-comand/" has no matching site route
 `url(...)` references in source stylesheets against `public/`. Catalog card images remain covered
 by `validate:catalog`; release files served from R2 are intentionally outside this repository check.
 
+The division of responsibility is deliberate:
+
+- **Repo-resident assets are checked.** Every static reference under `public/` must exist, whether it
+  comes from a template attribute (`favicon.svg` in `BaseLayout`, card art, scripts, stylesheets) or a
+  stylesheet `url(...)`. Removing a referenced file fails `validate:assets` with the referencing source
+  and line, for example `src/layouts/BaseLayout.astro:20: href asset "/favicon.svg" does not exist
+under public/`.
+- **R2-resident game builds are excluded by design.** `/game-assets/...` is served by the Pages
+  Function in `functions/game-assets/`, backed by the private R2 bucket. Those objects are runtime
+  data rather than repository content, so there is no in-repo file to check and the reference is
+  skipped instead of reported as a false positive. Their availability is proven at runtime by the
+  game-asset tests, not by this static check.
+- References that resolve outside `public/` (a `src/`-local import), plus fragment-only anchors,
+  external URLs, `mailto:`, and `tel:`, are skipped by the same rule.
+
 `npm run validate:built-links` scans generated HTML after the Astro build. It checks internal
 `href` and `src` references against the same route model and files in `dist/`; Pages Function paths
 from `public/_routes.json` are accepted without requiring a local file. The command fails when

@@ -73,4 +73,69 @@ describe("static public asset validation", () => {
     expect(result.violations).toEqual([]);
     expect(result.checkedReferences).toBe(1);
   });
+
+  it("reports a referenced favicon-style layout asset with its source and line", () => {
+    const projectRoot = createProject({
+      "src/layouts/BaseLayout.astro":
+        "<html>\n" +
+        '  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />\n' +
+        "</html>\n"
+    });
+
+    const result = validateStaticAssets({ projectRoot });
+
+    expect(result.violations).toEqual([
+      {
+        source: "src/layouts/BaseLayout.astro",
+        line: 2,
+        reference: "/favicon.svg",
+        message:
+          'src/layouts/BaseLayout.astro:2: href asset "/favicon.svg" does not exist under public/'
+      }
+    ]);
+  });
+
+  it("reports a root-relative CSS url() that has no public/ counterpart", () => {
+    const projectRoot = createProject({
+      "public/art/present.svg": "<svg />",
+      "src/styles/global.css":
+        ".present { background: url('/art/present.svg'); }\n" +
+        ".absent { background: url('/art/absent.svg'); }\n"
+    });
+
+    const result = validateStaticAssets({ projectRoot });
+
+    expect(result.violations).toEqual([
+      {
+        source: "src/styles/global.css",
+        line: 2,
+        reference: "/art/absent.svg",
+        message:
+          'src/styles/global.css:2: css url asset "/art/absent.svg" does not exist under public/'
+      }
+    ]);
+    expect(result.checkedReferences).toBe(2);
+  });
+
+  it("ignores references that resolve outside public/ rather than reporting false positives", () => {
+    const projectRoot = createProject({
+      "public/_routes.json": JSON.stringify({
+        version: 1,
+        include: ["/game-assets/*"],
+        exclude: []
+      }),
+      "src/pages/index.astro":
+        "<style>.local { background: url('../local/only-in-src.svg'); }</style>\n" +
+        '<a href="https://example.com/remote.png">remote</a>\n' +
+        '<a href="mailto:hello@example.test">mail</a>\n' +
+        '<a href="tel:+15550100">tel</a>\n' +
+        '<a href="#section">fragment</a>\n' +
+        '<iframe src="/game-assets/fraction-match/1.0.0/index.html"></iframe>\n'
+    });
+
+    const result = validateStaticAssets({ projectRoot });
+
+    expect(result.violations).toEqual([]);
+    expect(result.checkedReferences).toBe(0);
+  });
 });
