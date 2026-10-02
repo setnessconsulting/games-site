@@ -15,11 +15,13 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "validate:catalog": "tsx scripts/validate-catalog.ts",
+    "validate:assets": "tsx scripts/validate-static-assets.ts",
     "validate:routes": "tsx scripts/validate-routes.ts",
+    "validate:built-links": "tsx scripts/validate-built-links.ts",
     "check:functions": "tsc -p functions/tsconfig.json --noEmit",
     "check:wrangler": "wrangler types --check --path=functions/types.d.ts",
     "types:wrangler": "wrangler types --path=functions/types.d.ts",
-    "verify": "npm run types:wrangler && npm run validate:catalog && npm run validate:routes && npm run lint && npm run format:check && npm run check && npm run check:functions && npm run test && npm run build"
+    "verify": "npm run types:wrangler && npm run validate:catalog && npm run validate:assets && npm run validate:routes && npm run lint && npm run format:check && npm run check && npm run check:functions && npm run test && npm run build && npm run validate:built-links"
   },
   "dependencies": {
     "@setnessconsulting/game-platform-sdk": "https://github.com/setnessconsulting/project-game-platform-sdk.git#sdk-v0.1.1",

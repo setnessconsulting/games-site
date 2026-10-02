@@ -98,6 +98,16 @@ export interface RoutesOptions {
   readonly extraStaticLinks?: readonly { source: string; href: string }[];
 }
 
+export interface RouteResolver {
+  /** Whether a URL path is a known page, intentional target, or function route. */
+  readonly routeExists: (href: string) => boolean;
+  /** Whether a URL path is a page generated from src/pages. */
+  readonly siteRouteExists: (href: string) => boolean;
+  readonly routeCount: number;
+  readonly functionRoutes: readonly string[];
+  readonly notes: readonly string[];
+}
+
 function toPosix(value: string): string {
   return value.split("\\").join("/");
 }
@@ -177,15 +187,12 @@ function isServedByFunction(href: string, functionPrefixes: FunctionRoutePrefixe
   return included && !excluded;
 }
 
-/**
- * Validate registry routes, play routes, unavailable-game targets, static
- * navigation links, and duplicate/conflicting routes against the discovered
- * static route model.
- */
-export function validateRoutes(options: RoutesOptions = {}): RouteValidationResult {
+/** Build the shared route model used by source and built-output validation. */
+export function createRouteResolver(
+  options: Pick<RoutesOptions, "projectRoot" | "pageFiles"> = {}
+): RouteResolver {
   const projectRoot = toPosix(options.projectRoot ?? process.cwd());
   const pageRootPosix = toPosix(join(projectRoot, "src", "pages"));
-
   const pageFiles = options.pageFiles
     ? options.pageFiles.map(toPosix)
     : (() => {
@@ -202,13 +209,30 @@ export function validateRoutes(options: RoutesOptions = {}): RouteValidationResu
 
   const notes: string[] = [];
   const functionPrefixes = readFunctionRoutePrefixes(projectRoot, notes);
-  const functionRoutes = functionPrefixes.include;
-  const intentional = new Map(INTENTIONAL_ROUTES.map((entry) => [entry.route, entry.reason]));
+  const intentional = new Set(INTENTIONAL_ROUTES.map((entry) => entry.route));
+
+  return {
+    routeExists: (href) =>
+      routes.has(href) || intentional.has(href) || isServedByFunction(href, functionPrefixes),
+    siteRouteExists: (href) => routes.has(href),
+    routeCount: routes.size,
+    functionRoutes: functionPrefixes.include,
+    notes
+  };
+}
+
+/**
+ * Validate registry routes, play routes, unavailable-game targets, static
+ * navigation links, and duplicate/conflicting routes against the discovered
+ * static route model.
+ */
+export function validateRoutes(options: RoutesOptions = {}): RouteValidationResult {
+  const projectRoot = toPosix(options.projectRoot ?? process.cwd());
+  const routeModel = createRouteResolver({ projectRoot, pageFiles: options.pageFiles });
+  const { functionRoutes, notes, routeCount } = routeModel;
+  const routeExists = routeModel.routeExists;
   const catalog = options.catalog ?? games;
   const violations: Violation[] = [];
-
-  const routeExists = (href: string): boolean =>
-    routes.has(href) || intentional.has(href) || isServedByFunction(href, functionPrefixes);
 
   // --- Registry routes: format, uniqueness, existence -------------------------
   const routeOwner = new Map<string, string>();
@@ -383,12 +407,12 @@ export function validateRoutes(options: RoutesOptions = {}): RouteValidationResu
     if (game.status === "playable") {
       staticLinks.push({ source: `GameCard:${game.slug}`, href: game.route });
     }
-    if (routes.has(game.route)) {
+    if (routeModel.siteRouteExists(game.route)) {
       staticLinks.push({ source: `game-page:${game.slug}`, href: "/" });
     }
     // Toolbar back links and the shared unavailable panel only render on play
     // pages, so only attribute those links when the play page actually exists.
-    if (routes.has(playRoute)) {
+    if (routeModel.siteRouteExists(playRoute)) {
       staticLinks.push({ source: `play-toolbar:${game.slug}`, href: game.route });
       staticLinks.push({ source: `play-page:${game.slug}`, href: game.route });
       staticLinks.push({ source: `GameUnavailable:${game.slug}`, href: game.route });
@@ -403,7 +427,7 @@ export function validateRoutes(options: RoutesOptions = {}): RouteValidationResu
 
   return {
     violations,
-    routeCount: routes.size,
+    routeCount,
     functionRoutes,
     notes
   };
