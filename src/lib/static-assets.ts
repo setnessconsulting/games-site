@@ -86,6 +86,10 @@ function collectReferences(source: string): AssetReference[] {
   return references;
 }
 
+function toPosix(value: string): string {
+  return value.split(sep).join("/");
+}
+
 function decodeReference(value: string): string {
   return value
     .trim()
@@ -109,6 +113,8 @@ function publicFileForReference(
   value: string
 ): { file: string } | undefined {
   const pathname = value.split(/[?#]/, 1)[0] ?? "";
+  // `/game-assets/...` is served by the Pages Function from R2, not from this
+  // repository, so there is no in-repo file to check.
   if (!pathname || pathname.includes("\\") || pathname.startsWith("/game-assets/"))
     return undefined;
 
@@ -122,18 +128,29 @@ function publicFileForReference(
   const file = decodedPath.startsWith("/")
     ? resolve(publicRoot, `.${decodedPath}`)
     : resolve(dirname(sourceFile), decodedPath);
-  const publicRelative = relative(publicRoot, file);
+
+  // A relative reference resolves against its own source directory, which is
+  // normally `src/` rather than `public/`. Those assets ship only if a copy also
+  // exists under public/, so the reference is checked against public/ as a whole:
+  // an absolute-looking `/x` maps to `public/x`, and a relative one is verified by
+  // its path relative to `public/` once the `src/` prefix is dropped.
+  const publicRelative = decodedPath.startsWith("/")
+    ? decodedPath.slice(1)
+    : toPosix(relative(publicRoot, file));
   if (
     publicRelative === "" ||
     publicRelative === ".." ||
-    publicRelative.startsWith(`..${sep}`) ||
+    publicRelative.startsWith("../") ||
     isAbsolute(publicRelative)
   ) {
+    // The reference points outside public/, so it is not a repo-resident asset
+    // this check owns (for example a `src/`-local import). Skip it rather than
+    // report a false positive.
     return undefined;
   }
 
   return {
-    file
+    file: resolve(publicRoot, publicRelative)
   };
 }
 
@@ -151,6 +168,9 @@ export function validateStaticAssets(
 ): StaticAssetValidationResult {
   const projectRoot = resolve(options.projectRoot ?? process.cwd());
   const sourceRoot = join(projectRoot, "src");
+  // Always resolve public/ from the caller's projectRoot: fixture projects pass
+  // their own synthetic root, and falling back to this module's public/ would
+  // silently validate fixtures against the real repository's assets.
   const publicRoot = join(projectRoot, "public");
   const routeResolver = createRouteResolver({ projectRoot });
   const files: string[] = [];
