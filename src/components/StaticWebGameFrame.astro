@@ -6,9 +6,11 @@ interface Props {
   assetBase: string;
   entryFile: string;
   gamePageUrl: string;
+  /** Opt-in GPSDK activation for a versioned candidate artifact. */
+  gpsdkEnabled?: boolean;
 }
 
-const { title, assetBase, entryFile, gamePageUrl } = Astro.props;
+const { title, assetBase, entryFile, gamePageUrl, gpsdkEnabled = false } = Astro.props;
 const entryUrl = `${assetBase}/${entryFile}`;
 ---
 
@@ -17,12 +19,23 @@ const entryUrl = `${assetBase}/${entryFile}`;
   data-game-stage
   data-release-kind="static-web"
   data-asset-base={assetBase}
+  data-gpsdk-enabled={gpsdkEnabled ? "true" : undefined}
 >
   <GameFrameOverlays kind="static" title={title} returnHref={gamePageUrl} />
+  {gpsdkEnabled && (
+    <p
+      class="game-sdk-handshake-status"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+      data-gpsdk-handshake-status
+    ></p>
+  )}
   <iframe
     class="static-game-frame"
     data-static-game-frame
-    src={entryUrl}
+    src={gpsdkEnabled ? undefined : entryUrl}
+    data-gpsdk-entry-url={gpsdkEnabled ? entryUrl : undefined}
     title={`${title} game`}
     loading="eager"
     referrerpolicy="strict-origin-when-cross-origin"
@@ -32,7 +45,32 @@ const entryUrl = `${assetBase}/${entryFile}`;
 </div>
 
 <script>
+  import { initializeNumberLineJumperGpsdkFrame } from "../lib/number-line-jumper-gpsdk-frame";
   import { wireStaticGameIframe } from "../lib/static-game-iframe";
 
-  wireStaticGameIframe(document.querySelector('[data-game-stage][data-release-kind="static-web"]'));
+  const stage = document.querySelector('[data-game-stage][data-release-kind="static-web"]');
+  const frame = stage?.querySelector<HTMLIFrameElement>("[data-static-game-frame]") ?? null;
+  const entryUrl = frame?.getAttribute("data-gpsdk-entry-url") ?? null;
+  const handshakeStatus =
+    stage?.querySelector<HTMLElement>("[data-gpsdk-handshake-status]") ?? null;
+
+  if (stage?.getAttribute("data-gpsdk-enabled") === "true") {
+    initializeNumberLineJumperGpsdkFrame(stage, frame, entryUrl, handshakeStatus);
+  } else {
+    wireStaticGameIframe(stage);
+  }
 </script>
+
+<style is:global>
+  .game-sdk-handshake-status {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+</style>
