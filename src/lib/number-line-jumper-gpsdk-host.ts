@@ -8,6 +8,7 @@
 import type {
   GameIdentity,
   HostLaunchConfig,
+  ProtocolErrorPayload,
   SessionCompletionPayload
 } from "@setnessconsulting/game-platform-sdk/core";
 import {
@@ -15,6 +16,7 @@ import {
   performHostHandshake,
   type HostTransport
 } from "@setnessconsulting/game-platform-sdk/host";
+import adoption from "./number-line-jumper-gpsdk-adoption.json";
 
 export const NUMBER_LINE_JUMPER_HOST_CONFIG: HostLaunchConfig = {
   protocolVersion: "1.0",
@@ -25,13 +27,7 @@ export const NUMBER_LINE_JUMPER_HOST_CONFIG: HostLaunchConfig = {
   }
 };
 
-const EXPECTED_GAME_IDENTITY = {
-  gameId: "number-line-jumper",
-  gameVersion: "0.1.0",
-  sdkVersion: "0.1.1",
-  protocolVersion: "1.0",
-  runtimeKind: "web-dom"
-} as const;
+export const NUMBER_LINE_JUMPER_SDK_VERSION = adoption.sdkVersion;
 
 export type GpsdkSessionIds = {
   channelId: string;
@@ -93,24 +89,29 @@ function isExpectedGame(value: unknown): value is GameIdentity {
   if (typeof value !== "object" || value === null || Array.isArray(value)) return false;
   const identity = value as Record<string, unknown>;
   return (
-    identity.gameId === EXPECTED_GAME_IDENTITY.gameId &&
-    identity.gameVersion === EXPECTED_GAME_IDENTITY.gameVersion &&
-    identity.sdkVersion === EXPECTED_GAME_IDENTITY.sdkVersion &&
-    identity.protocolVersion === EXPECTED_GAME_IDENTITY.protocolVersion &&
-    identity.runtimeKind === EXPECTED_GAME_IDENTITY.runtimeKind &&
+    identity.gameId === adoption.gameId &&
+    typeof identity.gameVersion === "string" &&
+    identity.gameVersion.length > 0 &&
+    identity.sdkVersion === adoption.sdkVersion &&
+    identity.protocolVersion === "1.0" &&
+    identity.runtimeKind === "web-dom" &&
     typeof identity.capabilities === "object" &&
     identity.capabilities !== null &&
     !Array.isArray(identity.capabilities)
   );
 }
 
-function isCompletionPayload(value: unknown, sessionId: string): value is SessionCompletionPayload {
+function isCompletionPayload(
+  value: unknown,
+  sessionId: string,
+  identity: GameIdentity
+): value is SessionCompletionPayload {
   if (typeof value !== "object" || value === null || Array.isArray(value)) return false;
   const payload = value as Record<string, unknown>;
   return (
     payload.sessionId === sessionId &&
-    payload.gameId === EXPECTED_GAME_IDENTITY.gameId &&
-    payload.gameVersion === EXPECTED_GAME_IDENTITY.gameVersion &&
+    payload.gameId === identity.gameId &&
+    payload.gameVersion === identity.gameVersion &&
     typeof payload.durationMs === "number" &&
     Number.isFinite(payload.durationMs) &&
     payload.durationMs >= 0 &&
@@ -130,6 +131,7 @@ export type NumberLineJumperGpsdkHostOptions = {
   origin?: string;
   onGameReady?: (identity: GameIdentity) => void;
   onGameRejected?: () => void;
+  onGameError?: (error: ProtocolErrorPayload) => void;
   onSessionComplete?: (payload: SessionCompletionPayload) => void;
 };
 
@@ -165,7 +167,8 @@ export function wireNumberLineJumperGpsdkHost(
     targetOrigin: origin,
     allowedOrigins: [origin]
   });
-  let gameAccepted = false;
+  let acceptedIdentity: GameIdentity | null = null;
+  let completionSeen = false;
   const handshakeTransport: HostTransport = {
     get channelId() {
       return transport.channelId;
@@ -195,16 +198,23 @@ export function wireNumberLineJumperGpsdkHost(
     handshakeTransport,
     NUMBER_LINE_JUMPER_HOST_CONFIG,
     (identity) => {
-      gameAccepted = true;
+      acceptedIdentity = identity;
       options.onGameReady?.(identity);
     }
   );
+  const unsubscribeError = transport.onMessage((envelope) => {
+    if (envelope.messageType === "ERROR_SIGNAL" && acceptedIdentity) {
+      options.onGameError?.(envelope.payload as ProtocolErrorPayload);
+    }
+  });
   const unsubscribeCompletion = transport.onMessage((envelope) => {
     if (
-      gameAccepted &&
+      acceptedIdentity &&
+      !completionSeen &&
       envelope.messageType === "COMPLETE_SESSION" &&
-      isCompletionPayload(envelope.payload, ids.sessionId)
+      isCompletionPayload(envelope.payload, ids.sessionId, acceptedIdentity)
     ) {
+      completionSeen = true;
       options.onSessionComplete?.(envelope.payload);
     }
   });
@@ -214,6 +224,7 @@ export function wireNumberLineJumperGpsdkHost(
     teardownHandshake,
     destroy: () => {
       teardownHandshake();
+      unsubscribeError();
       unsubscribeCompletion();
       transport.destroy();
     }
@@ -236,6 +247,7 @@ export function activateNumberLineJumperGpsdkFrame(
     origin: options.origin,
     onGameReady: options.onGameReady,
     onGameRejected: options.onGameRejected,
+    onGameError: options.onGameError,
     onSessionComplete: options.onSessionComplete
   });
   if (!wire) return null;

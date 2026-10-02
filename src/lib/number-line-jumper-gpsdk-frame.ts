@@ -21,9 +21,14 @@ export function initializeNumberLineJumperGpsdkFrame(
   options: NumberLineJumperGpsdkFrameOptions = {}
 ): NumberLineJumperGpsdkFrameActivation | null {
   const setTimeoutFn = options.setTimeoutFn ?? setTimeout;
-  wireStaticGameIframe(stage, { setTimeoutFn });
+  const gpsdkEnabled = stage?.getAttribute("data-gpsdk-enabled") === "true";
+  const timeoutMs = options.handshakeTimeoutMs ?? GPSDK_HANDSHAKE_TIMEOUT_MS;
+  wireStaticGameIframe(stage, {
+    setTimeoutFn,
+    timeoutMs: gpsdkEnabled ? timeoutMs + 5_000 : undefined
+  });
 
-  if (stage?.getAttribute("data-gpsdk-enabled") !== "true") return null;
+  if (!gpsdkEnabled) return null;
 
   if (!frame || !entryUrl) {
     if (statusElement) statusElement.textContent = "The game connection could not be started.";
@@ -33,9 +38,22 @@ export function initializeNumberLineJumperGpsdkFrame(
   let handshakeComplete = false;
   let handshakeRejected = false;
   let pageIsLeaving = false;
+  let fallbackStarted = false;
   if (statusElement) statusElement.textContent = "Connecting to the game platform.";
 
   let activation: NumberLineJumperGpsdkFrameActivation | null = null;
+  const fallbackToStandalone = (message: string) => {
+    if (fallbackStarted || handshakeComplete || pageIsLeaving) return;
+    fallbackStarted = true;
+    handshakeRejected = true;
+    if (handshakeTimeoutId !== undefined) clearTimeout(handshakeTimeoutId);
+    activation?.wire.destroy();
+    if (statusElement) statusElement.textContent = message;
+    frame.removeAttribute("hidden");
+    stage?.querySelector("[data-static-game-loading]")?.setAttribute("hidden", "true");
+    stage?.querySelector("[data-static-game-error]")?.setAttribute("hidden", "true");
+    frame.setAttribute("src", entryUrl);
+  };
   try {
     activation = activateNumberLineJumperGpsdkFrame(stage, frame, entryUrl, {
       randomUuid: options.randomUuid,
@@ -44,14 +62,18 @@ export function initializeNumberLineJumperGpsdkFrame(
       onGameReady: (identity) => {
         if (handshakeComplete) return;
         handshakeComplete = true;
+        if (handshakeTimeoutId !== undefined) clearTimeout(handshakeTimeoutId);
         if (statusElement) statusElement.textContent = "Game connection ready.";
         options.onGameReady?.(identity);
       },
       onGameRejected: () => {
-        handshakeRejected = true;
-        if (statusElement)
-          statusElement.textContent = "The game connection returned an unexpected game identity.";
+        fallbackToStandalone(
+          "The game connection returned an unexpected identity. Loading standalone play."
+        );
         options.onGameRejected?.();
+      },
+      onGameError: () => {
+        fallbackToStandalone("The platform connection failed. Loading standalone play.");
       },
       onSessionComplete: (payload) => {
         if (statusElement) statusElement.textContent = "The game session has ended.";
@@ -69,10 +91,9 @@ export function initializeNumberLineJumperGpsdkFrame(
     return null;
   }
 
-  const timeoutMs = options.handshakeTimeoutMs ?? GPSDK_HANDSHAKE_TIMEOUT_MS;
-  setTimeoutFn(() => {
-    if (!handshakeComplete && !handshakeRejected && !pageIsLeaving && statusElement) {
-      statusElement.textContent = "The game platform connection has not been established.";
+  const handshakeTimeoutId = setTimeoutFn(() => {
+    if (!handshakeComplete && !handshakeRejected && !pageIsLeaving) {
+      fallbackToStandalone("The platform connection timed out. Loading standalone play.");
     }
   }, timeoutMs);
 
