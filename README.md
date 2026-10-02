@@ -57,6 +57,10 @@ CI:
 npm run validate:routes
 ```
 
+Every catalog entry owns both `/<slug>/` and `/<slug>/play/`. Unavailable games keep their own play
+URL and render the shared fallback from catalog-owned `unavailableCopy`; the validator requires
+the generated pages and no longer uses an intentional-route allowlist.
+
 The check derives the site's routes from `src/pages` and `public/_routes.json`, then verifies every
 registry route, play route, unavailable-game target, and known static link (header, launcher,
 back links) resolves. It also fails on duplicate or conflicting catalog routes. Broken routes are

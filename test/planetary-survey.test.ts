@@ -302,6 +302,7 @@ describe("route validation covers the preview-gated route", () => {
   // route itself is missing, and validateRoutes stops before the play-route checks.
   const launcherPage = join(process.cwd(), "src", "pages", PLANETARY_SURVEY_SLUG, "index.astro");
   const playPage = join(process.cwd(), "src", "pages", PLANETARY_SURVEY_SLUG, "play.astro");
+  const homePage = join(process.cwd(), "src", "pages", "index.astro");
 
   it("flags previewEnabled when the play page is missing", async () => {
     const { validateRoutes } = await import("../src/lib/routes");
@@ -317,18 +318,16 @@ describe("route validation covers the preview-gated route", () => {
     );
   });
 
-  it("still flags a coming-soon game that exposes a play page without opting in", async () => {
+  it("accepts a coming-soon game that exposes its shared fallback play page", async () => {
     const { validateRoutes } = await import("../src/lib/routes");
     const entry: GameEntry = { ...planetarySurvey(), previewEnabled: false };
     const result = validateRoutes({
       projectRoot: process.cwd(),
       catalog: [entry],
-      pageFiles: [launcherPage, playPage]
+      pageFiles: [homePage, launcherPage, playPage]
     });
 
-    expect(result.violations.map((violation) => violation.id)).toContain(
-      "unavailable-game-play-route"
-    );
+    expect(result.violations).toEqual([]);
   });
 
   it("accepts the preview-gated play route in the real repository tree", async () => {

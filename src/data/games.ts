@@ -175,6 +175,10 @@ export interface GameEntry {
   status: GameStatus;
   eyebrow: string;
   description: string;
+  unavailableCopy: {
+    readonly heading: string;
+    readonly description: string;
+  };
   cardImage: string;
   route: string;
   controls: readonly GameControl[];
@@ -206,6 +210,10 @@ export const games: readonly GameEntry[] = [
     eyebrow: "A quiet world in progress",
     description:
       "Tend a tiny landscape, follow its gentle signals, and discover what changes when you pay attention.",
+    unavailableCopy: {
+      heading: "The garden is still growing.",
+      description: "There isn’t a playable build here yet. Come back after the next release."
+    },
     cardImage: "/art/signal-garden-card.svg",
     route: "/signal-garden/",
     controls: [
@@ -228,6 +236,11 @@ export const games: readonly GameEntry[] = [
     status: "playable",
     eyebrow: "A thoughtful construction game",
     description: "Choose planks, close each gap exactly, and send the car safely across.",
+    unavailableCopy: {
+      heading: "The bridge is unavailable right now.",
+      description:
+        "There isn’t a playable build here right now. Return to the game page and try again later."
+    },
     cardImage: "/art/bridge-builder-card.svg",
     route: "/bridge-builder/",
     controls: [
@@ -245,6 +258,11 @@ export const games: readonly GameEntry[] = [
     description: numberLineJumperPreviewVersion
       ? "Estimate, place, and explore values on a responsive number line across whole numbers, fractions, decimals, and negatives. This candidate build is being tested before it joins the playable collection."
       : "Estimate, place, and explore values on a responsive number line across whole numbers, fractions, decimals, and negatives.",
+    unavailableCopy: {
+      heading: "Number Line Jumper is not published yet.",
+      description:
+        "The arcade route is ready, but no validated production release has been promoted."
+    },
     cardImage: "/art/coming-soon.svg",
     route: "/number-line-jumper/",
     controls: [
@@ -259,6 +277,11 @@ export const games: readonly GameEntry[] = [
     status: "playable",
     eyebrow: "A case file for curious minds",
     description: "Follow the clues, solve the math, and crack the case.",
+    unavailableCopy: {
+      heading: "The case file is still being prepared.",
+      description:
+        "There isn’t a playable build here yet. Return to the game page and try again later."
+    },
     cardImage: "/art/math-detective-card.svg",
     route: "/math-detective/",
     controls: [
@@ -276,6 +299,11 @@ export const games: readonly GameEntry[] = [
     description: fractionMatchPreviewVersion
       ? "Turn two cards that show the same amount, even when the pictures look different. This candidate build is being tested before it joins the collection."
       : "Turn two cards that show the same amount, even when the pictures look different.",
+    unavailableCopy: {
+      heading: "The cards are still being dealt.",
+      description:
+        "There isn’t a qualified Fraction Match build here yet. Production stays intentionally unavailable until the candidate passes its accessibility, comparator, device, and playtest gates."
+    },
     cardImage: "/art/fraction-match-card.svg",
     route: "/fraction-match/",
     controls: [
@@ -293,6 +321,11 @@ export const games: readonly GameEntry[] = [
     description: weatherCommandPreviewVersion
       ? "Inspect atmospheric evidence, make a forecast, and compare your prediction with a simulated weather system in this qualification preview."
       : "Inspect atmospheric evidence, make a forecast, and compare your prediction with a simulated weather system.",
+    unavailableCopy: {
+      heading: "The forecast desk is still being prepared.",
+      description:
+        "There isn’t a qualified Weather Command build here yet. Production stays intentionally unavailable until the immutable game candidate passes its science, accessibility, comparator, device, and playtest gates."
+    },
     cardImage: "/art/coming-soon.svg",
     route: "/weather-command/",
     controls: [
@@ -315,6 +348,11 @@ export const games: readonly GameEntry[] = [
     description: ecosystemRescuePreviewVersion
       ? "Follow fertiliser from the fields into a pond: watch the algae bloom, the water cloud over, and the animals that need the most oxygen feel it first, then decide what to do about it. This candidate build is being tested before it joins the collection."
       : "Follow fertiliser from the fields into a pond: watch the algae bloom, the water cloud over, and the animals that need the most oxygen feel it first, then decide what to do about it.",
+    unavailableCopy: {
+      heading: "The pond is still being prepared.",
+      description:
+        "There isn’t a qualified Ecosystem Rescue build here yet. Production stays intentionally unavailable until the candidate passes its science, accessibility, comparator, device, and playtest gates."
+    },
     cardImage: "/art/ecosystem-rescue-card.svg",
     route: "/ecosystem-rescue/",
     controls: [
@@ -331,6 +369,11 @@ export const games: readonly GameEntry[] = [
     description: planetarySurveyPreviewVersion
       ? "Run a planetary survey: measure worlds, keep the evidence, compare them, and make a claim the data can back up. This qualification candidate is being tested before it joins the collection."
       : "Run a planetary survey: measure worlds, keep the evidence, compare them, and make a claim the data can back up.",
+    unavailableCopy: {
+      heading: "The survey probe is still being prepared.",
+      description:
+        "There isn’t a qualified Planetary Survey build here yet. Production stays intentionally unavailable until the immutable candidate passes its science, accessibility, comparator, device, rollback, and playtest gates. A hosted preview never promotes the game."
+    },
     cardImage: "/art/coming-soon.svg",
     route: "/planetary-survey/",
     controls: [
@@ -353,6 +396,11 @@ export const games: readonly GameEntry[] = [
     description: motionLabPreviewVersion
       ? "Run controlled experiments with a cart and a track: change one thing, measure what happens, compare trials, and back your claim with evidence. This candidate build is being tested before it joins the collection."
       : "Run controlled experiments with a cart and a track: change one thing, measure what happens, compare trials, and back your claim with evidence.",
+    unavailableCopy: {
+      heading: "The experiment bench could not be loaded.",
+      description:
+        "This build selects no Motion Lab release, so there is nothing to frame here. The catalog entry is playable, which makes this a deployment fault rather than a deliberate state — the promoted release should always resolve."
+    },
     cardImage: "/art/coming-soon.svg",
     route: "/motion-lab/",
     controls: [
@@ -368,6 +416,11 @@ export const games: readonly GameEntry[] = [
     status: "coming-soon",
     eyebrow: "Next in the collection",
     description: "Another small place is taking shape. Its first light will arrive soon.",
+    unavailableCopy: {
+      heading: "This world is taking shape.",
+      description:
+        "We’re preparing this game for the collection. Check back later for its first playable release."
+    },
     cardImage: "/art/coming-soon.svg",
     route: "/new-world-01/",
     controls: []
@@ -378,6 +431,10 @@ export const games: readonly GameEntry[] = [
     status: "coming-soon",
     eyebrow: "More to explore",
     description: "A new experiment is waiting just beyond the edge of the map.",
+    unavailableCopy: {
+      heading: "The next experiment is still curious.",
+      description: "We’re getting this game ready to play. Check back soon to explore it."
+    },
     cardImage: "/art/coming-soon.svg",
     route: "/new-world-02/",
     controls: []

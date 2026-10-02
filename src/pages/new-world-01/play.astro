@@ -1,0 +1,18 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import GameUnavailable from "../../components/GameUnavailable.astro";
+import PlayToolbar from "../../components/PlayToolbar.astro";
+import SiteHeader from "../../components/SiteHeader.astro";
+import { getGame } from "../../data/games";
+
+const game = getGame("new-world-01");
+if (!game) throw new Error("New World 01 is missing from the catalog");
+---
+
+<BaseLayout title={`Play ${game.title}`} description={`Play ${game.title} at Setness Games.`}>
+  <SiteHeader compact />
+  <main class="play-page page-shell">
+    <PlayToolbar game={game} canFullscreen={false} />
+    <GameUnavailable game={game} />
+  </main>
+</BaseLayout>

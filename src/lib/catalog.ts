@@ -107,6 +107,12 @@ export function validateCatalog(entries: readonly GameEntry[]): string[] {
     if (!game.description || game.description.trim().length === 0) {
       errors.push(`${game.slug}: missing or empty description`);
     }
+    if (!game.unavailableCopy?.heading?.trim()) {
+      errors.push(`${game.slug}: missing or empty unavailableCopy.heading`);
+    }
+    if (!game.unavailableCopy?.description?.trim()) {
+      errors.push(`${game.slug}: missing or empty unavailableCopy.description`);
+    }
     if (!game.cardImage || game.cardImage.trim().length === 0) {
       errors.push(`${game.slug}: missing or empty cardImage`);
     } else {

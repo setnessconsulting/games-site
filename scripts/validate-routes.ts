@@ -1,7 +1,7 @@
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { formatViolation, intentionalRoutes, validateRoutes } from "../src/lib/routes";
+import { formatViolation, validateRoutes } from "../src/lib/routes";
 
 // Resolve the package root from this file so the script behaves the same no
 // matter which working directory it is invoked from.
@@ -22,5 +22,5 @@ if (result.violations.length > 0) {
 }
 
 console.log(
-  `Routes valid: ${result.routeCount} site route(s), ${result.functionRoutes.length} Pages Function route prefix(es), ${intentionalRoutes.length} intentional non-page route(s)`
+  `Routes valid: ${result.routeCount} site route(s), ${result.functionRoutes.length} Pages Function route prefix(es)`
 );

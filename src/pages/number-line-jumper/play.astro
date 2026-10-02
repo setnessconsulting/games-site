@@ -28,11 +28,7 @@ const playSource = getStaticWebPlaySource(game);
         gamePageUrl={game.route}
       />
     ) : (
-      <GameUnavailable
-        game={game}
-        heading="Number Line Jumper is not published yet."
-        description="The arcade route is ready, but no validated production release has been promoted."
-      />
+      <GameUnavailable game={game} />
     )}
   </main>
 </BaseLayout>

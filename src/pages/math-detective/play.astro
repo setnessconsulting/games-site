@@ -24,11 +24,7 @@ const entryUrl = playSource ? `${playSource.assetBase}/${playSource.release.entr
     {entryUrl ? (
       <StaticGameFrame title={game.title} entryUrl={entryUrl} gamePageUrl={game.route} />
     ) : (
-      <GameUnavailable
-        game={game}
-        heading="The case file is still being prepared."
-        description="There isn’t a playable build here yet. Return to the game page and try again later."
-      />
+      <GameUnavailable game={game} />
     )}
   </main>
 </BaseLayout>

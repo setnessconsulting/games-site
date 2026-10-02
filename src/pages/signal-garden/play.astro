@@ -32,11 +32,7 @@ const playSource = getUnityWebglPlaySource(game);
         returnRoute={game.route}
       />
     ) : (
-      <GameUnavailable
-        game={game}
-        heading="The garden is still growing."
-        description="There isn’t a playable build here yet. Come back after the next release."
-      />
+      <GameUnavailable game={game} />
     )}
   </main>
 </BaseLayout>

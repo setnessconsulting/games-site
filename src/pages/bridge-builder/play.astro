@@ -29,11 +29,7 @@ const entryUrl = playSource ? `${playSource.assetBase}/${playSource.release.entr
         gpsdkEnabled
       />
     ) : (
-      <GameUnavailable
-        game={game}
-        heading="The bridge is unavailable right now."
-        description="There isn’t a playable build here right now. Return to the game page and try again later."
-      />
+      <GameUnavailable game={game} />
     )}
   </main>
 </BaseLayout>

@@ -28,6 +28,8 @@ describe("play page structure", () => {
   it("discovers every play.astro route from the filesystem", () => {
     expect(PLAY_PAGE_SLUGS.length).toBeGreaterThan(0);
     expect(PLAY_PAGE_SLUGS).toContain("fraction-match");
+    expect(PLAY_PAGE_SLUGS).toContain("new-world-01");
+    expect(PLAY_PAGE_SLUGS).toContain("new-world-02");
   });
 
   it("renders the unavailable state through the shared GameUnavailable component", () => {
@@ -57,6 +59,12 @@ describe("play page structure", () => {
         source.includes(`<${frame}`)
       );
       const stageProps = source.match(/fullscreenStage="[^"]+"/g) ?? [];
+
+      if (source.includes("canFullscreen={false}")) {
+        expect(frames, `${slug} should not render a game frame`).toHaveLength(0);
+        expect(stageProps, `${slug} should not configure a fullscreen stage`).toHaveLength(0);
+        continue;
+      }
 
       expect(frames, `${slug} should render exactly one game frame`).toHaveLength(1);
       expect(stageProps, `${slug} should pass one fullscreenStage`).toHaveLength(1);

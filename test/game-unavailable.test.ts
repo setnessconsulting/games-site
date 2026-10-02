@@ -12,23 +12,17 @@ const PLAY_ROUTE_SLUGS = [
 ] as const;
 
 describe("GameUnavailable", () => {
-  it("renders the shared fallback panel with the game heading and copy", async () => {
+  it("renders the shared fallback panel with catalog-owned heading and copy", async () => {
     const game = getGame("signal-garden")!;
     const container = await AstroContainer.create();
     const html = await container.renderToString(GameUnavailable, {
-      props: {
-        game,
-        heading: "The garden is still growing.",
-        description: "There isn’t a playable build here yet. Come back after the next release."
-      }
+      props: { game }
     });
 
     expect(html).toContain('class="not-ready-panel"');
     expect(html).toContain('<p class="eyebrow">Coming soon</p>');
-    expect(html).toContain("<h1>The garden is still growing.</h1>");
-    expect(html).toContain(
-      "<p>There isn’t a playable build here yet. Come back after the next release.</p>"
-    );
+    expect(html).toContain(`<h1>${game.unavailableCopy.heading}</h1>`);
+    expect(html).toContain(`<p>${game.unavailableCopy.description}</p>`);
     expect(html).not.toContain("<iframe");
   });
 
@@ -38,7 +32,7 @@ describe("GameUnavailable", () => {
     for (const slug of PLAY_ROUTE_SLUGS) {
       const game = getGame(slug)!;
       const html = await container.renderToString(GameUnavailable, {
-        props: { game, heading: `${game.title} heading`, description: `${game.title} copy` }
+        props: { game }
       });
 
       expect(html).toContain(`<a class="button button-primary" href="${game.route}">`);
