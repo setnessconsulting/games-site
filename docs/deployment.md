@@ -46,14 +46,15 @@ Plain `astro preview` does not execute Pages Functions, so `/game-assets/...` wi
 (including Signal Garden’s Unity loader). After `npm run build`, use `npm run preview:pages` to
 run `wrangler pages dev dist` with the `GAME_ASSETS` binding from this file’s `wrangler.jsonc`.
 
-Bridge Builder is promoted. The production catalog selects `0.1.0-qualification.14` (source commit
-`9b4fdb0f0826ab893c9b70b0a50ce1b9521cdb89`, SDK pin `sdk-v0.1.1` at
+Bridge Builder is promoted. The production catalog selects `0.1.0-qualification.15` (source commit
+`266491f470ea0b7e607154f50a0f2294606b3d79`, SDK pin `sdk-v0.1.1` at
 `8933746ebefe128a23b08f3fc9fd6796f4d906bd`) through `BRIDGE_BUILDER_PRODUCTION_VERSION` in
 `src/data/games.ts`. That bundle carries the guest Game Platform SDK transport, so
-`/bridge-builder/play/` completes the host handshake in production, and it holds the
-GAME-297 reduced-motion success payoff fix: with reduce-motion enabled the exact-fit
-celebration is now held for a readable interval instead of painting for a single frame.
-The previous known-good pointer, `0.1.0-qualification.13`, remains published in R2 as the
+`/bridge-builder/play/` completes the host handshake in production. It carries the GAME-297
+reduced-motion success payoff fix from `.14`, plus the GAME-297/GAME-361 follow-up that gives
+the setup Relaxed toggle the same 48px touch target as every other setup control; the setup
+card tightens its spacing on short viewports so that change costs no scroll at 390x700. The
+previous known-good pointer, `0.1.0-qualification.14`, remains published in R2 as the
 rollback target. Note that `/game-assets/...` only serves the version the catalog approves,
 so that target returns 404 until the committed pointer is reverted — see
 `docs/bridge-builder-rollback.md`.

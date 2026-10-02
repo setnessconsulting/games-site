@@ -4,9 +4,10 @@ Recorded 2026-09-27 (owner-approved) for the Bridge Builder production release.
 
 ## Current pointer
 
-Production now selects immutable R2 `bridge-builder/0.1.0-qualification.14/`
-(manifest commit `9b4fdb0f0826ab893c9b70b0a50ce1b9521cdb89`), promoted
-2026-10-01 for the GAME-297 reduced-motion success-payoff fix.
+Production now selects immutable R2 `bridge-builder/0.1.0-qualification.15/`
+(manifest commit `266491f470ea0b7e607154f50a0f2294606b3d79`), promoted
+2026-10-02 for the GAME-297 setup touch-target follow-up found during the
+GAME-361 discoverability validation.
 
 ### How a rollback actually works
 

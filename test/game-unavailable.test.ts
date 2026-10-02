@@ -46,8 +46,8 @@ describe("play source resolution", () => {
     const game = getGame("bridge-builder")!;
 
     expect(getStaticWebPlaySource(game)).toEqual({
-      assetBase: "/game-assets/bridge-builder/0.1.0-qualification.14",
-      release: { kind: "static-web", version: "0.1.0-qualification.14", entryFile: "index.html" }
+      assetBase: "/game-assets/bridge-builder/0.1.0-qualification.15",
+      release: { kind: "static-web", version: "0.1.0-qualification.15", entryFile: "index.html" }
     });
   });
 
