@@ -66,6 +66,15 @@ reported with their source, for example:
 weather-comand: configured route "/weather-comand/" has no matching site route
 ```
 
+`npm run validate:assets` checks literal local `href`/`src` references in source templates and
+`url(...)` references in source stylesheets against `public/`. Catalog card images remain covered
+by `validate:catalog`; release files served from R2 are intentionally outside this repository check.
+
+`npm run validate:built-links` scans generated HTML after the Astro build. It checks internal
+`href` and `src` references against the same route model and files in `dist/`; Pages Function paths
+from `public/_routes.json` are accepted without requiring a local file. The command fails when
+`dist/` is missing, so run `npm run build` first. Both checks are included in `npm run verify`.
+
 The site is designed to run at the root of `games.setnessconsulting.com`:
 
 - `/` — arcade collection
