@@ -24,11 +24,7 @@ const entryUrl = playSource ? `${playSource.assetBase}/${playSource.release.entr
     {entryUrl ? (
       <StaticGameFrame title={game.title} entryUrl={entryUrl} gamePageUrl={game.route} />
     ) : (
-      <GameUnavailable
-        game={game}
-        heading="The pond is still being prepared."
-        description="There isn’t a qualified Ecosystem Rescue build here yet. Production stays intentionally unavailable until the candidate passes its science, accessibility, comparator, device, and playtest gates."
-      />
+      <GameUnavailable game={game} />
     )}
   </main>
 </BaseLayout>

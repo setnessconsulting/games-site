@@ -11,6 +11,7 @@ function baseEntry(overrides: Partial<GameEntry> = {}): GameEntry {
     status: "playable",
     eyebrow: "",
     description: "Valid description",
+    unavailableCopy: { heading: "Coming soon", description: "Unavailable for now." },
     cardImage: "/art/signal-garden-card.svg",
     route: "/valid-slug/",
     controls: [],
@@ -42,6 +43,13 @@ describe("catalog validation regression fixtures", () => {
     const a = baseEntry({ title: "" });
     const errors = validateCatalog([a]);
     expect(errors).toContain(`${a.slug}: missing or empty title`);
+  });
+
+  it("detects missing unavailable-state copy", () => {
+    const a = baseEntry({ unavailableCopy: { heading: "", description: "   " } });
+    const errors = validateCatalog([a]);
+    expect(errors).toContain(`${a.slug}: missing or empty unavailableCopy.heading`);
+    expect(errors).toContain(`${a.slug}: missing or empty unavailableCopy.description`);
   });
 
   it("detects missing card asset", () => {

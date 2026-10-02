@@ -7,7 +7,7 @@ import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import type { GameEntry } from "../src/data/games";
-import { intentionalRoutes, validateRoutes } from "../src/lib/routes";
+import { validateRoutes } from "../src/lib/routes";
 
 function baseEntry(overrides: Partial<GameEntry> = {}): GameEntry {
   return {
@@ -16,6 +16,7 @@ function baseEntry(overrides: Partial<GameEntry> = {}): GameEntry {
     status: "playable",
     eyebrow: "",
     description: "Valid description",
+    unavailableCopy: { heading: "Coming soon", description: "Unavailable for now." },
     cardImage: "/art/signal-garden-card.svg",
     route: "/alpha/",
     controls: [],
@@ -79,6 +80,27 @@ describe("route integrity validation", () => {
         message: 'configured route "/weather-comand/" has no matching site route'
       }
     ]);
+  });
+
+  it("requires catalog routes to be generated pages, not Pages Function targets", () => {
+    projectRoot = createPageTree(["index.astro"]);
+    mkdirSync(join(projectRoot, "public"), { recursive: true });
+    writeFileSync(
+      join(projectRoot, "public", "_routes.json"),
+      JSON.stringify({ version: 1, include: ["/game-assets/*"], exclude: [] })
+    );
+
+    const result = validateRoutes({
+      projectRoot,
+      catalog: [baseEntry({ route: "/game-assets/alpha/1.0.0/" })]
+    });
+
+    expect(result.violations).toContainEqual({
+      id: "missing-route",
+      source: "alpha",
+      href: "/game-assets/alpha/1.0.0/",
+      message: 'configured route "/game-assets/alpha/1.0.0/" has no matching site route'
+    });
   });
 
   it("detects a playable game whose play destination has no site route", () => {
@@ -156,7 +178,7 @@ describe("route integrity validation", () => {
     });
   });
 
-  it("flags a coming-soon game that still exposes its own playable page", () => {
+  it("accepts a coming-soon game that exposes its own shared fallback page", () => {
     projectRoot = createPageTree([
       "index.astro",
       "beta/index.astro",
@@ -178,17 +200,16 @@ describe("route integrity validation", () => {
       ]
     });
 
-    expect(result.violations).toContainEqual({
-      id: "unavailable-game-play-route",
-      source: "beta",
-      href: "/beta/play/",
-      message:
-        'coming-soon game exposes a playable page at "/beta/play/"; remove the page or point the entry at the shared placeholder route'
-    });
+    expect(result.violations).toEqual([]);
   });
 
-  it("accepts a coming-soon game with no pages as an intentional non-page route", () => {
-    projectRoot = createPageTree(["index.astro", "alpha/index.astro", "alpha/play.astro"]);
+  it("requires a coming-soon game to keep its own play page", () => {
+    projectRoot = createPageTree([
+      "index.astro",
+      "alpha/index.astro",
+      "alpha/play.astro",
+      "new-world-01/index.astro"
+    ]);
 
     const result = validateRoutes({
       projectRoot,
@@ -203,8 +224,13 @@ describe("route integrity validation", () => {
       ]
     });
 
-    expect(result.violations).toEqual([]);
-    expect(intentionalRoutes.map((entry) => entry.route)).toContain("/new-world-01/");
+    expect(result.violations).toContainEqual({
+      id: "missing-unavailable-play-route",
+      source: "new-world-01",
+      href: "/new-world-01/play/",
+      message:
+        'coming-soon game must have its own play page at "/new-world-01/play/" for the shared unavailable state'
+    });
   });
 
   it("validates static navigation links against the discovered routes", () => {

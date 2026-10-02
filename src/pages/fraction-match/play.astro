@@ -24,11 +24,7 @@ const entryUrl = playSource ? `${playSource.assetBase}/${playSource.release.entr
     {entryUrl ? (
       <StaticGameFrame title={game.title} entryUrl={entryUrl} gamePageUrl={game.route} />
     ) : (
-      <GameUnavailable
-        game={game}
-        heading="The cards are still being dealt."
-        description="There isn’t a qualified Fraction Match build here yet. Production stays intentionally unavailable until the candidate passes its accessibility, comparator, device, and playtest gates."
-      />
+      <GameUnavailable game={game} />
     )}
   </main>
 </BaseLayout>

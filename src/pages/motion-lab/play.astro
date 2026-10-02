@@ -28,11 +28,7 @@ const entryUrl = playSource ? `${playSource.assetBase}/${playSource.release.entr
     {entryUrl ? (
       <StaticGameFrame title={game.title} entryUrl={entryUrl} gamePageUrl={game.route} />
     ) : (
-      <GameUnavailable
-        game={game}
-        heading="The experiment bench could not be loaded."
-        description="This build selects no Motion Lab release, so there is nothing to frame here. The catalog entry is playable, which makes this a deployment fault rather than a deliberate state — the promoted release should always resolve."
-      />
+      <GameUnavailable game={game} />
     )}
   </main>
 </BaseLayout>

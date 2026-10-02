@@ -6,7 +6,7 @@ interface Props {
   /** Only show the fullscreen control when a promoted build is available. */
   canFullscreen: boolean;
   /** Selector for the element that should enter fullscreen. */
-  fullscreenStage: string;
+  fullscreenStage?: string;
 }
 
 const { game, canFullscreen, fullscreenStage } = Astro.props;

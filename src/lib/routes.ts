@@ -23,8 +23,8 @@ import { getGamePlayRoute, games, type GameEntry } from "../data/games";
  * Anchor fragments (#collection) are page-relative and are not resolved against
  * page content; their path portion is still validated.
  *
- * Intentional targets that live outside src/pages are declared in
- * INTENTIONAL_ROUTES with a reason instead of being special-cased inline.
+ * Every catalog route maps to a generated page. Unavailable games retain their own
+ * play URL and render the shared GameUnavailable component with catalog copy.
  */
 
 const ANCHOR_PATTERN = /^#[A-Za-z0-9_-]+$/;
@@ -38,32 +38,13 @@ function isInternalTarget(href: string): boolean {
   );
 }
 
-/**
- * Intentional internal targets that are not src/pages files. Keep reasons here:
- * each entry documents why a route is valid even though no page generates it.
- * When a coming-soon game gets its launcher page, remove its entry below.
- */
-const INTENTIONAL_ROUTES: readonly { route: string; reason: string }[] = [
-  {
-    route: "/new-world-01/",
-    reason: "coming-soon teaser; launcher page intentionally not published yet"
-  },
-  {
-    route: "/new-world-02/",
-    reason: "coming-soon teaser; launcher page intentionally not published yet"
-  }
-];
-
-/** Intentional non-page routes accepted by validation, exposed for tooling output. */
-export const intentionalRoutes: readonly { route: string; reason: string }[] = INTENTIONAL_ROUTES;
-
 export type ViolationId =
   | "malformed-route"
   | "duplicate-route"
   | "conflicting-route"
   | "missing-route"
   | "missing-play-route"
-  | "unavailable-game-play-route"
+  | "missing-unavailable-play-route"
   | "missing-preview-play-route";
 
 export interface Violation {
@@ -99,7 +80,7 @@ export interface RoutesOptions {
 }
 
 export interface RouteResolver {
-  /** Whether a URL path is a known page, intentional target, or function route. */
+  /** Whether a URL path is a known page or function route. */
   readonly routeExists: (href: string) => boolean;
   /** Whether a URL path is a page generated from src/pages. */
   readonly siteRouteExists: (href: string) => boolean;
@@ -209,11 +190,8 @@ export function createRouteResolver(
 
   const notes: string[] = [];
   const functionPrefixes = readFunctionRoutePrefixes(projectRoot, notes);
-  const intentional = new Set(INTENTIONAL_ROUTES.map((entry) => entry.route));
-
   return {
-    routeExists: (href) =>
-      routes.has(href) || intentional.has(href) || isServedByFunction(href, functionPrefixes),
+    routeExists: (href) => routes.has(href) || isServedByFunction(href, functionPrefixes),
     siteRouteExists: (href) => routes.has(href),
     routeCount: routes.size,
     functionRoutes: functionPrefixes.include,
@@ -301,7 +279,7 @@ export function validateRoutes(options: RoutesOptions = {}): RouteValidationResu
       });
     }
 
-    if (!routeExists(game.route)) {
+    if (!routeModel.siteRouteExists(game.route)) {
       violations.push({
         id: "missing-route",
         source: game.slug,
@@ -318,13 +296,13 @@ export function validateRoutes(options: RoutesOptions = {}): RouteValidationResu
   for (const game of catalog) {
     if (typeof game.route !== "string" || !INTERNAL_ROUTE_PATTERN.test(game.route)) continue;
     // A missing base route is already reported; the derived play route adds noise.
-    if (!routeExists(game.route)) continue;
+    if (!routeModel.siteRouteExists(game.route)) continue;
 
     const playRoute = getGamePlayRoute(game);
     const playable = game.status === "playable";
-    const exists = routeExists(playRoute);
+    const pageExists = routeModel.siteRouteExists(playRoute);
 
-    if (playable && !exists) {
+    if (playable && !pageExists) {
       violations.push({
         id: "missing-play-route",
         source: game.slug,
@@ -333,34 +311,15 @@ export function validateRoutes(options: RoutesOptions = {}): RouteValidationResu
       });
     }
 
-    // A coming-soon game must not keep a private playable page that would render
-    // a dead game frame. Sharing a placeholder route instead is fine: point the
-    // entry's route at the placeholder (declared in INTENTIONAL_ROUTES) or let
-    // the play page render the shared unavailable panel.
-    //
-    // A preview-gated entry is the sanctioned exception, and it is opt-in rather
-    // than inferred: `previewEnabled` is a reviewable source statement. It is safe
-    // because the promoted-release helper is status-gated, so a coming-soon entry
-    // cannot resolve a production pointer no matter what the page renders, and the
-    // candidate only appears when a deployment supplies a preview pointer. The page
-    // test asserts the production build renders the shared unavailable panel.
-    if (!playable && exists && !game.previewEnabled) {
+    // Every game keeps its own play URL. When it is unavailable, that page renders
+    // the shared GameUnavailable component; when a preview pointer is configured,
+    // the same page may host only that exact candidate outside production.
+    if (!playable && !pageExists) {
       violations.push({
-        id: "unavailable-game-play-route",
+        id: game.previewEnabled ? "missing-preview-play-route" : "missing-unavailable-play-route",
         source: game.slug,
         href: playRoute,
-        message: `coming-soon game exposes a playable page at "${playRoute}"; remove the page or point the entry at the shared placeholder route`
-      });
-    }
-
-    // The reverse drift: `previewEnabled` claims a preview-gated play page exists,
-    // so a missing one means reviewable intent no longer matches the tree.
-    if (game.previewEnabled && !exists) {
-      violations.push({
-        id: "missing-preview-play-route",
-        source: game.slug,
-        href: playRoute,
-        message: `coming-soon game declares previewEnabled but "${playRoute}" has no matching site route`
+        message: `coming-soon game must have its own play page at "${playRoute}" for the shared unavailable state`
       });
     }
   }

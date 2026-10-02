@@ -28,11 +28,7 @@ const entryUrl = playSource ? `${playSource.assetBase}/${playSource.release.entr
     {entryUrl ? (
       <StaticGameFrame title={game.title} entryUrl={entryUrl} gamePageUrl={game.route} />
     ) : (
-      <GameUnavailable
-        game={game}
-        heading="The survey probe is still being prepared."
-        description="There isn’t a qualified Planetary Survey build here yet. Production stays intentionally unavailable until the immutable candidate passes its science, accessibility, comparator, device, rollback, and playtest gates. A hosted preview never promotes the game."
-      />
+      <GameUnavailable game={game} />
     )}
   </main>
 </BaseLayout>
