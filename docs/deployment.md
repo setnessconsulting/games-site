@@ -16,6 +16,25 @@ Configure:
 
 Cloudflare Git integration creates previews for branches and deploys `main` to production.
 
+**⚠ Open deploy gap as of 2026-10-02.** This repository has **no GitHub Actions deploy workflow and
+no repository webhook** — `ci.yml` only runs "Site checks". Production deploys therefore depend
+entirely on the Cloudflare Pages Git integration, which is dashboard-configured.
+
+Candidate `0.1.0-qualification.15` was promoted here by PR #48 (merge `602c63a`, `verify` green),
+but **that merge has not reached production**: the live play route still serves `.14` and
+`/game-assets/bridge-builder/0.1.0-qualification.15/index.html` returns 404. The last recorded
+successful Pages deployment is 2026-09-26 (deployment `6684161309`, sha `3f1b59f`), so the Git
+integration may have detached from the repository.
+
+To finish the promotion, open Workers & Pages → the games-site project in the Cloudflare dashboard,
+confirm the Git integration is still connected to `setnessconsulting/games-site` on `main`, and
+re-trigger the build for `602c63a`. Verify afterwards that
+`/game-assets/bridge-builder/0.1.0-qualification.15/index.html` returns `200` and the play route
+reports `qualification.15`.
+
+Because production depends on a dashboard-configured integration, a merged `main` is **not** by
+itself proof of a live deploy. Always read the live route back before reporting a promotion.
+
 `wrangler.jsonc` declares `SKIP_DEPENDENCY_INSTALL=1` for both Production and Preview so the custom
 build command runs before Cloudflare's automatic installer. The Pages project must also have
 `GAME_PLATFORM_SDK_DEPLOY_KEY` as an encrypted build secret in both environments. The build script
